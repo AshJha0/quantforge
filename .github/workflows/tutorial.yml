@@ -53,6 +53,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "25.0.5"
+          cache: maven
       - run: python3 tools/check_tutorial.py --lang java
       # K-7 clean machine (KR-222): every example case and the example scripts no page runs, on the CLI page 1 built
       - run: python3 tools/check_examples.py --lang java

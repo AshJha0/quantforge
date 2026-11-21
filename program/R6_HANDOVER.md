@@ -358,3 +358,35 @@ TOTALS: 15999 value 7894 error 5591 invariance 2514
 Stage K round 1 (2026-11-19 to 2026-11-20, k-r1 merged as PR #58, then k-r2): waves 1b and 2 Python, K-8, paper and curve daily jobs, margin replacement (`sbim_g`, `sbim_alias_k`), audit A/B/C and follow-up audit responses, E1 NaN goldens, traffic-light large-n and boundary goldens, stage G E1 regenerated (+79). Read from `tools/case_figures.py` at k-r2 2026-11-20.
 
 TOTALS: 16545 value 8084 error 5901 invariance 2560
+
+Stage K `k-v1` parts (pull requests #60 to #64, main `11ba1b40`, counted 2026-11-21 by `tools/check_case_total.py`, measured): `wwr_g` grows from 6 to 26 cases (+15 value, +5 error; WWR CVA root fix, KR-257), `e1g_xva` is regenerated from 343 to 324 cases (-1 value, -12 error, -6 invariance), `lex_k` grows from 9 to 10 value cases: +2 cases in all. The line above was read at `k-r2` and was not updated when these merged; the count, not the line, is the truth (it equals the generated `docs/case-figures.md`). `check_case_total.py` is not run by any workflow (`grep -r check_case_total .github/workflows`: none, read 2026-11-21), so CI did not catch the drift.
+
+TOTALS: 16547 value 8099 error 5894 invariance 2554
+
+Stage K fuzz fixes (branch `k-v1-fuzz2`, merged into `k-v1` 2026-11-21, counted 2026-11-21 by `tools/check_case_total.py`, measured): new golden set `fuzzfix_k` adds 16 error cases (fuzz run 44815591552 findings and the same fault class in sibling handlers).
+
+TOTALS: 16563 value 8099 error 5910 invariance 2554
+
+Stage K v1 integration plus branch `k-v1-rev1` (2026-11-21, merge of local `k-v1` 47072365 into `k-v1-rev1`, counted by `tools/check_case_total.py`, measured): `fuzzfix_k` (lane `k-v1-fuzz2`, 16 error), `sabrz_c` (32 value, KR-340), `ivdeep_c` (11 value, 1 error, KR-341), `fuzzrev_k` (2 error, K-9 finding 1)
+
+TOTALS: 16609 value 8142 error 5913 invariance 2554
+
+Stage K lane `k-v1-fin` (2026-11-21, counted by `tools/check_case_total.py`, measured): `lex_k-0011` (1 value case, KR-326: group labels U+FFFF and U+1F600 in code-point order, not UTF-16 order).
+
+TOTALS: 16610 value 8143 error 5913 invariance 2554
+
+Stage K error-parity fixes (branch `k-v1-fix`, merged with `k-v1` 19399ec0, then with `origin/k-v1` 5e4facc9 on 2026-11-21, counted 2026-11-21 by `tools/check_case_total.py`, measured): 12 error goldens tag `kr258` (`wwr_g-0027` to `-0032`, `xvaadj_g-0013` to `-0018`) and 11 two-error goldens tag `hr122` add 23 error cases.
+
+TOTALS: 16632 value 8142 error 5936 invariance 2554
+
+Merge of `k-v1-fix` into `k-v1` (2026-11-21, after `k-v1-fin`; counted by `tools/check_case_total.py`, measured): 16,610 + 23 error goldens of `k-v1-fix`.
+
+TOTALS: 16633 value 8143 error 5936 invariance 2554
+
+Stage K lane `k-v1-fuzz3` (2026-11-21, counted by `tools/check_case_total.py`, measured): new golden set `fuzzfix_k2` adds 19 error cases (fuzz run 44937631714, Python `paper.book.apply_fill` with an array `side`, and the same fault class in the sibling `paper.*` handlers; `oracle/python/gen_stage_k_fuzz3.py`).
+
+TOTALS: 16629 value 8143 error 5932 invariance 2554
+
+Merge of `k-v1-fuzz3` into `k-v1` (2026-11-21, after `k-v1-fix`; counted by `tools/check_case_total.py`, measured): 16,633 + 19 error goldens of `fuzzfix_k2`.
+
+TOTALS: 16652 value 8143 error 5955 invariance 2554

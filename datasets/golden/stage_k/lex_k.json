@@ -1858,6 +1858,130 @@
     "absolute": 1e-15,
     "relative": 1e-12
    }
+  },
+  {
+   "case_id": "lex_k-0011",
+   "operation": "risk.capital.large_exposures",
+   "inputs": {
+    "tier1": 1000,
+    "counterparties": [
+     {
+      "id": "A",
+      "group": "😀"
+     },
+     {
+      "id": "B",
+      "group": "￿"
+     },
+     {
+      "id": "C",
+      "group": "￿"
+     }
+    ],
+    "banking_book": [
+     {
+      "counterparty": "A",
+      "value": 50
+     },
+     {
+      "counterparty": "B",
+      "value": 20
+     },
+     {
+      "counterparty": "C",
+      "value": 30
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "counterparties": [
+      {
+       "id": "A",
+       "banking_book": 50.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 50.0
+      },
+      {
+       "id": "B",
+       "banking_book": 20.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 20.0
+      },
+      {
+       "id": "C",
+       "banking_book": 30.0,
+       "off_balance": 0.0,
+       "trading_book_net_long": 0.0,
+       "trading_book_net_short": 0.0,
+       "protected": 0.0,
+       "received": 0.0,
+       "exposure": 30.0
+      }
+     ],
+     "groups": [
+      {
+       "group": "￿",
+       "members": [
+        "B",
+        "C"
+       ],
+       "exposure": 50.0,
+       "share": 0.05,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      },
+      {
+       "group": "😀",
+       "members": [
+        "A"
+       ],
+       "exposure": 50.0,
+       "share": 0.05,
+       "large": false,
+       "limit": 250.0,
+       "breach": false,
+       "exempt": false
+      }
+     ],
+     "report": [
+      "￿",
+      "😀"
+     ],
+     "label": "simplified large exposures (LEX subset); not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "hand"
+   ],
+   "description": "hand: group labels U+FFFF and U+1F600 with equal exposures: code-point order, not UTF-16 order (KR-326)",
+   "output_classes": {
+    "label": "date_and_convention",
+    "report": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
   }
  ]
 }

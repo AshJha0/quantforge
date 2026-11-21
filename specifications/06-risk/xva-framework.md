@@ -1,6 +1,6 @@
 # xVA framework on given paths: collateral, netting, adjustments, sensitivity-based margin, wrong-way risk
 
-Spec version 1.0.0. Status: Specified (stage G, wave 4b). Rulings: `stage-g-rulings.md` G-40 to G-44. Suites `stage_g/collexp_g` (17), `xvaadj_g` (12), `sbim_g` (8; `simm_g` until v0.10.0), `wwr_g` (26; 6 until KR-257 added 20 on 2026-11-20), written by `oracle/python/gen_stage_g_w4b.py`; alias suite `stage_k/sbim_alias_k` (21, KR-153). Stage K rulings KR-150 to KR-155 (`stage-k-rulings-margin.md`) replaced the margin goldens' weights and renamed the operation on main (2026-11-20, pull request #59; released with v1.0.0).
+Spec version 1.0.0. Status: Specified (stage G, wave 4b). Rulings: `stage-g-rulings.md` G-40 to G-44. Suites `stage_g/collexp_g` (20; 17 until the KR-258 sweep added 3 on 2026-11-20), `xvaadj_g` (21; 12 until KR-258 added 6 and its sweep 3 on 2026-11-20), `sbim_g` (8; `simm_g` until v0.10.0), `wwr_g` (37; 6 until KR-257 added 20, KR-258 6 and its sweep 5 on 2026-11-20), written by `oracle/python/gen_stage_g_w4b.py`; alias suite `stage_k/sbim_alias_k` (21, KR-153). Stage K rulings KR-150 to KR-155 (`stage-k-rulings-margin.md`) replaced the margin goldens' weights and renamed the operation on main (2026-11-20, pull request #59; released with v1.0.0).
 
 **Plain idea.** A bank's loss if a counterparty defaults depends on the whole relationship with that counterparty, not on one trade. Trades under one legal netting agreement offset each other. Under a credit support annex (CSA), collateral changes hands when the netted value moves past a threshold, but only in steps of at least the minimum transfer amount, and after a default it takes some days (the margin period of risk, MPoR) before the position can be closed out, so the collateral held lags the exposure. This page takes simulated values as **inputs**, so every formula can be checked exactly. It then turns exposure profiles into the valuation adjustments: CVA (counterparty default), DVA (own default), FVA (funding), MVA (funding initial margin), KVA (holding capital). It adds a sensitivity-based initial margin for interest-rate delta (on placeholder weights) and the Hull-White wrong-way-risk model. The simulation that produces the paths, and its check against ORE, is the separate wave 4c slice.
 
@@ -24,7 +24,7 @@ Worked example (`collexp_g-0001` and `-0004`). Four paths, quarterly to one year
 
 ## `xva.adjustments.value` (ruling G-41)
 
-Inputs: `times` `t_1 < ... < t_n` (buckets from 0), `discount_factors`, `ee` (`>= 0`), `ene` (`<= 0`) (all length `n`, else `E_INPUT`; signs else `E_DOMAIN`); `counterparty` and `own` `{hazard_rate >= 0, recovery in [0, 1)}` (else `E_DOMAIN`); `funding` `{borrow_spread, lend_spread, exclude_dva_overlap}`; optional `im` with `im_spread`, optional `capital` with `hurdle_rate` (each pair together, else `E_INPUT`).
+Inputs: `times` `t_1 < ... < t_n` (buckets from 0; `t_1 > 0` and strictly increasing, else `E_INPUT`, KR-258), `discount_factors`, `ee` (`>= 0`), `ene` (`<= 0`) (all length `n`, else `E_INPUT`; signs else `E_DOMAIN`); `counterparty` and `own` `{hazard_rate >= 0, recovery in [0, 1)}` (else `E_DOMAIN`); `funding` `{borrow_spread, lend_spread, exclude_dva_overlap}`; optional `im` with `im_spread`, optional `capital` with `hurdle_rate` (each pair together, else `E_INPUT`).
 
 Formal statement, buckets `(t_(i-1), t_i]`, exposure at the bucket end, `S_c`, `S_b` the survival curves `e^(-h t)`, both names alive at the bucket start for the first-to-default weight [BM]:
 - `CVA = (1 - R_c) sum D_i ee_i (S_c(t_(i-1)) - S_c(t_i)) S_b(t_(i-1))`; `DVA = (1 - R_b) sum D_i |ene_i| (S_b(t_(i-1)) - S_b(t_i)) S_c(t_(i-1))`;
@@ -45,7 +45,7 @@ Worked example, on placeholder weights (KR-150: `RW_k = 10 k` on the tenors 0.25
 
 ## `xva.wwr.cva_hw` (ruling G-44)
 
-Inputs: `times` `t_1 < ... < t_n`, `values` (paths of length `n`, the exposure at bucket ends), `discount_factors`, `hazard_rate` `h > 0` (else `E_DOMAIN`), `recovery`, `wwr_b`.
+Inputs: `times` `t_1 < ... < t_n` (buckets from 0; `t_1 > 0` and strictly increasing, else `E_INPUT`, KR-258), `values` (paths of length `n`, the exposure at bucket ends), `discount_factors`, `hazard_rate` `h > 0` (else `E_DOMAIN`), `recovery`, `wwr_b`.
 
 Formal statement [HW12]: on path `p` the hazard in bucket `i` is `exp(a_i + b V_p(t_i))`; `a_i` solves `mean_p S_p(t_i) = e^(-h t_i)` given the path survivals `S_p(t_(i-1))` (one root per bucket, strictly monotone in `a`); `CVA = (1 - R) sum D_i mean_p[max(V_p(t_i), 0) (S_p(t_(i-1)) - S_p(t_i))]`. Outputs `cva` and `a`.
 

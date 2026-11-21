@@ -43,7 +43,7 @@ Operations (9; listed for this entry in tools/inventory_counts.py): `rates.short
 | Operation | Value-checked | Error | Invariance | Invariance base | Suites | Outside-checked value cases | Unit-test files (Python, Java, C++, Rust) |
 |---|---:|---:|---:|---:|---|---|---|
 | `rates.shortrate.zcb` | 39 | 29 | 5 | 5 | `e1g_rates`, `shortrate_g` | 38 of 38 (stage G) | 0, 0, 0, 0 |
-| `rates.shortrate.zcb_option` | 28 | 29 | 8 | 8 | `e1g_rates`, `shortrate_g` | 24 of 28 (stage G) | 0, 0, 0, 0 |
+| `rates.shortrate.zcb_option` | 28 | 30 | 8 | 8 | `e1g_rates`, `fuzzrev_k`, `shortrate_g` | 24 of 28 (stage G) | 0, 0, 0, 0 |
 | `rates.shortrate.swaption` | 71 | 39 | 9 | 9 | `e1g_rates`, `swaption_affine_g`, `swaption_g` | 64 of 71 (stage G) | 0, 0, 0, 0 |
 | `rates.shortrate.capfloor` | 38 | 32 | 8 | 8 | `capfloor_g`, `e1g_rates`, `fuzzfix_j` | 0 of 2 (stage J) | 1, 1, 1, 0 |
 | `rates.shortrate.hw_calibrate` | 3 | 48 | 15 | 15 | `e1g_rates`, `hwcal_g` | 3 of 3 (stage G) | 0, 0, 0, 0 |
@@ -52,7 +52,7 @@ Operations (9; listed for this entry in tools/inventory_counts.py): `rates.short
 | `rates.g2pp.zcb` | 17 | 44 | 10 | 10 | `e1g_rates`, `g2pp_g` | 14 of 14 (stage G) | 2, 0, 0, 0 |
 | `rates.g2pp.zcb_option` | 23 | 41 | 13 | 13 | `e1g_rates`, `g2pp_g` | 21 of 23 (stage G) | 2, 0, 0, 0 |
 
-Totals: 240 value-checked, 354 error, 186 invariance cases (measured from `datasets/golden` at generation).
+Totals: 240 value-checked, 355 error, 186 invariance cases (measured from `datasets/golden` at generation).
 Outside-checked: 175 of 190 value cases (92.1%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: modules `G/g2pp`, `K/bermudan_k8` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.

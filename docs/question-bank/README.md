@@ -1,6 +1,6 @@
 # QuantForge question bank
 
-A learning question bank and knowledge check: 470 questions with full answers, in 14 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
+A learning question bank and knowledge check: 500 questions with full answers, in 14 sets that follow the project's topics. It is for two readers. A newcomer can work through the foundation questions in order; a practitioner can jump to a set and test themselves against QuantForge's own conventions and rulings.
 
 How to use it: read the question, answer it on paper, then read the answer. Each answer starts with the plain idea, then gives the formal rule as the spec states it, then (for quantitative topics) a worked example with numbers, and ends with the pitfall that matters on a desk or in validation. Each question names its source spec or tutorial and an evidence class:
 
@@ -27,14 +27,14 @@ Levels: **foundation** (the idea and the convention), **practitioner** (using th
 | [Research statistics and backtest honesty](11-research-statistics.md) | 10 | 12 | 8 | 30 |
 | [Four-language engineering and verification](12-engineering-verification.md) | 11 | 13 | 6 | 30 |
 | [Execution and microstructure](13-execution-microstructure.md) | 18 | 20 | 9 | 47 |
-| [Stage K: data platform, intraday risk, capital and the paper ledger](14-stage-k-risk-platform.md) | 13 | 20 | 19 | 52 |
-| **Total** | 156 | 197 | 117 | **470** |
+| [Stage K: data platform, intraday risk, capital and the paper ledger](14-stage-k-risk-platform.md) | 20 | 35 | 27 | 82 |
+| **Total** | 163 | 212 | 125 | **500** |
 
 Back to [Learn QuantForge](../../LEARN.md).
 
 ## Foundation questions
 
-156 questions.
+163 questions.
 
 - Q1.1 (01-foundations-numerics.md) How do ACT/360 and ACT/365F differ, and what year fraction does each give from 1 January to 1 July 2024?
 - Q1.4 (01-foundations-numerics.md) What does QuantForge return when the start equals the end, or the end is before the start?
@@ -192,10 +192,17 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q14.33 (14-stage-k-risk-platform.md) Why can a store with one time axis not replace a bitemporal store, and what does a query before the first knowledge time return?
 - Q14.42 (14-stage-k-risk-platform.md) Derive the bound of `idr_k-0001` by hand.
 - Q14.52 (14-stage-k-risk-platform.md) Why are the margin weights labelled "placeholder weights", and what can a result computed with them be used for?
+- Q14.57 (14-stage-k-risk-platform.md) Counterparty A is 26% of Tier 1 and C is exactly 25%. Which is a large exposure, and which is a breach?
+- Q14.63 (14-stage-k-risk-platform.md) Encode 300 as a FAST-style stop-bit unsigned integer, and 100 as a signed one.
+- Q14.67 (14-stage-k-risk-platform.md) The end-of-day rehearsal has seven planted faults. What must each one show, and why "no earlier step fails"?
+- Q14.68 (14-stage-k-risk-platform.md) A meeting step to 4.00% takes effect on 2026-12-10. Why is the discount factor to 2026-12-10 still computed entirely at the old 4.25%?
+- Q14.71 (14-stage-k-risk-platform.md) Why is `d ln D / d quote` for the 1-month SOFR pillar close to -0.10?
+- Q14.79 (14-stage-k-risk-platform.md) Why is the K-5 Python snapshot useful although it is not lock-free?
+- Q14.80 (14-stage-k-risk-platform.md) Why does the K-6 soak read memory only when no case is in flight?
 
 ## Practitioner questions
 
-197 questions.
+212 questions.
 
 - Q1.2 (01-foundations-numerics.md) What does ACT/ACT ISDA give from 1 November 2003 to 1 May 2004, and how does ACT/ACT ICMA differ on the same dates?
 - Q1.3 (01-foundations-numerics.md) How do the 30/360 variants treat 29 February 2024 to 31 August 2024?
@@ -394,10 +401,25 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q14.47 (14-stage-k-risk-platform.md) The same two swaps are worth -310 to us. What happens to the multiplier and the EAD?
 - Q14.50 (14-stage-k-risk-platform.md) An attacker edits row 7 of a hash-chained ledger. What does the verifier report if they recompute nothing, only row 7's hash, or every later hash?
 - Q14.51 (14-stage-k-risk-platform.md) Show that the paper ledger's three market terms telescope on the spec's worked day.
+- Q14.53 (14-stage-k-risk-platform.md) A long stock of 50 and a short senior bond of 40 on the same BB issuer. Why does the bond not offset the stock in the default risk charge, and what is the DRC?
+- Q14.54 (14-stage-k-risk-platform.md) Why does the IMCC take half a diversified figure and half an undiversified one, and what is it for the golden `imcc_k-0001`?
+- Q14.56 (14-stage-k-risk-platform.md) With one counterparty, why does reduced BA-CVA equal the standalone charge, and what does a second counterparty do?
+- Q14.60 (14-stage-k-risk-platform.md) A request to `xva.wwr.cva_hw` has a path of the wrong length and `|b V| = 705`. Which error comes back, and why?
+- Q14.64 (14-stage-k-risk-platform.md) A multicast receiver sees packets starting at 1 (3 messages), 4 (2), 8 (1), a heartbeat at 9 and the first packet again. What does it deliver?
+- Q14.65 (14-stage-k-risk-platform.md) Why is the K-3 round-trip hash taken over the canonical form of records sorted by `seq`, not over the bytes the store returns?
+- Q14.66 (14-stage-k-risk-platform.md) A soak bound is 1 MiB per hour and the process handles 23 cases a second. What is the smallest average leak per case it can see?
+- Q14.69 (14-stage-k-risk-platform.md) A year-end turn factor is 0.999989041155939. What funding spread does it represent, and which discount factors does it change?
+- Q14.72 (14-stage-k-risk-platform.md) A two-year receiver has par DV01 -4,806.94 but zero DV01 -4,913.22. Why do they differ by about 2%?
+- Q14.73 (14-stage-k-risk-platform.md) Why does a triangular key-rate set put -22.19 on the 5-year key for a two-year swap?
+- Q14.75 (14-stage-k-risk-platform.md) Two instruments with the same dates and different quotes are given to the joint solve. What comes back, and why?
+- Q14.76 (14-stage-k-risk-platform.md) The K-5 writer publishes version 1 with shift `h = 0.005`. How is the hedge notional 1,998,033.51 obtained?
+- Q14.77 (14-stage-k-risk-platform.md) Why does the K-5 snapshot store results instead of computing them when a reader asks?
+- Q14.81 (14-stage-k-risk-platform.md) On Windows the soak judges committed private bytes, not the working set. Why?
+- Q14.82 (14-stage-k-risk-platform.md) In `docs/capacity.md`, Java runs the cheap mix at 737 cases a second and Python at 7,421. Then Java reaches 5,275 a second on a million lines. What explains both?
 
 ## Advanced questions
 
-117 questions.
+125 questions.
 
 - Q1.5 (01-foundations-numerics.md) Why does ACT/ACT AFB give the same answer from 28 February 2004 to both 28 and 29 February 2008, and why does Strata disagree?
 - Q1.21 (01-foundations-numerics.md) How does the adaptive Gauss-Kronrod rule integrate `1/sqrt(x)` on `[0, 1]` when the integrand is infinite at 0?
@@ -516,3 +538,11 @@ Back to [Learn QuantForge](../../LEARN.md).
 - Q14.46 (14-stage-k-risk-platform.md) Why does the interest-rate aggregation have cross terms 1.4 and 0.6, and what do they do to two offsetting trades?
 - Q14.48 (14-stage-k-risk-platform.md) A desk's true 99% VaR is really a 98% VaR. How likely is a 250-day backtest to put it in amber or red?
 - Q14.49 (14-stage-k-risk-platform.md) Why is one observation with no exception YELLOW at 95% confidence in `risk.backtest.traffic_light`?
+- Q14.55 (14-stage-k-risk-platform.md) An IMA bank has six backtesting exceptions and one amber desk. Walk through `risk.frtb.ima.capital` on `cap_k-0002`.
+- Q14.58 (14-stage-k-risk-platform.md) In `xva.wwr.cva_hw`, why is the hazard level `a_i = ln h - b V_i` when every path has the same exposure?
+- Q14.59 (14-stage-k-risk-platform.md) Why does the KR-257 bracket `[ln h - max bV - 1, ln h - min bV + 1]` always contain the root?
+- Q14.61 (14-stage-k-risk-platform.md) Why does a K-5 snapshot pool with `R` readers need `R + 2` slots and not `R + 1`?
+- Q14.62 (14-stage-k-risk-platform.md) Why did K-5 not use a seqlock, which is simpler and allocation-free?
+- Q14.70 (14-stage-k-risk-platform.md) In the joint solve of `joint_f-0003`, why does the 10-year pillar of the term curve depend on the SOFR 10-year quote?
+- Q14.74 (14-stage-k-risk-platform.md) The 2-year par quote rises from 2.5% to 2.6%. Why does the 3-year discount factor rise?
+- Q14.78 (14-stage-k-risk-platform.md) What staleness does K-5 promise, and why not a bound in microseconds?
