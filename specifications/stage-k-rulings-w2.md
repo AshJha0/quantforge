@@ -111,3 +111,5 @@ The stage K coordinator, under the owner's delegation, accepted the recommendati
 | KR-312, KR-319, KR-324 | Rest of each row CONFIRMED (the parts not covered on 2026-11-20: BA-CVA duplicate id; the other K-8i defaults; the label namespace and duplicate counterparty id) | Decision table | None |
 
 KR-133 note. The large-exposures G-SIB group rule called "KR-133" in `institutional-quant-engine-plan/STAGE_K_BASEL_READINGS.md` is the pre-renumbering id of KR-324 (wave 2b's KR-120 to KR-135 became KR-311 to KR-326). KR-324 is CONFIRMED (any member) and pinned by `lex_k-0010`. The KR-133 of `stage-k-rulings-sbim.md` is a different ruling (the SBIM clipped bucket sum).
+
+KR-133 decision (coordinator, 2026-11-21, delegated by owner). The "explicit input" item that lane `k-v1-fix` was asked to read as KR-133 means the G-SIB group rule, now KR-324 (any member, golden `lex_k-0010`), not the SBIM clipped bucket sum. Evidence: the note above and `program/stage_k_fix/STOP_NOTE.md` (read). No code change follows.

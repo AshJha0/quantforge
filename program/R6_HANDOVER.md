@@ -374,3 +374,11 @@ TOTALS: 16609 value 8142 error 5913 invariance 2554
 Stage K lane `k-v1-fin` (2026-11-21, counted by `tools/check_case_total.py`, measured): `lex_k-0011` (1 value case, KR-326: group labels U+FFFF and U+1F600 in code-point order, not UTF-16 order).
 
 TOTALS: 16610 value 8143 error 5913 invariance 2554
+
+Stage K error-parity fixes (branch `k-v1-fix`, merged with `k-v1` 19399ec0, then with `origin/k-v1` 5e4facc9 on 2026-11-21, counted 2026-11-21 by `tools/check_case_total.py`, measured): 12 error goldens tag `kr258` (`wwr_g-0027` to `-0032`, `xvaadj_g-0013` to `-0018`) and 11 two-error goldens tag `hr122` add 23 error cases.
+
+TOTALS: 16632 value 8142 error 5936 invariance 2554
+
+Merge of `k-v1-fix` into `k-v1` (2026-11-21, after `k-v1-fin`; counted by `tools/check_case_total.py`, measured): 16,610 + 23 error goldens of `k-v1-fix`.
+
+TOTALS: 16633 value 8143 error 5936 invariance 2554

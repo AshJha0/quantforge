@@ -86,7 +86,7 @@ final class OpsXva {
             in.gate();
             Xva.checkGrid("times", t, 1);
             if (!(t[0] > 0.0)) {
-                throw domain("times");
+                throw input("times"); // KR-258: ordering against the implied t_0 = 0, structural
             }
             sameLength("discount_factors", t.length, df);
             if (v.length == 0) {
@@ -210,7 +210,7 @@ final class OpsXva {
         in.gate();
         Xva.checkGrid("times", t, 1);
         if (!(t[0] > 0.0)) {
-            throw domain("times");
+            throw input("times"); // KR-258: ordering against the implied t_0 = 0, structural
         }
         sameLength("ee", t.length, df, ee, ene);
         if (hasIm != hasImS) {
