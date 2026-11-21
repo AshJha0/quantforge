@@ -60,7 +60,7 @@ pub fn cap_price(
 ) -> Result<Vec<f64>> {
     crate::error::finite("vols", &vols)?;
     crate::error::finite("t", &t)?;
-    if t.start_months < 1 {
+    if !(1..=1200).contains(&t.start_months) {
         return fail("E_INPUT", "start_months must be at least 1");
     }
     let as_of = discount.as_of;
@@ -103,7 +103,7 @@ pub fn swaption_price(
 ) -> Result<(f64, f64, f64)> {
     crate::error::finite("vol", &vol)?;
     crate::error::finite("t", &t)?;
-    if t.expiry_months < 1 {
+    if !(1..=1200).contains(&t.expiry_months) {
         return fail("E_INPUT", "expiry_months must be at least 1");
     }
     if vol < 0.0 {

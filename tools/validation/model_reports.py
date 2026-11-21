@@ -186,7 +186,10 @@ def share_rows(ops, shares):
     per = {}
     for st, s in shares["stages"].items():
         for op, v in (s.get("per_operation") or {}).items():
-            per[op] = (st, v)
+            # A later stage with no value case of the operation (an error-only suite such as fuzzfix_j or
+            # fuzzfix_k) does not hide the stage that holds its value cases.
+            if v["cases"] or op not in per:
+                per[op] = (st, v)
     return per
 
 

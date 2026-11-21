@@ -25,6 +25,7 @@ Exit 0 when every marked recipe matches, 1 otherwise. Standard library only. Not
 """
 import argparse
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -71,7 +72,8 @@ def recipes(text):
 
 def check(title, body, want, run=subprocess.run):
     t0 = time.monotonic()
-    p = run(["bash", "-e"], input=shims() + body, capture_output=True, text=True, cwd=ROOT, encoding="utf-8")
+    # PATH bash, not the System32 WSL launcher that a bare "bash" finds on Windows (see check_tutorial.py).
+    p = run([shutil.which("bash") or "bash", "-e"], input=shims() + body, capture_output=True, text=True, cwd=ROOT, encoding="utf-8")
     missing = [w for w in want if w not in p.stdout]
     seconds = time.monotonic() - t0
     if p.returncode != 0 or missing:

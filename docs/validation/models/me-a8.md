@@ -47,7 +47,7 @@ Operations (11; every operation whose name-map spec is the model's spec (shared 
 | `exotic.american.fd` | 9 | 26 | 7 | 7 | `american_e`, `e1_exotic`, `rulings_e_a` | 0 of 9 (stage E) | 1, 0, 2, 1 |
 | `exotic.asian.geometric` | 12 | 21 | 6 | 6 | `e1_exotic`, `exotic_e`, `rulings_e_a` | 12 of 12 (stage E) | 3, 0, 1, 0 |
 | `exotic.barrier.price` | 70 | 88 | 15 | 15 | `barrier_g`, `barrier_r6`, `e1_exotic`, `e1g_exotic`, `exotic_e` | 8 of 9 (stage G) | 1, 0, 2, 0 |
-| `exotic.basket.moment` | 3 | 45 | 13 | 13 | `e1_exotic`, `exotic_e`, `fuzzfix_j`, `rulings_e_a` | 0 of 0 (stage J) | 2, 1, 2, 0 |
+| `exotic.basket.moment` | 3 | 45 | 13 | 13 | `e1_exotic`, `exotic_e`, `fuzzfix_j`, `rulings_e_a` | 0 of 3 (stage E) | 2, 1, 2, 0 |
 | `exotic.chooser.price` | 6 | 22 | 7 | 7 | `e1_exotic`, `exotic_e` | 6 of 6 (stage E) | 1, 0, 1, 0 |
 | `exotic.digital.price` | 16 | 23 | 7 | 7 | `e1_exotic`, `exotic_e` | 16 of 16 (stage E) | 1, 0, 1, 0 |
 | `exotic.lookback.floating` | 13 | 21 | 6 | 6 | `e1_exotic`, `exotic_e` | 13 of 13 (stage E) | 1, 0, 1, 0 |
@@ -55,7 +55,7 @@ Operations (11; every operation whose name-map spec is the model's spec (shared 
 | `exotic.spread.kirk` | 5 | 27 | 6 | 6 | `e1_exotic`, `exotic_e`, `rulings_e_a` | 3 of 3 (stage E) | 1, 0, 0, 0 |
 
 Totals: 172 value-checked, 342 error, 172 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 76 of 104 value cases (73.1%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Outside-checked: 76 of 107 value cases (71.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: no module of `conformance/mutation/stages.json` names one of this model's value-checked suites by a pattern narrower than the whole stage (patterns such as `*` or `*_d` run every suite of a stage), so no mutation result maps to this model alone.
 

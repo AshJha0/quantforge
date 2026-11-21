@@ -43,14 +43,14 @@ Operations (6; listed for this entry in tools/inventory_counts.py): `hedge.qp.so
 | Operation | Value-checked | Error | Invariance | Invariance base | Suites | Outside-checked value cases | Unit-test files (Python, Java, C++, Rust) |
 |---|---:|---:|---:|---:|---|---|---|
 | `hedge.qp.solve` | 85 | 30 | 0 | 0 | `fuzzfix_j`, `hedgeaudit_r6`, `hedgecost_i`, `hedgecut_j`, `hedgeqp5_i`, `hedgeqp_i`, `hedgeqp_large_r6`, `hedgescale_r6`, `hedgesign_j` | 0 of 6 (stage J) | 7, 2, 2, 6 |
-| `hedge.integer.solve` | 12 | 11 | 0 | 0 | `e1_r6`, `fuzzfix_j`, `hedgeint_i` | 0 of 0 (stage J) | 6, 1, 2, 3 |
-| `hedge.minvar.ratio` | 40 | 16 | 0 | 0 | `e1_r6`, `fuzzfix_j`, `hedgeaudit_r6`, `hedgemv5_i`, `hedgemv_i`, `minvarconst_j` | 0 of 0 (stage J) | 4, 0, 1, 2 |
+| `hedge.integer.solve` | 12 | 11 | 0 | 0 | `e1_r6`, `fuzzfix_j`, `hedgeint_i` | 0 of 12 (stage I) | 6, 1, 2, 3 |
+| `hedge.minvar.ratio` | 40 | 16 | 0 | 0 | `e1_r6`, `fuzzfix_j`, `hedgeaudit_r6`, `hedgemv5_i`, `hedgemv_i`, `minvarconst_j` | 9 of 10 (stage I) | 4, 0, 1, 2 |
 | `hedge.greeks.neutralise` | 60 | 13 | 0 | 0 | `e1_r6`, `hedgegreeks5_i`, `hedgegreeks_i` | 10 of 10 (stage I) | 3, 1, 1, 2 |
 | `hedge.beta.futures` | 8 | 4 | 0 | 0 | `hedgebeta_i` | 0 of 8 (stage I) | 3, 1, 2, 1 |
-| `hedge.residual.report` | 7 | 8 | 0 | 0 | `e1_r6`, `fuzzfix_j`, `hedgeres_i` | 0 of 0 (stage J) | 2, 2, 3, 1 |
+| `hedge.residual.report` | 7 | 8 | 0 | 0 | `e1_r6`, `fuzzfix_j`, `hedgeres_i` | 0 of 7 (stage I) | 2, 2, 3, 1 |
 
 Totals: 212 value-checked, 82 error, 0 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 10 of 24 value cases (41.7%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Outside-checked: 19 of 53 value cases (35.8%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: modules `I/hedge_credit_corr`, `I/hedge_cross`, `I/hedge_dynamic`, `I/hedge_select_slip`, `I/hedge_solvers` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.
 

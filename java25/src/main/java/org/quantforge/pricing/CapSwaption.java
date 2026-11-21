@@ -17,7 +17,8 @@ public final class CapSwaption {
 
     public static LocalDate start(Curve d, long months) {
         LocalDate spot = Calendars.addBusinessDays(Calendars.Id.USGS, d.asOf(), 2);
-        return Calendars.adjust(Calendars.Id.USGS, spot.plusMonths(months), Calendars.Convention.MODIFIED_FOLLOWING);
+        return Calendars.adjust(Calendars.Id.USGS, Calendars.plusMonthsInRange(spot, months),
+                Calendars.Convention.MODIFIED_FOLLOWING);
     }
 
     public static double option(boolean normal, double phi, double f, double k, double t, double v) {
