@@ -429,7 +429,13 @@ def _fill_list(fills: Sequence[Any]) -> list[dict[str, Any]]:
         if q <= 0 or p <= 0:
             raise QfError("E_DOMAIN", "quantity and price must be positive", f"fills/{k}/quantity")
         out.append(
-            {"symbol": _SYM, "side": f["side"], "quantity": fmt(q), "price": fmt(p), "fee": fmt(fee)}
+            {
+                "symbol": _SYM,
+                "side": f["side"],
+                "quantity": fmt(q),
+                "price": fmt(p),
+                "fee": fmt(fee),
+            }
         )
     return out
 

@@ -374,3 +374,7 @@ TOTALS: 16609 value 8142 error 5913 invariance 2554
 Stage K lane `k-v1-fin` (2026-11-21, counted by `tools/check_case_total.py`, measured): `lex_k-0011` (1 value case, KR-326: group labels U+FFFF and U+1F600 in code-point order, not UTF-16 order).
 
 TOTALS: 16610 value 8143 error 5913 invariance 2554
+
+Stage K lane `k-v1-fuzz3` (2026-11-21, counted by `tools/check_case_total.py`, measured): new golden set `fuzzfix_k2` adds 19 error cases (fuzz run 44937631714, Python `paper.book.apply_fill` with an array `side`, and the same fault class in the sibling `paper.*` handlers; `oracle/python/gen_stage_k_fuzz3.py`).
+
+TOTALS: 16629 value 8143 error 5932 invariance 2554
