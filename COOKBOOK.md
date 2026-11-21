@@ -21,7 +21,7 @@ The sections below follow the order in which stages were built. To find recipes 
 | 09 Microstructure | [Stage H](#stage-h-recipes-available-from-v0100) (book rebuild, quotes, estimators), [trading conventions](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues) |
 | 10 Execution | [Stage H](#stage-h-recipes-available-from-v0100) (schedules, TCA, simulated venues, paper trading), [simulated auction, FX and futures venues](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues), [liquidity curve](#read-a-liquidity-cost-curve) |
 | 11 Research | [Stage J](#stage-j-recipes) |
-| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, scheduled on main since 2026-11-20) |
+| 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, scheduled on main since 2026-11-20), [platform recipes](#stage-k-platform-recipes-simulated-feeds-end-of-day-rehearsal-soak-and-snapshots) (simulated feed fixtures, end-of-day rehearsal, soak verdict) |
 
 ## Run a tutorial script
 
@@ -1708,3 +1708,70 @@ By hand at `b = 0`: every path has hazard `h = 0.03`, so `a_i = ln 0.03 = -3.506
 | identical paths | 1.0 | 0.11347051247504979 | -14.605170185988092 | `wwr_g-0007` |
 
 The last line, `too_big`, returns `E_DOMAIN` on `wwr_b` ("|wwr_b * value| must be at most 700 (KR-257)"): `b V = 800` would overflow the hazard, and the operation now says so instead of returning a wrong number. How to read it: at `b = 0.3` the CVA is about twice the independent figure on the same paths, because the recalibrated hazard is highest on the paths with the largest exposure; at `b = -0.2` it falls to about a third. The outputs differ from the goldens in the last digit or two, inside the `root_finding` tolerance (1e-9 absolute plus 1e-12 relative). Limits: the paths are inputs (four hand-written paths here, not a simulation); the choice of `b` is a model judgement the operation does not make.
+
+### Stage K platform recipes: simulated feeds, end-of-day rehearsal, soak and snapshots
+
+Operating tasks around the K-3, K-5 and K-6 items merged to main on 2026-11-20 (not in a tag). Outputs observed on 2026-11-21 on branch `k-v1-docs-a`, Windows, local laptop, not the acceptance machine. Two of these tasks have tutorials that CI runs: reading a soak verdict ([Tutorial 60](docs/getting-started/tutorial-60-read-a-soak-run.md)) and the K-5 snapshot, its checksum and its hedge ([Tutorial 61](docs/getting-started/tutorial-61-snapshots-and-hedge.md)).
+
+#### Round-trip every simulated feed fixture and check the malformed ones (K-3)
+
+Plain idea: the five feed formats (QF-FIX-S, QF-ITCH-S, QF-OUCH-S, QF-MOLD-S, QF-FAST-S) are simulated, not any venue's or standard's. Each hand-built fixture records the fields the spec derives and the SHA-256 of its bytes. Decoding must give those fields, and re-encoding must give the same bytes; every malformed input must raise `FeedError` with its listed code.
+
+Formal statement (`specifications/12-platform/adapters.md` 0.2.0 section 3, rulings KR-270 to KR-283 confirmed 2026-11-20; KR-276: every encoding is canonical, so anything that decodes re-encodes to the same bytes). The adapter package lives outside the library trees (`platform/python`), so it is put on `PYTHONPATH`.
+
+```bash
+export PYTHONUTF8=1 PYTHONPATH=platform/python
+uv run --locked --project python python - <<'EOF'
+import hashlib, json, pathlib
+from quantforge_adapters.feeds import FeedError, fast, fix, itch, mold, ouch
+
+CODEC = {"QF-FIX-S": (fix.decode, fix.encode), "QF-ITCH-S": (itch.decode, itch.encode),
+         "QF-OUCH-S": (ouch.decode, ouch.encode), "QF-MOLD-S": (mold.decode, mold.encode),
+         "QF-FAST-S": (lambda b: {"messages": fast.decode_packet(b)}, lambda m: fast.encode_packet(m["messages"]))}
+STREAM = (lambda b: {"messages": ouch.decode_stream(b)}), (lambda m: ouch.encode_stream(m["messages"]))
+good = 0
+for meta in sorted(pathlib.Path("datasets/feeds").glob("*/*.json")):
+    spec, raw = json.loads(meta.read_text(encoding="utf-8")), meta.with_suffix(".bin").read_bytes()
+    dec, enc = STREAM if meta.stem.startswith("stream") else CODEC[spec["format"]]
+    msg = dec(raw)
+    good += (json.loads(json.dumps(msg, default=bytes.hex)) == spec["fields"]  # the fields the spec derived
+             and enc(msg) == raw                                              # canonical: same bytes back
+             and hashlib.sha256(raw).hexdigest() == spec["sha256"])           # the file is the one recorded
+right = 0
+cases = json.loads(pathlib.Path("datasets/feeds/malformed.json").read_text(encoding="utf-8"))["cases"]
+for case in cases:
+    dec = STREAM[0] if case["name"].startswith("stream") else CODEC[case["format"]][0]
+    try:
+        dec(bytes.fromhex(case["hex"]))
+    except FeedError as e:
+        right += e.code == case["code"]
+print(f"{good} of {len(list(pathlib.Path('datasets/feeds').glob('*/*.json')))} fixtures round-trip; "
+      f"{right} of {len(cases)} malformed inputs give their expected code")
+EOF
+```
+
+Output: `17 of 17 fixtures round-trip; 39 of 39 malformed inputs give their expected code`. The OUCH fixture `stream_two` and the malformed cases whose names start with "stream" are length-prefixed streams, so they go to `ouch.decode_stream`. A byte-level worked example (the 36-byte ITCH Add Order, offset by offset) is in the [adapters developer guide](docs/developer-guides/adapters.md#decoding-a-fixture-a-worked-example). Label: "simulated; not a certified implementation; not connected to any venue". Limits: the container round trips (Kafka, PostgreSQL and the others) run only in the `adapters` workflow and need Docker; this recipe does not start any service.
+
+#### Rehearse an end of day, then plant a fault and watch the step that catches it (K-6)
+
+Plain idea: before trusting the daily jobs with a date, run the whole chain for that date as a dry run: read and verify the recorder's log, check the date against the preregistered holdout windows, fit the curve, run the paper ledger, compute intraday risk, render and check the pages, archive. A failed step stops the run, and the steps after it are recorded as "not run". A planted fault must be caught at the step named for it.
+
+Formal statement (`specifications/12-platform/soak-eod-capacity.md` 0.2.0 section 3, rulings KR-217 to KR-221 confirmed 2026-11-20; `tools/eod/rehearse.py`, read): eight steps E1 to E8; `--plant` injects exactly one fault: `GAP` (E1), `HOLDOUT` (E2), `HASH` (E3), `EXPLAIN` (E4), `DOMAIN` (E5), `LABEL` (E6), `WIDTH` (E7). It writes only to a temporary folder and to the `--out` file; it never writes to `forward-log`, `curve-daily` or `paper-ledger` and starts no workflow.
+
+```bash
+export PYTHONUTF8=1
+uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --out eod.json
+uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --plant EXPLAIN --out eod-explain.json
+uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --plant HOLDOUT --out eod-holdout.json
+```
+
+Output: the clean run prints `pass` for E1 to E8 and `result: pass` (about 1 s in all). With `EXPLAIN`, E1 to E3 pass, E4 prints `fail    EXPLAIN`, E5 to E8 print `not run`, and the result is `fail (failed at E4)`; the E4 evidence in the JSON reads `"planted": "roll_down of the date's row plus one cent, chain rebuilt"`, `"verify_ok": false`, `"verify_reason": "EXPLAIN"`: one cent in one explain term, with the hash chain recomputed as a forger would, and the verifier's exact replay still refuses it. With `HOLDOUT` the run stops at E2. The JSON holds hashes, counts and aggregates only, never a recorded row. On 2026-11-20 the same date from the forward log (`--source forward-log`) passed all eight steps (`benchmarks/results/k6/eod-2026-11-19-forward-log.json`, measured by the K-6 lane); not rerun here. Limits: a dry run has no anchors to check; E3 fits the five recorded Treasury tenors, not the thirteen of the scheduled run (`rehearse.py`, deviation 3). How to act on a failed step: [runbook](docs/runbooks/soak-and-eod.md#rehearse-an-end-of-day).
+
+#### Reread a soak verdict from the committed files (K-6)
+
+```bash
+export PYTHONUTF8=1
+python benchmarks/soak/analyse.py benchmarks/results/k6/soak-python-2026-11-20.csv benchmarks/results/k6/soak-python-2026-11-20.summary.json --out soak-verdict.json
+```
+
+Output: `python: MISS slope 2.3243 MiB/h (95% CI [1.696, 3.7996]), range 13.035 MiB of median 432.59 MiB, reasons ['SLOPE']`. **This is the recorded MISS of the Python soak**: the memory climbs 2.32 MiB an hour against a bound of 1 MiB an hour fixed before the run, and the cause has not been found (`docs/known-issues.md`). `--out` writes the full verdict JSON; without it the analyser prints the line only, and it exits 1 on a MISS (`analyse.py`, read). Worked by hand in [Tutorial 60](docs/getting-started/tutorial-60-read-a-soak-run.md). Running a new soak takes 130 minutes and must be detached on a shared machine ([runbook](docs/runbooks/soak-and-eod.md#run-a-soak)).
