@@ -1299,7 +1299,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-8 FRTB DRC and RRAO (stage K wave 2, K-8a)
 - **Purpose:** default risk charge for non-securitisations, securitisations and the correlation trading portfolio, and the residual risk add-on (`risk.frtb.drc_nonsec`, `.drc_sec_nonctp`, `.drc_ctp`, `.rrao`; MAR22, MAR23), in all four languages.
 - **Inputs:** as in the spec page; tables `specifications/tables/stage_k/mar22_drc.json` and `mar23_rrao.json`, one copy for the four builds.
-- **Limitations:** implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
+- **Limitations:** implemented in all four builds and merged to main (pull request #63, 2026-11-20); rulings KR-50 to KR-69 and KR-300 to KR-326 all confirmed (KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 on 2026-11-20, the rest on 2026-11-21, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
 - **Validation:** goldens `drc_k` passed by every build through the neutral runner (each port lane measured 289 of 289 on the 11 wave 2 suites; local laptop, not the acceptance machine, 2026-11-20). **Review:** 2026-11-20.
 - **Tier:** 3.
 - **Challenger:** 15 of 18 value cases (83.3%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
@@ -1311,7 +1311,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-9 FRTB IMA: ES with liquidity horizons, NMRF and SES, RFET, PLA, capital (stage K wave 2, K-8f)
 - **Purpose:** liquidity-horizon-scaled expected shortfall, stressed ES for non-modellable factors, the risk factor eligibility test, the P&L attribution test and the IMA capital aggregation (`risk.frtb.ima.lh`, `.es_lh`, `.es_stressed`, `.imcc`, `.ses`, `.capital`, `risk.frtb.rfet`, `.rfet.bucket`, `risk.frtb.pla`, `.pla.ks_pvalue`; MAR31 to MAR33), in all four languages.
 - **Inputs:** as in the spec page; tables `specifications/tables/stage_k/mar31_rfet.json`, `mar32_pla.json`, `mar33_ima.json`, one copy for the four builds.
-- **Limitations:** implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
+- **Limitations:** implemented in all four builds and merged to main (pull request #63, 2026-11-20); rulings KR-50 to KR-69 and KR-300 to KR-326 all confirmed (KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 on 2026-11-20, the rest on 2026-11-21, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
 - **Validation:** goldens `ima_k` passed by every build through the neutral runner (each port lane measured 289 of 289 on the 11 wave 2 suites; local laptop, not the acceptance machine, 2026-11-20). **Review:** 2026-11-20.
 - **Tier:** 3.
 - **Challenger:** 23 of 33 value cases (69.7%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
@@ -1323,7 +1323,7 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-10 CVA risk capital: BA-CVA and SA-CVA (stage K wave 2, K-8g)
 - **Purpose:** basic (reduced and full) and standardised CVA capital (`risk.cva.ba`, `risk.cva.sa`; MAR50), in all four languages.
 - **Inputs:** as in the spec page; tables `specifications/tables/stage_k/mar50_cva.json`, one copy for the four builds.
-- **Limitations:** implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
+- **Limitations:** implemented in all four builds and merged to main (pull request #63, 2026-11-20); rulings KR-50 to KR-69 and KR-300 to KR-326 all confirmed (KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 on 2026-11-20, the rest on 2026-11-21, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
 - **Validation:** goldens `cva_k`, `cva_ke`, `df_k`, `sacva_k`, `sacva_ke` passed by every build through the neutral runner (each port lane measured 289 of 289 on the 11 wave 2 suites; local laptop, not the acceptance machine, 2026-11-20). **Review:** 2026-11-20.
 - **Tier:** 3.
 - **Challenger:** 14 of 21 value cases of `cva_k`, `df_k`, `sacva_k` (66.7%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
@@ -1335,10 +1335,10 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 ### MK-11 Leverage ratio and large exposures, simplified (stage K wave 2, K-8i)
 - **Purpose:** leverage ratio and large-exposure limit checks, simplified (`risk.capital.leverage`, `risk.capital.large_exposures`; LEV, LEX), in all four languages.
 - **Inputs:** as in the spec page; tables `specifications/tables/stage_k/lev_leverage.json` and `lex_large_exposures.json`, one copy for the four builds.
-- **Limitations:** implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
+- **Limitations:** implemented in all four builds and merged to main (pull request #63, 2026-11-20); rulings KR-50 to KR-69 and KR-300 to KR-326 all confirmed (KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 on 2026-11-20, the rest on 2026-11-21, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section.
 - **Validation:** goldens `lev_k`, `lev_ke`, `lex_k`, `lex_ke` passed by every build through the neutral runner (each port lane measured 289 of 289 on the 11 wave 2 suites; local laptop, not the acceptance machine, 2026-11-20). **Review:** 2026-11-20.
 - **Tier:** 3.
-- **Challenger:** 22 of 23 value cases of `lev_k`, `lex_k` (95.7%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
+- **Challenger:** 22 of 24 value cases of `lev_k`, `lex_k` (91.7%); blind re-derivation (DR-H2, `program/STAGE_K_BLIND_W2.md`) and printed figures counted only through a blind packet (KR-250); `oracle/OUTSIDE_SHARES.md`, generated.
 - **Monitoring thresholds:** any ratio, limit or breach-flag difference across the four builds.
 - **Data lineage hash:** sha256 abd1899eca6de40db45345c0987505c9e0b1c255d82391d7ffe14c8ab101c14c (file bytes of `datasets/golden/stage_k/lev_k.json`, 13 cases) (2026-11-20).
 - **Retirement trigger:** a superseding stage K ruling or a change of LEV or LEX.

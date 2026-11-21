@@ -1774,7 +1774,7 @@ By hand at `b = 0`: every path has hazard `h = 0.03`, so `a_i = ln 0.03 = -3.506
 "code":"E_DOMAIN"
 -->
 
-The table shows the Windows output (local laptop, 2026-11-21). On the Linux GitHub runner (Docs run 44895037149) two values differ in the 16th and 17th significant digits: `b = 0.1` gives 0.061148353888627785 and `b = -0.2` gives 0.015569211034720722 (the root finder and `exp` round differently across platforms). The recipe check asserts the first 14 significant digits, which both platforms print.
+The table shows the Windows output (local laptop, 2026-11-21). On the Linux GitHub runner (Docs run 44895037149) two values differ in the 16th and 17th significant digits: `b = 0.1` gives 0.061148353888627785 and `b = -0.2` gives 0.015569211034720722 (the root finder and `exp` round differently across platforms). The recipe check asserts the first 14 significant digits, which both platforms print. Why this is allowed: [docs/determinism.md](docs/determinism.md) claims bit-for-bit equality only for integer, date, enum and error outputs; a real output such as `cva` is compared within its golden tolerance (class `root_finding` in `wwr_g`, 1e-9 absolute plus 1e-12 relative), and the cross-platform gap here, about 4e-17 at `b = 0.1` (measured from the two printed values), is far inside it.
 
 | Case | `wwr_b` | `cva` | `a` first bucket | Golden |
 |---|---|---|---|---|

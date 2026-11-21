@@ -660,6 +660,15 @@ def gen_lev():
         "banking_book": [{"counterparty": c, "value": 100} for c in ("M1", "M2", "N1", "N2")]},
         lex, OC_LEX, TAGS_L, "mixed group: one G-SIB member and one not, exposure 20% of Tier 1, breaches the 15% limit (KR-324 any member)",
         rederived=False)
+    # KR-326 (confirmed 2026-11-21): group labels in code-point order. U+FFFF sorts before U+1F600 by code point
+    # (and by UTF-8 bytes), but after it in UTF-16 order (the surrogate 0xD83D is below 0xFFFF). Equal exposures, so
+    # the report's tie-break by label shows the order too.
+    hand(s, "risk.capital.large_exposures", {"tier1": 1000, "counterparties": [
+        {"id": "A", "group": "😀"}, {"id": "B", "group": "￿"}, {"id": "C", "group": "￿"}],
+        "banking_book": [{"counterparty": "A", "value": 50}, {"counterparty": "B", "value": 20},
+                         {"counterparty": "C", "value": 30}]},
+        lex, OC_LEX, TAGS_L, "group labels U+FFFF and U+1F600 with equal exposures: code-point order, not UTF-16 order (KR-326)",
+        rederived=False)
     s.write()
 
 
