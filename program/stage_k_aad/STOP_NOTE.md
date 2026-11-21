@@ -8,21 +8,27 @@ Branch `k-v1-aad` now holds `k-xva-spec` (c7a036cc, merge 1st) and local `k-v1` 
 
 **Content.** KR-296 and KR-297 marked CONFIRMED (coordinator, 2026-11-21) in `specifications/stage-k-rulings-xva.md`, the three K-8b specs, the oracle comments (the candidate files and MANIFEST are unchanged, they already use the bucket start), CHANGELOG, model inventory and known-issues. New known-issues row "K-8 AAD = bump (plan 14.8)" (K-9 part 2, Major 3): the 1e-8 clause is delivered for `xva.adjustments.value` only (13 value goldens, tolerance fixed failing-first in 7ea4d91f, passing in all four builds below) and NOT delivered for the other six KR-162 operations; generated into `docs/results.md`.
 
-**Merged head counts** (generated): 388 operations, 16,600 cases (8,112 value-checked, 5,934 error, 2,554 invariance).
+**Second merge (19:00 UTC, coordinator request):** `origin/k-v1` 5e4facc9 merged into `k-v1-aad` (merge 490b9b59): conflicts only in count lines and generated files (taken from `k-v1`, regenerated); a new `TOTALS:` line in `program/R6_HANDOVER.md`. The Rust replay minimum stays 580 (a floor; more cases exist now).
 
-| Language | Command | Result (2026-11-21) |
+**Merged head counts** (generated): 388 operations, 16,646 cases (8,155 value-checked, 5,937 error, 2,554 invariance).
+
+Verification at the final merged head (490b9b59 and later doc-only commits), 2026-11-21, local laptop, not the acceptance machine:
+
+| Language | Command | Result |
 |---|---|---|
 | Python (Windows) | `uv run ruff check .`, `ruff format --check .`, `mypy .` | rc 0, rc 0, rc 0 |
-| Python | `coverage run -m pytest -q` + per-file coverage gate | 4,419 passed, 3 skipped; gate rc 0 |
-| Python | conformance runner, full tree; `check_tutorial.py --lang python` | 16,600 of 16,600 (aadadj_k 37/37); rc 0 |
-| Java (Windows) | `mvn -B -Pcoverage verify` (under the mvn lock) + coverage gate | 1,095 tests, 0 failures, 1 skipped; 8 modules at 85%, 0 below |
-| Java | package, conformance runner, `check_tutorial.py --lang java` | 16,600 of 16,600 (aadadj_k 37/37); rc 0 |
-| Rust (WSL) | `cargo fmt --check`, `clippy -D warnings`, `cargo test --workspace` | rc 0, rc 0, 801 passed in 39 binaries (second run; first failed only on the replay minimum) |
-| Rust | release CLI conformance | 16,600 of 16,600 |
-| C++ (WSL) | Release `-Werror` build, ctest, conformance | build rc 0; 6 of 6 ctest; 16,600 of 16,600 |
-| C++ | ASan/UBSan build and ctest | build rc 0; the 5 small ctest tests pass; `ctest` hit the 10-minute cap on `quantforge_core_tests` (the same TIMEOUT on k-v1-fix, k-v1-rev1 and m5); rerun in 6 Catch2 shards, each under the lock: RESULT PENDING |
-| Repo | `python -m pytest -q tools`; `check_case_total.py`; `research/test_preregs.py` | 110 passed, 4 skipped; rc 0 (after the TOTALS line); OK |
-| Repo | the 18 gates of `_h4ci/kv1/gates.sh` | 17 rc 0; `outside_shares.py --check` rc 1 (below) |
+| Python | `coverage run -m pytest -q` + per-file coverage gate | PY_RESULT |
+| Python | conformance runner, full tree | PYCONF_RESULT |
+| Java (Windows, mvn lock) | `mvn -B -Pcoverage verify` + coverage gate; package | 1,102 tests, 0 failures, 1 skipped; 8 modules at 85%, 0 below; rc 0 |
+| Java | conformance runner; `check_tutorial.py --lang java` | 16,646 of 16,646; rc 0 |
+| Rust (WSL) | `cargo fmt --check`, `clippy -D warnings`, `cargo test --workspace` | rc 0, rc 0, 801 passed in 39 binaries |
+| Rust | release CLI conformance | 16,646 of 16,646 |
+| C++ (WSL) | Release `-Werror` build, ctest, conformance | rc 0; 6 of 6; 16,646 of 16,646 |
+| C++ | ASan/UBSan build; `quantforge_core_tests` in 6 Catch2 shards (`--shard-count 6`), each under the lock and the 10-minute cap | build rc 0; 711 test cases, all pass, no sanitizer report. The single `ctest` run of `asan2` exceeds the 10-minute cap (TIMEOUT, as on k-v1-fix, k-v1-rev1, m5), hence the shards (`_h4ci/kv1/k-v1-aad/asan_shards.sh`). The five small ASan ctest tests (snapshot, k5a) passed at the pre-merge head only |
+| Repo | `python -m pytest -q tools`; `check_case_total.py`; `research/test_preregs.py` | 118 passed, 4 skipped; rc 0 (16,646 / 8,155 / 5,937 / 2,554 equal to the handover line); OK |
+| Repo | the 18 gates of `_h4ci/kv1/gates.sh` | 17 rc 0; `outside_shares.py --check` rc 1 (open item 1) |
+
+Before the second merge (head e5c4a21d) the same set was run and passed (Python 4,419 passed, 3 skipped; Java 1,095 tests; Rust 801; C++ 6/6; conformance 16,600 of 16,600 in all four builds; ASan shards 711 test cases). The first Rust run failed only on the stage K replay minimum (a guessed 601 against 580 found), fixed in f830637f.
 
 **Open.**
 1. `outside_shares.py --check` is red: K-8 AAD (`aadadj_k`) 0 of 13 outside-checked. The tool credits only goldens in `datasets/golden/stage_k/` whose `verified_by` records a DR-H2 MATCH on every compared output. The 41 blind v2 matches are on the K-8b candidates, which are not goldens (KR-299), and no blind packet covered the `aadadj_k` outputs (the `hazard_buckets` entries were never in a packet). Nothing was credited. Route: a blind packet over the 13 `aadadj_k` value inputs, or the K-8b build.
