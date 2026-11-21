@@ -136,6 +136,9 @@ public final class Black {
             }
         }
         double v = (lo + hi) / 2.0;
+        if (!normal && t > 0.0) {
+            return solveLognormal(phi, f, x, t, d, price, lo, hi, v);
+        }
         for (int i = 0; i < 400; i++) {
             double val = value(normal, phi, f, x, t, d, v);
             double diff = val - price;
@@ -187,6 +190,77 @@ public final class Black {
         }
         double scale = v * vega(normal, f, x, t, d, v);
         double error = Math.abs(value(normal, phi, f, x, t, d, v) - price) + 0x1p-52 * mag
+                + 0x1p-1070 * (1.0 + d * (Math.abs(f) + Math.abs(x) + root));
+        if (!(scale > 0.0) || error > 1e-10 * scale) {
+            throw new QfError("E_NO_CONVERGENCE", "the price does not identify the vol in binary64");
+        }
+        return v;
+    }
+
+    /**
+     * The lognormal branch of {@link #solve} with t &gt; 0, computing the same floating-point expressions in the
+     * same order (so the same iterates, result and errors), but evaluating each one once: ln(F/K) and sqrt(T) are
+     * hoisted out of the loop, vega reuses n(d1) from the price, and the closing checks plus {@link #identified} share
+     * one price evaluation and its two N() terms. In the loop v stays inside (lo, hi) with lo &gt;= 0, so v &gt; 0
+     * and finite, which is when {@link #lognormal} takes its general branch.
+     */
+    private static double solveLognormal(double phi, double f, double x, double t, double d, double price,
+                                         double lo, double hi, double v) {
+        double lf = Math.log(f / x);
+        double r = Math.sqrt(t);
+        // n(phi d1) = n(d1) exactly when |phi| = 1 (pdf takes |x| first), so the density is shared with vega.
+        boolean unit = phi == 1.0 || phi == -1.0;
+        for (int i = 0; i < 400; i++) {
+            double s = v * r;
+            double d1 = (lf + v * v * t / 2.0) / s;
+            double n1 = Normal.pdf(d1);
+            double c1 = unit ? Normal.cdf(phi * d1, n1) : Normal.cdf(phi * d1);
+            double c2 = Normal.cdf(phi * (d1 - s));
+            double val = d * phi * (f * c1 - x * c2);
+            double diff = val - price;
+            if (diff == 0.0) {
+                return identifiedLognormal(f, x, d, v, price, s, n1, c1, c2, val, r);
+            }
+            if (diff > 0.0) {
+                hi = v;
+            } else {
+                lo = v;
+            }
+            double vega = d * f * r * n1;
+            // Newton on ln V - ln price (ruling KR-341): the same step near the root, and it keeps its size far
+            // out of the money, where V spans hundreds of decades over the bracket.
+            double next = vega > 0.0 && val > 0.0 ? v - Math.log(val / price) * val / vega : Double.NaN;
+            if (!(next > lo && next < hi)) {
+                next = (lo + hi) / 2.0;
+            }
+            boolean done = Math.abs(next - v) <= 4e-16 * v;
+            v = next;
+            if (done) {
+                break;
+            }
+        }
+        double s = v * r;
+        double d1 = (lf + v * v * t / 2.0) / s;
+        double n1 = Normal.pdf(d1);
+        double c1 = unit ? Normal.cdf(phi * d1, n1) : Normal.cdf(phi * d1);
+        double c2 = Normal.cdf(phi * (d1 - s));
+        double val = d * phi * (f * c1 - x * c2);
+        // Accept a tiny price error, or a vol bracket collapsed to a few ulps: there the price formula's own
+        // rounding (cancellation in f N(d1) - x N(d2) far from the money) is larger than 1e-13 of the price.
+        boolean priced = Math.abs(val - price) <= 1e-13 * Math.max(1.0, price);
+        boolean collapsed = hi - lo <= 1e-14 * hi && Math.abs(val - price) <= 1e-10 * Math.max(1.0, price);
+        if (!priced && !collapsed) {
+            throw new QfError("E_NO_CONVERGENCE", "implied vol did not converge: f=" + f + " x=" + x + " t=" + t + " d=" + d + " price=" + price + " v=" + v + " value=" + val);
+        }
+        return identifiedLognormal(f, x, d, v, price, s, n1, c1, c2, val, r);
+    }
+
+    /** {@link #identified} for the lognormal model, given the terms of V(v) already evaluated at v. */
+    private static double identifiedLognormal(double f, double x, double d, double v, double price, double root,
+                                              double n1, double c1, double c2, double val, double r) {
+        double mag = d * (f * c1 + x * c2);
+        double scale = v * (d * f * r * n1);
+        double error = Math.abs(val - price) + 0x1p-52 * mag
                 + 0x1p-1070 * (1.0 + d * (Math.abs(f) + Math.abs(x) + root));
         if (!(scale > 0.0) || error > 1e-10 * scale) {
             throw new QfError("E_NO_CONVERGENCE", "the price does not identify the vol in binary64");
