@@ -15,7 +15,7 @@ The sections below follow the order in which stages were built. To find recipes 
 | 03 Calibration | [Build a curve](#build-a-curve), [Stage F](#stage-f-recipes) (joint solve), [Stage G](#stage-g-recipes) (Hull-White calibration) |
 | 04 Pricing | [Stage B](#stage-b-recipes), [Stage D](#stage-d-recipes), [Stage E](#stage-e-recipes), [Stage G](#stage-g-recipes) |
 | 05 Volatility | [Stage C](#stage-c-recipes), [Stage E](#stage-e-recipes) |
-| 06 Risk and xVA | [stage K](#stage-k-recipes) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder; [desk recipes](#stage-k-desk-recipes)), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
+| 06 Risk and xVA | [stage K](#stage-k-recipes) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder; [desk recipes](#stage-k-desk-recipes); [wave 2 capital and xVA](#stage-k-wave-2-capital-and-xva-recipes): RRAO, securitisation and CTP DRC, SA-CVA, large exposures, wrong-way CVA), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
 | 07 Portfolio | [Stage F](#stage-f-recipes) (book), [portfolio construction](#stage-j-wave-2-portfolio-construction-estimation-es-backtest-baum-welch) |
 | 08 Hedging | [Stage I](#stage-i-recipes) |
 | 09 Microstructure | [Stage H](#stage-h-recipes-available-from-v0100) (book rebuild, quotes, estimators), [trading conventions](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues) |
@@ -1596,3 +1596,115 @@ EOF
 ```
 
 Output, key fields (Python build, read 2026-11-20): `derivatives` 569.8, `exposure` 569.8, `ratio` 0.17550017550017552, `meets_minimum` true, label "simplified leverage ratio (LEV30 subset); not a regulatory return". The golden records the Basel printed EAD 569 (CRE99.40) within its stated tolerance of 1.0 and a blind MATCH (`program/STAGE_K_BLIND_K8I.md`). Limits: a simplified subset of LEV30, not a regulatory return.
+
+### Stage K wave 2 capital and xVA recipes
+
+The wave 2 operations (merged to main 2026-11-20, merge 37292e4f; not in a tag) not covered by a recipe above, and the wrong-way-risk CVA of stage G with its KR-257 root fix. The IMA pieces (PLA, ES with liquidity horizons, stress calibration, SES, capital) are worked in [Tutorial 59](docs/getting-started/tutorial-59-frtb-ima-pla-to-capital.md). Every output shown was observed on 2026-11-21 on branch `k-v1-docs-a` with the Python build, local laptop, not the acceptance machine. On that laptop Windows Smart App Control blocks the `quantforge` launcher that `uv` installs, so the lines were sent to `uv run --locked --project python python -m quantforge_core.cli.main batch`, the same entry point; on Linux or macOS use `uv run --locked --project python quantforge batch` as below. Every capital output carries a label such as "regulatory formula on caller inputs; not a regulatory return". No checker runs these blocks.
+
+#### Residual risk add-on: what counts and what is excluded (golden rrao_k-0002)
+
+Plain idea: the RRAO is a blunt charge on gross notional for risks the sensitivities do not see: 1% for exotic underlyings (weather, longevity, realised volatility), 0.1% for other residual risks (barriers, baskets, Bermudans). Back-to-back hedged trades, and "other" instruments that are listed or clearable, are excluded.
+
+Formal statement (`specifications/06-risk/frtb-drc-rrao.md`, MAR23.7 and MAR23.8(2) read 2026-11-19 by the spec lane): `RRAO = sum gross_notional x (0.01 for EXOTIC, 0.001 for OTHER)` over the instruments not excluded. Classifying an instrument is the caller's job.
+
+By hand: the listed OTHER of 5,000,000 is excluded; the listed EXOTIC of 1,000,000 is not (listing excludes only OTHER), so it adds 10,000; the back-to-back EXOTIC of 3,000,000 is excluded. RRAO 10,000.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"rrao","operation":"risk.frtb.rrao","inputs":{"instruments":[{"id":"o","gross_notional":5000000,"kind":"OTHER","listed_or_clearable":true,"back_to_back":false},{"id":"e1","gross_notional":1000000,"kind":"EXOTIC","listed_or_clearable":true,"back_to_back":false},{"id":"e2","gross_notional":3000000,"kind":"EXOTIC","listed_or_clearable":false,"back_to_back":true}]}}
+EOF
+```
+
+Output, key fields: instruments `o` weight 0.001 `excluded` true, `e1` weight 0.01 `excluded` false `addon` 10000.0, `e2` `excluded` true; `rrao` 10000.0, as worked and as the golden.
+
+#### Securitisation DRC: two tranches of one pool do not offset (golden sec_k-0001)
+
+Plain idea: for securitisations the jump-to-default is the market value (no recovery assumption), and a long and a short offset only when they are the same tranche of the same pool. Different tranches of one pool lose differently in a default, so they only hedge each other through the hedge benefit ratio.
+
+Formal statement (`specifications/06-risk/frtb-drc-rrao.md`, MAR22.27 to 22.35, KR-55): `JTD = market value`; net within identical `pool` and `tranche`; `HBR = sum net_long / (sum net_long + sum |net_short|)`; `DRC_b = max(sum RW net_long - HBR sum RW |net_short|, 0)`. The risk weight is the caller's (`rw_source` says "securitisation risk weights supplied by the caller (CRE40-CRE44 not implemented)").
+
+By hand, long 50 of tranche T1 and short 20 of tranche T2, RW 20%: `HBR = 50 / 70 = 0.7143`; weighted long 10, weighted short 4; `DRC = 10 - 0.7143 x 4 = 7.1429`. If the short were the same tranche T1, the two would net to a long of 30 and `DRC = 0.2 x 30 = 6`.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"sec","operation":"risk.frtb.drc_sec_nonctp","inputs":{"positions":[{"id":"l","bucket":"RMBS-EU","pool":"P1","tranche":"T1","market_value":50,"maturity_years":5,"rw":0.2},{"id":"s","bucket":"RMBS-EU","pool":"P1","tranche":"T2","market_value":-20,"maturity_years":5,"rw":0.2}]}}
+{"schema_version":"1.0","case_id":"sec_same","operation":"risk.frtb.drc_sec_nonctp","inputs":{"positions":[{"id":"l","bucket":"RMBS-EU","pool":"P1","tranche":"T1","market_value":50,"maturity_years":5,"rw":0.2},{"id":"s","bucket":"RMBS-EU","pool":"P1","tranche":"T1","market_value":-20,"maturity_years":5,"rw":0.2}]}}
+EOF
+```
+
+Output, key fields: `sec` bucket `hbr` 0.7142857142857143, `wtd_long` 10.0, `wtd_short` 4.0, `drc` 7.142857142857142; `sec_same` `hbr` 1.0, `wtd_long` 6.0, `drc` 6.0. The golden `sec_k-0001` states `drc` 7.142857142857143, one unit in the last place from the output, inside its tolerance. The second line is not a golden; it is the same input with one tranche label changed.
+
+#### Correlation trading DRC: a negative bucket gives half credit (golden ctp_k-0002)
+
+Plain idea: in the correlation trading portfolio a short in one index can partly offset a long in another. Each index bucket's DRC may go negative, and a negative bucket reduces the total at half weight.
+
+Formal statement (`specifications/06-risk/frtb-drc-rrao.md`, MAR22.39 to 22.45): net within identical `index`, `series` and `tranche`; `HBR_ctp` over all CTP net positions together; `DRC_b = sum RW net_long - HBR_ctp sum RW |net_short|` with no floor; `DRC_CTP = max(sum_b (max(DRC_b, 0) + 0.5 min(DRC_b, 0)), 0)`.
+
+By hand, long 1,000 of index A and short 1,000 of index B, RW 10%: `HBR_ctp = 1000 / 2000 = 0.5`; `DRC_A = 100`, `DRC_B = -0.5 x 100 = -50`; total `100 + 0.5 x (-50) = 75`.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"ctp","operation":"risk.frtb.drc_ctp","inputs":{"positions":[{"id":"a","index":"A","series":"S1","tranche":"T1","market_value":1000,"maturity_years":5,"rw":0.1},{"id":"b","index":"B","series":"S1","tranche":"T1","market_value":-1000,"maturity_years":5,"rw":0.1}]}}
+EOF
+```
+
+Output, key fields: `hbr_ctp` 0.5, bucket A `drc` 100.0, bucket B `drc` -50.0, `drc` 75.0, as worked and as the golden. To check the aggregation alone, send `{"bucket_drc": [100, -100]}` (golden `ctp_k-0001`, the MAR22.45 printed example): 50.
+
+#### SA-CVA interest-rate delta, with and without a hedge (goldens sacva_k-0001 and sacva_k-0002)
+
+Plain idea: SA-CVA charges how the bank's CVA moves with market factors. Hedges net against the CVA sensitivities, but the formula keeps 1% of the squared hedge sensitivities as a floor term, so even a perfect hedge leaves a charge.
+
+Formal statement (`specifications/06-risk/cva-capital.md`, MAR50.51 to 50.53, KR-62): `WS_k = RW_k s_cva_k - RW_k s_hdg_k`, `WSH_k = RW_k s_hdg_k`, `K_b = sqrt(max(0, sum WS_k^2 + sum_{k != l} rho_kl WS_k WS_l + 0.01 sum WSH_k^2))`. USD is a specified currency: RW 1.11% at 1Y and 0.74% at 5Y, `rho(1Y, 5Y) = 72%` (spec worked example).
+
+By hand without a hedge: `WS_1Y = 11,100`, `WS_5Y = -14,800`; `K_b^2 = 11,100^2 + 14,800^2 - 2 x 0.72 x 11,100 x 14,800 = 105,686,800`, `K_b = 10,280.41`. With a 5Y hedge sensitivity of -1,500,000: `WS_5Y = -3,700`, hedge term `0.01 x 11,100^2`, `K_b = 8,887.70`. With hedges equal to both CVA sensitivities, every `WS_k` is 0 and `K_b = 0.1 sqrt(11,100^2 + 14,800^2) = 1,850`.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"sacva_nohedge","operation":"risk.cva.sa","inputs":{"m_cva":1,"reporting_currency":"USD","classes":{"IR.DELTA":[{"bucket":"USD","factor":"1Y","s_cva":1000000,"s_hdg":0},{"bucket":"USD","factor":"5Y","s_cva":-2000000,"s_hdg":0}]}}}
+{"schema_version":"1.0","case_id":"sacva_hedge","operation":"risk.cva.sa","inputs":{"m_cva":1,"reporting_currency":"USD","classes":{"IR.DELTA":[{"bucket":"USD","factor":"1Y","s_cva":1000000,"s_hdg":0},{"bucket":"USD","factor":"5Y","s_cva":-2000000,"s_hdg":-1500000}]}}}
+{"schema_version":"1.0","case_id":"sacva_perfect","operation":"risk.cva.sa","inputs":{"m_cva":1,"reporting_currency":"USD","classes":{"IR.DELTA":[{"bucket":"USD","factor":"1Y","s_cva":1000000,"s_hdg":1000000},{"bucket":"USD","factor":"5Y","s_cva":-2000000,"s_hdg":-2000000}]}}}
+EOF
+```
+
+Output, key fields: `sacva_nohedge` `k_b` 10280.408552192855, `total` 10280.408552192855, `rwa` 128505.1069024107; `sacva_hedge` `k_b` 8887.704990603592, `rwa` 111096.3123825449; `sacva_perfect` `k_b` 1850.0, `rwa` 23125.0. The first two equal their goldens; the third is not a golden and shows the floor term. Limits: every sensitivity is an input; there is no CVA model behind it (spec, Limits).
+
+#### Large exposures: a trading book short of a junior claim offsets a senior bond (golden lex_k-0004)
+
+Plain idea: the large exposures rule caps what a bank can lose if one counterparty, or one connected group, fails, at 25% of Tier 1; 10% or more must be reported. In the trading book it assumes nothing is recovered, and a short position offsets a long only if the short is not more senior.
+
+Formal statement (`specifications/06-risk/leverage-large-exposures.md`, LEX10, LEX20 and LEX30 read 2026-11-19 by the spec lane): trading book JTD with LGD 1 (LEX30.17); offsets per counterparty by the seniority rule; a net short counts 0; exposure = banking book + converted off balance sheet + trading book net long - protected + received as provider; `large` when exposure >= 0.10 Tier 1, `breach` when exposure > 0.25 Tier 1 (0.15 between G-SIBs).
+
+By hand, Tier 1 1,000: a loan of 200 to issuer G; a long senior bond of G, face 100, market value 90: JTD `100 + (90 - 100) = 90`; a short of G stock, -30. The stock is junior to the bond, so it offsets: net long 60. Exposure `200 + 60 = 260`, 26% of Tier 1: large and in breach.
+
+```bash
+uv run --locked --project python quantforge batch <<'EOF'
+{"schema_version":"1.0","case_id":"lex","operation":"risk.capital.large_exposures","inputs":{"tier1":1000,"bank_gsib":false,"counterparties":[{"id":"G"}],"banking_book":[{"counterparty":"G","value":200}],"off_balance":[],"crm":[],"trading_book":[{"id":"bond","counterparty":"G","seniority":"SENIOR","notional":100,"market_value":90,"maturity_years":5},{"id":"stock","counterparty":"G","seniority":"EQUITY","notional":-30,"market_value":-30,"maturity_years":1,"cash_equity":true}]}}
+EOF
+```
+
+Output, key fields: counterparty G `banking_book` 200.0, `trading_book_net_long` 60.0, `exposure` 260.0; group G `share` 0.26, `large` true, `limit` 250.0, `breach` true; `report` `["G"]`; label "simplified large exposures (LEX subset); not a regulatory return". Under MAR22 the same bond would have LGD 75% and JTD 65 (spec worked example); the large exposures rule assumes no recovery.
+
+#### Wrong-way-risk CVA: how the CVA moves with the dependence parameter (goldens wwr_g-0001 to wwr_g-0004, wwr_g-0007)
+
+Plain idea: ordinary CVA assumes the counterparty's default is independent of the exposure. Wrong-way risk is when the counterparty is more likely to default exactly when the bank is owed most. The Hull-White model makes the hazard rate on each simulated path grow with the exposure on that path, `exp(a(t) + b V(t))`, and recalibrates `a(t)` so the average survival still matches the counterparty's credit curve. `b > 0` is wrong way, `b < 0` right way, `b = 0` independent.
+
+Formal statement (`specifications/06-risk/xva-framework.md`, ruling G-44; J. Hull and A. White, "CVA and wrong-way risk", 2012, recalled through the spec): on path `p` the hazard in bucket `i` is `exp(a_i + b V_p(t_i))`; `a_i` solves `mean_p S_p(t_i) = e^(-h t_i)`; `CVA = (1 - R) sum_i D_i mean_p[max(V_p(t_i), 0) (S_p(t_(i-1)) - S_p(t_i))]`. Ruling KR-257 (confirmed 2026-11-20) fixed the root: before it, large `|b V|` returned an unconverged `a` and CVA 0 without an error in Python and Rust.
+
+By hand at `b = 0`: every path has hazard `h = 0.03`, so `a_i = ln 0.03 = -3.506558` and the CVA is the independent one on the path-mean positive exposure `EE = (1.125, 2.75, 3.375, 2.75)`: `0.6 x sum D_i EE_i (e^(-0.03 t_(i-1)) - e^(-0.03 t_i)) = 0.0436277` (standard-library line, 0.043627733225243444). For identical exposure on every path (KR-257 closed form) `a_i = ln h - b V`: with `h = 0.01`, `b = 1`, `V = 10`, `a = ln 0.01 - 10 = -14.605170` and `CVA = 0.6 x 10 x (0.97 (1 - e^-0.01) + 0.94 (e^-0.01 - e^-0.02)) = 0.113471`.
+
+```bash
+{ for b in 0.0 0.1 0.3 -0.2; do echo "{\"schema_version\":\"1.0\",\"case_id\":\"b=$b\",\"operation\":\"xva.wwr.cva_hw\",\"inputs\":{\"times\":[0.25,0.5,0.75,1.0],\"values\":[[3.0,5.0,2.0,-1.0],[-2.0,-4.0,-6.0,-3.0],[1.0,6.0,9.0,4.0],[0.5,-1.0,2.5,7.0]],\"discount_factors\":[0.995,0.99,0.985,0.98],\"hazard_rate\":0.03,\"recovery\":0.4,\"wwr_b\":$b}}"; done
+  echo '{"schema_version":"1.0","case_id":"flat","operation":"xva.wwr.cva_hw","inputs":{"times":[1.0,2.0],"values":[[10.0,10.0],[10.0,10.0]],"discount_factors":[0.97,0.94],"hazard_rate":0.01,"recovery":0.4,"wwr_b":1.0}}'
+  echo '{"schema_version":"1.0","case_id":"too_big","operation":"xva.wwr.cva_hw","inputs":{"times":[1.0,2.0],"values":[[10.0,10.0],[800.0,10.0]],"discount_factors":[0.97,0.94],"hazard_rate":0.01,"recovery":0.4,"wwr_b":1.0}}'
+} | uv run --locked --project python quantforge batch
+```
+
+| Case | `wwr_b` | `cva` | `a` first bucket | Golden |
+|---|---|---|---|---|
+| independent | 0.0 | 0.04362773322524349 | -3.50655789731998 | `wwr_g-0001` |
+| wrong way | 0.1 | 0.06114835388862783 | -3.584568660698148 | `wwr_g-0002` |
+| wrong way | 0.3 | 0.08648730471425058 | -3.8277224868236654 | `wwr_g-0003` |
+| right way | -0.2 | 0.015569211034720719 | -3.4452987689759205 | `wwr_g-0004` |
+| identical paths | 1.0 | 0.11347051247504979 | -14.605170185988092 | `wwr_g-0007` |
+
+The last line, `too_big`, returns `E_DOMAIN` on `wwr_b` ("|wwr_b * value| must be at most 700 (KR-257)"): `b V = 800` would overflow the hazard, and the operation now says so instead of returning a wrong number. How to read it: at `b = 0.3` the CVA is about twice the independent figure on the same paths, because the recalibrated hazard is highest on the paths with the largest exposure; at `b = -0.2` it falls to about a third. The outputs differ from the goldens in the last digit or two, inside the `root_finding` tolerance (1e-9 absolute plus 1e-12 relative). Limits: the paths are inputs (four hand-written paths here, not a simulation); the choice of `b` is a model judgement the operation does not make.
