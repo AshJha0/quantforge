@@ -1,0 +1,41 @@
+# Stage K tools stop note (lane k-v1-tools, 2026-11-21)
+
+Branch `k-v1-tools` (off `k-v1` at 47072365), pushed. No PR, no merge. Source of the diagnoses: `institutional-quant-engine-plan/STAGE_K_INVESTIGATION_2026-11-21.md` (read-only lane, same day; outside the repo). Reviewer: none: self-assessment; no second review (owner decision 2026-11-18).
+
+No gate, target, threshold, sample size, soak bound or acceptance rule is changed by this branch. Evidence class of each statement in brackets.
+
+## Done
+
+1. **K9-1b, self-describing workflow downloads** (`tools/workflows/common.py`, `fetch`). Plain idea: a download that comes back broken is tried again, and if it stays broken the error says what came back. Formal: up to 3 attempts, waiting 30 s and then 60 s; retried on a network error, HTTP 429 or 5xx, an empty body, and (with `expect_json=True`) a body that does not parse as JSON; any other HTTP 4xx fails at once. The final `FetchError` names the URL, the HTTP status, the Content-Type and the first 200 bytes. The body returned is the server's body, unchanged, so nothing recorded or reported changes. `expect_json=True` is passed at the New York Fed calls (`eod_curves.py`, `sofr_check.py`, both queries) and the Fiscal Data auctions call (`rich_cheap.py`). Example: run 44630395673 would have logged `body is not JSON: https://markets.newyorkfed.org/... (HTTP 200, Content-Type '...', first 200 bytes b'...')` after two retries instead of `JSONDecodeError ... char 0`. Tests: `tools/test_tools.py` class `WorkflowFetch`, 7 cases with a fake opener, no network [measured: pass].
+2. **K9-1c, missing shard no longer scored** (`conformance/mutation/stage_report.py`). Plain idea: a Rust module is scored in two shard files; if one is missing, the report must not print a percentage from the other. Formal: `missing_shards()` lists each shard `sK` with no file (an unsharded module file counts as complete); the row reads `incomplete: shard sK missing`, has no score, and the shard file is added to "Missing results", so `--gate` exits 1. Example: run 43716417939 scored rust `surfaces_local_vol` 100.0 % from shard s1 alone; it now reads `incomplete: shard s0 missing` and the gate fails. Tests: `tools/test_tools.py` `test_mutation_report_flags_a_missing_rust_shard`; `conformance/mutation/test_gates.py` (planted missing s0 fails, both shards pass) [measured: pass].
+3. **K9-1c, baseline output kept** (`conformance/mutation/golden_mutants.py`, `run(..., keep=True)`). The unmutated baseline commands (Rust release build, `cargo test --no-run`, `cargo test -p quantforge-core`, and the golden baseline for Rust and Python) keep stdout and stderr in a temporary file; when one fails or times out, the last 80 lines are printed to stderr with the command and its exit, before the job stops with exit 2 as before. Mutant runs still discard output, so no verdict rule changes. Tests: `test_gates.py` check group 8 (failure tail, 80-line cap, silent mutant run, silent pass, timeout) [measured: pass].
+4. **Python daycount suite**: see the section below.
+5. **K-6 soak harness, no rule change.**
+   - `benchmarks/soak/analyse.py`: module docstring corrected. It said the judged value was "the smallest memory reading taken once a second inside that 10 s window"; the code (`soak.py` sampling loop) takes one reading at the idle point after `quiesce()`, and none if quiesce did not finish. Only the docstring changed: the AST of the code with the docstring removed is identical to 47072365 [measured]. `RULES`, bounds and the acceptance text are untouched. The file hash changes: new sha256 `4667cb37aa7788f0a707ace932be5bf4c494b0dc0ffedc49683851f49710abc5` (freeze 1ce167bf recorded `ecd91611...`). The next declared freeze should cite the new hash [measured].
+   - `benchmarks/soak/soak.py` `commit()`: falls back to `GITHUB_SHA` when `git rev-parse HEAD` prints nothing, and survives a missing git. Cause of the empty C++ `commit` in run 44824197236: the C++ job runs in the `gcc` container as root on a checkout owned by the runner user; `actions/checkout` adds `safe.directory` only to its temporary global config (job log of 136592490639, lines 139-140 and 502-503), so later `git` calls refuse the repository and print nothing on stdout [read: log; inferred: the refusal, since the soak step's git stderr is not captured]. New sha256 of `soak.py`: `18539ad7038a313d1ddc2a4da142765ae16487a8d35adf9f8d9e4f8bf2679988`. Tests: `benchmarks/soak/test_soak.py` class `CommitFieldTest` [measured: pass].
+
+DAYCOUNT_SECTION
+
+## Verification
+
+VERIFY_SECTION
+
+## Proposed text for rows the docs lane owns (not edited here)
+
+`docs/known-issues.md`, row K9-1b, last two cells:
+
+> Diagnosed 2026-11-21 as transient: the recorder fetched the same New York Fed source as valid JSON at 22:23Z that evening (52,378 bytes, hash `854c2c343739`, run 44627910431) and got the same hash at 04:09Z next morning (run 44672467178); the workflow code and URL are unchanged since 7314924f, and the runs before and after were green (read: run logs; inferred: a short outage or edge response). `tools/workflows/common.py` `fetch` now retries twice (30 s, 60 s) on a network error, 429/5xx, empty or non-JSON body and names URL, status, content type and first 200 bytes when it gives up (branch `k-v1-tools`). | closed when the retrying fetch is on main; reopen if the self-describing error appears in a scheduled run
+
+`docs/known-issues.md`, row K9-1c, third and fourth cells:
+
+> The scheduled run of 2026-11-15 failed: seven mutation jobs did not finish, not four: Java `rates_vol` and `roots` (Maven Central refused the pitest plugin, HTTP 429 named in the roots log), Rust `surfaces_local_vol` shard s0 (the unmutated `cargo test` failed once; shard s1 passed it on the same commit), Python `interp` (target without `*`, no mutants), and Python `daycount`, `compounding` and `roots` (cancelled at the 120-minute job limit). The report also scored Rust `surfaces_local_vol` 100.0 % from shard s1 alone. The report gate found modules below the 80 % target on the 40-mutant sample (for example C++ `hedge_solvers` 28 of 40, 70.0 %, Wilson 95 % interval 55 % to 82 %). Read from the run log of 43716417939 (2026-11-20, re-read 2026-11-21). | open; the mutation shortfall is the README known issue "Mutation gate". Fixed since the run: Maven retries, fallback mirror and cache (1e816fc5, e443e3b5, 47072365); Python `interp` target and the narrower suites for `compounding` and `roots` (H-0, green in 44373491612). Branch `k-v1-tools`: a missing shard is now reported `incomplete` and fails the gate; a failed baseline prints its output tail; DAYCOUNT_ROW. Not yet shown: the next weekly run (2026-11-22 05:41 UTC) must finish every job
+
+`CHANGELOG.md`, under "Fixed":
+
+> - **Tooling (lane `k-v1-tools`, 2026-11-21; known issues K9-1b, K9-1c).** `tools/workflows/common.py` `fetch` retries a transient bad download (network error, HTTP 429/5xx, empty or non-JSON body; 3 attempts, 30 s and 60 s apart) and its final error names the URL, status, content type and first 200 bytes. `conformance/mutation/stage_report.py` reports a module with a missing shard as `incomplete: shard sN missing` and the gate counts it as missing (run 43716417939 had scored one shard as 100 %). `golden_mutants.py` prints the last 80 lines of a failed unmutated baseline command. DAYCOUNT_CHANGELOG K-6 soak harness: `analyse.py` docstring now matches the code (one reading at the idle point; rule unchanged, new file hash recorded) and `soak.py` records `GITHUB_SHA` when git refuses the container checkout (empty C++ commit in run 44824197236). No gate, target, threshold, sample size or soak bound changed.
+
+## Open
+
+- K9-1c is shown fixed only by a full weekly run (next 2026-11-22 05:41 UTC) or a branch dispatch with `stage=ALL`; not run from this lane.
+- Why the unmutated Rust `cargo test` failed once on `surfaces_local_vol--s0` is still unknown; the next failure will print its output tail.
+- The K-6 soak misses stay recorded misses. The diagnostics D1 to D4 in the investigation report are not implemented; they need declaring before the next soak run.
