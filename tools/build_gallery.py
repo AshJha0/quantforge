@@ -736,13 +736,33 @@ Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown. The papers and standards behind each curve are cited in its spec and collected in [References](../references.md).
 
 {table(['Curve', 'Stage', 'Evidence'], rows)}
-
+{hand_pages()}
 Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 {real}{RISK_CAPITAL}
 ## How the gallery is built
 
 `tools/build_gallery.py` runs the CLIs and writes these pages and `docs/curves/data/`. CI reruns the Python CLI and fails if a committed number moves by more than {TOL['curve'][0]:g} plus {TOL['curve'][1]:g} relative, or {TOL['risk'][0]:g} plus {TOL['risk'][1]:g} relative for risk figures. See [the guide](../developer-guides/curves-gallery.md).
 """
+
+
+# Hand-written method pages (docs lane k-v1-docs-b, 2026-11-21): written by hand, not from data/, so --check only
+# requires that each listed file exists; their numbers are rechecked by docs/question-bank/verify/v14_stage_k.py.
+HAND_PAGES = [
+    ("meeting-steps.md", "Central-bank meeting steps and the year-end turn", "`rates.ois.step_curve`, `rates.ois.fit_steps`"),
+    ("joint-solve.md", "Multi-curve joint solve and its Jacobian", "`rates.curve.joint_solve`, `rates.curve.joint_bootstrap`"),
+    ("curve-risk.md", "Curve risk: par buckets, key rates and the Jacobian", "`risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian`"),
+    ("incremental-update.md", "Incremental curve update (stage K)", "`curve.bootstrap.par_annual`, `curve.incremental.update`"),
+]
+
+
+def hand_pages():
+    missing = [f for f, _, _ in HAND_PAGES if not (OUT / f).is_file()]
+    if missing:
+        raise SystemExit(f"hand-written curve page missing: {missing}")
+    lines = "\n".join(f"| [{title}]({f}) | {ops} |" for f, title, ops in HAND_PAGES)
+    return ("\n## Method pages\n\nWritten by hand rather than generated from `docs/curves/data/`: each explains a curve method "
+            "with a worked example from the Python build on golden inputs, and says so at its top.\n\n"
+            f"| Page | Operations |\n|---|---|\n{lines}\n")
 
 
 # Gap G-5 of the docs plan: risk and capital term structures, only what is released (stage K docs lane, 2026-11-19).

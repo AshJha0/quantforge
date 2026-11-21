@@ -46,6 +46,17 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Intraday volume profile (VWAP input)](volume-profile.md) | H | Implemented (v0.10.0), all four languages; `exec.schedule.vwap` cases in `sched_h` (blind re-derived) |
 | [Walk-the-book cost curves (crypto venue, recorded)](walk-the-book.md) | H | Planned; research item H-1(b), no result yet; crypto venue, not equities or rates; aggregates only |
 
+## Method pages
+
+Written by hand rather than generated from `docs/curves/data/`: each explains a curve method with a worked example from the Python build on golden inputs, and says so at its top.
+
+| Page | Operations |
+|---|---|
+| [Central-bank meeting steps and the year-end turn](meeting-steps.md) | `rates.ois.step_curve`, `rates.ois.fit_steps` |
+| [Multi-curve joint solve and its Jacobian](joint-solve.md) | `rates.curve.joint_solve`, `rates.curve.joint_bootstrap` |
+| [Curve risk: par buckets, key rates and the Jacobian](curve-risk.md) | `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` |
+| [Incremental curve update (stage K)](incremental-update.md) | `curve.bootstrap.par_annual`, `curve.incremental.update` |
+
 Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 
 ## Real data
