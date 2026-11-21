@@ -7788,6 +7788,81 @@
     "zero_jacobian"
    ]
   },
+  "risk.capital.large_exposures": {
+   "spec": "specifications/06-risk/leverage-large-exposures.md",
+   "rust": "quantforge::risk::capital_large_exposures",
+   "python": "quantforge.risk.capital_large_exposures",
+   "java": "Risk.capitalLargeExposures",
+   "cpp": "qf::risk::capital_large_exposures",
+   "inputs": {
+    "bank_gsib": {
+     "java": "bankGsib"
+    },
+    "banking_book": {
+     "java": "bankingBook"
+    },
+    "counterparties": {
+     "java": "counterparties"
+    },
+    "crm": {
+     "java": "crm"
+    },
+    "off_balance": {
+     "java": "offBalance"
+    },
+    "tier1": {
+     "java": "tier1"
+    },
+    "trading_book": {
+     "java": "tradingBook"
+    }
+   },
+   "outputs": [
+    "counterparties",
+    "groups",
+    "label",
+    "report"
+   ]
+  },
+  "risk.capital.leverage": {
+   "spec": "specifications/06-risk/leverage-large-exposures.md",
+   "rust": "quantforge::risk::capital_leverage",
+   "python": "quantforge.risk.capital_leverage",
+   "java": "Risk.capitalLeverage",
+   "cpp": "qf::risk::capital_leverage",
+   "inputs": {
+    "derivatives": {
+     "java": "derivatives"
+    },
+    "off_balance": {
+     "java": "offBalance"
+    },
+    "on_balance": {
+     "java": "onBalance"
+    },
+    "sfts": {
+     "java": "sfts"
+    },
+    "tier1": {
+     "java": "tier1"
+    },
+    "written_credit_derivatives": {
+     "java": "writtenCreditDerivatives"
+    }
+   },
+   "outputs": [
+    "derivative_netting_sets",
+    "derivatives",
+    "exposure",
+    "label",
+    "meets_minimum",
+    "off_balance",
+    "on_balance",
+    "ratio",
+    "sfts",
+    "written_credit_derivatives"
+   ]
+  },
   "risk.cashflows": {
    "spec": "specifications/06-risk/rates-sensitivities.md",
    "rust": "quantforge::risk::cashflows_",
@@ -8101,6 +8176,63 @@
     "loadings"
    ]
   },
+  "risk.cva.ba": {
+   "spec": "specifications/06-risk/cva-capital.md",
+   "rust": "quantforge::risk::cva_ba",
+   "python": "quantforge.risk.cva_ba",
+   "java": "Risk.cvaBa",
+   "cpp": "qf::risk::cva_ba",
+   "inputs": {
+    "counterparties": {
+     "java": "counterparties"
+    },
+    "index_hedges": {
+     "java": "indexHedges"
+    },
+    "single_name_hedges": {
+     "java": "singleNameHedges"
+    },
+    "version": {
+     "java": "version"
+    }
+   },
+   "outputs": [
+    "capital",
+    "counterparties",
+    "ih",
+    "k_full",
+    "k_hedged",
+    "k_reduced",
+    "label",
+    "rwa",
+    "version"
+   ]
+  },
+  "risk.cva.sa": {
+   "spec": "specifications/06-risk/cva-capital.md",
+   "rust": "quantforge::risk::cva_sa",
+   "python": "quantforge.risk.cva_sa",
+   "java": "Risk.cvaSa",
+   "cpp": "qf::risk::cva_sa",
+   "inputs": {
+    "classes": {
+     "java": "classes"
+    },
+    "m_cva": {
+     "java": "mCva"
+    },
+    "reporting_currency": {
+     "java": "reportingCurrency"
+    }
+   },
+   "outputs": [
+    "classes",
+    "label",
+    "m_cva",
+    "rwa",
+    "total"
+   ]
+  },
   "risk.frtb.backtest.count": {
    "spec": "specifications/06-risk/frtb-ima-backtest.md",
    "rust": "quantforge::risk::frtb_backtest_count",
@@ -8243,6 +8375,70 @@
     "scenarios"
    ]
   },
+  "risk.frtb.drc_ctp": {
+   "spec": "specifications/06-risk/frtb-drc-rrao.md",
+   "rust": "quantforge::risk::frtb_drc_ctp",
+   "python": "quantforge.risk.frtb_drc_ctp",
+   "java": "Risk.frtbDrcCtp",
+   "cpp": "qf::risk::frtb_drc_ctp",
+   "inputs": {
+    "bucket_drc": {
+     "java": "bucketDrc"
+    },
+    "positions": {
+     "java": "positions"
+    }
+   },
+   "outputs": [
+    "buckets",
+    "drc",
+    "hbr_ctp",
+    "label",
+    "positions",
+    "rw_source"
+   ]
+  },
+  "risk.frtb.drc_nonsec": {
+   "spec": "specifications/06-risk/frtb-drc-rrao.md",
+   "rust": "quantforge::risk::frtb_drc_nonsec",
+   "python": "quantforge.risk.frtb_drc_nonsec",
+   "java": "Risk.frtbDrcNonsec",
+   "cpp": "qf::risk::frtb_drc_nonsec",
+   "inputs": {
+    "positions": {
+     "java": "positions"
+    },
+    "ratings": {
+     "java": "ratings"
+    }
+   },
+   "outputs": [
+    "buckets",
+    "drc",
+    "label",
+    "obligors",
+    "positions"
+   ]
+  },
+  "risk.frtb.drc_sec_nonctp": {
+   "spec": "specifications/06-risk/frtb-drc-rrao.md",
+   "rust": "quantforge::risk::frtb_drc_sec_nonctp",
+   "python": "quantforge.risk.frtb_drc_sec_nonctp",
+   "java": "Risk.frtbDrcSecNonctp",
+   "cpp": "qf::risk::frtb_drc_sec_nonctp",
+   "inputs": {
+    "positions": {
+     "java": "positions"
+    }
+   },
+   "outputs": [
+    "buckets",
+    "drc",
+    "label",
+    "positions",
+    "rw_source"
+   ]
+  },
   "risk.frtb.equity_delta": {
    "spec": "specifications/06-risk/frtb-sa-fx-equity.md",
    "rust": "quantforge::risk::frtb_equity_delta",
@@ -8298,6 +8494,289 @@
     "binding_scenario",
     "capital",
     "scenarios"
+   ]
+  },
+  "risk.frtb.ima.capital": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_ima_capital",
+   "python": "quantforge.risk.frtb_ima_capital",
+   "java": "Risk.frtbImaCapital",
+   "cpp": "qf::risk::frtb_ima_capital",
+   "inputs": {
+    "c_u": {
+     "java": "cU"
+    },
+    "desks": {
+     "java": "desks"
+    },
+    "drc": {
+     "java": "drc"
+    },
+    "exceptions": {
+     "java": "exceptions"
+    },
+    "imcc_avg": {
+     "java": "imccAvg"
+    },
+    "imcc_prev": {
+     "java": "imccPrev"
+    },
+    "qualitative_addon": {
+     "java": "qualitativeAddon"
+    },
+    "sa_all": {
+     "java": "saAll"
+    },
+    "ses_avg": {
+     "java": "sesAvg"
+    },
+    "ses_prev": {
+     "java": "sesPrev"
+    }
+   },
+   "outputs": [
+    "acr_total",
+    "c_a",
+    "ima_ga",
+    "k",
+    "label",
+    "m_c",
+    "sa_ga",
+    "surcharge"
+   ]
+  },
+  "risk.frtb.ima.es_lh": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_ima_es_lh",
+   "python": "quantforge.risk.frtb_ima_es_lh",
+   "java": "Risk.frtbImaEsLh",
+   "cpp": "qf::risk::frtb_ima_es_lh",
+   "inputs": {
+    "es_t": {
+     "java": "esT"
+    },
+    "pnl": {
+     "java": "pnl"
+    },
+    "sigma": {
+     "java": "sigma"
+    }
+   },
+   "outputs": [
+    "es",
+    "es_by_horizon",
+    "label",
+    "mode"
+   ]
+  },
+  "risk.frtb.ima.es_stressed": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_ima_es_stressed",
+   "python": "quantforge.risk.frtb_ima_es_stressed",
+   "java": "Risk.frtbImaEsStressed",
+   "cpp": "qf::risk::frtb_ima_es_stressed",
+   "inputs": {
+    "es_fc": {
+     "java": "esFc"
+    },
+    "es_rc": {
+     "java": "esRc"
+    },
+    "es_rs": {
+     "java": "esRs"
+    }
+   },
+   "outputs": [
+    "es",
+    "label",
+    "ratio",
+    "ratio_floored"
+   ]
+  },
+  "risk.frtb.ima.imcc": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_ima_imcc",
+   "python": "quantforge.risk.frtb_ima_imcc",
+   "java": "Risk.frtbImaImcc",
+   "cpp": "qf::risk::frtb_ima_imcc",
+   "inputs": {
+    "classes": {
+     "java": "classes"
+    },
+    "portfolio": {
+     "java": "portfolio"
+    }
+   },
+   "outputs": [
+    "classes",
+    "classes_floored",
+    "imcc",
+    "imcc_c",
+    "label",
+    "portfolio_floored"
+   ]
+  },
+  "risk.frtb.ima.lh": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_ima_lh",
+   "python": "quantforge.risk.frtb_ima_lh",
+   "java": "Risk.frtbImaLh",
+   "cpp": "qf::risk::frtb_ima_lh",
+   "inputs": {
+    "category": {
+     "java": "category"
+    },
+    "constituents": {
+     "java": "constituents"
+    },
+    "fx_pair": {
+     "java": "fxPair"
+    },
+    "maturity_days": {
+     "java": "maturityDays"
+    }
+   },
+   "outputs": [
+    "label",
+    "n",
+    "rule",
+    "table_n"
+   ]
+  },
+  "risk.frtb.ima.ses": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_ima_ses",
+   "python": "quantforge.risk.frtb_ima_ses",
+   "java": "Risk.frtbImaSes",
+   "cpp": "qf::risk::frtb_ima_ses",
+   "inputs": {
+    "idio_credit": {
+     "java": "idioCredit"
+    },
+    "idio_equity": {
+     "java": "idioEquity"
+    },
+    "other": {
+     "java": "other"
+    }
+   },
+   "outputs": [
+    "idio_credit",
+    "idio_equity",
+    "label",
+    "other",
+    "ses"
+   ]
+  },
+  "risk.frtb.pla": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_pla",
+   "python": "quantforge.risk.frtb_pla",
+   "java": "Risk.frtbPla",
+   "cpp": "qf::risk::frtb_pla",
+   "inputs": {
+    "hpl": {
+     "java": "hpl"
+    },
+    "rtpl": {
+     "java": "rtpl"
+    }
+   },
+   "outputs": [
+    "ks",
+    "ks_count",
+    "ks_pvalue_asymptotic",
+    "label",
+    "n",
+    "regulatory_window",
+    "spearman",
+    "zone"
+   ]
+  },
+  "risk.frtb.pla.ks_pvalue": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_pla_ks_pvalue",
+   "python": "quantforge.risk.frtb_pla_ks_pvalue",
+   "java": "Risk.frtbPlaKsPvalue",
+   "cpp": "qf::risk::frtb_pla_ks_pvalue",
+   "inputs": {
+    "ks": {
+     "java": "ks"
+    },
+    "n": {
+     "java": "n"
+    }
+   },
+   "outputs": [
+    "label",
+    "pvalue"
+   ]
+  },
+  "risk.frtb.rfet": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_rfet",
+   "python": "quantforge.risk.frtb_rfet",
+   "java": "Risk.frtbRfet",
+   "cpp": "qf::risk::frtb_rfet",
+   "inputs": {
+    "as_of": {
+     "java": "asOf"
+    },
+    "observations": {
+     "java": "observations"
+    }
+   },
+   "outputs": [
+    "crit1",
+    "crit2",
+    "distinct_days",
+    "first_failing_window_count",
+    "first_failing_window_start",
+    "label",
+    "min_window_count",
+    "pass",
+    "window_start"
+   ]
+  },
+  "risk.frtb.rfet.bucket": {
+   "spec": "specifications/06-risk/frtb-ima.md",
+   "rust": "quantforge::risk::frtb_rfet_bucket",
+   "python": "quantforge.risk.frtb_rfet_bucket",
+   "java": "Risk.frtbRfetBucket",
+   "cpp": "qf::risk::frtb_rfet_bucket",
+   "inputs": {
+    "delta": {
+     "java": "delta"
+    },
+    "row": {
+     "java": "row"
+    },
+    "t": {
+     "java": "t"
+    }
+   },
+   "outputs": [
+    "bucket",
+    "label",
+    "lower",
+    "upper"
+   ]
+  },
+  "risk.frtb.rrao": {
+   "spec": "specifications/06-risk/frtb-drc-rrao.md",
+   "rust": "quantforge::risk::frtb_rrao",
+   "python": "quantforge.risk.frtb_rrao",
+   "java": "Risk.frtbRrao",
+   "cpp": "qf::risk::frtb_rrao",
+   "inputs": {
+    "instruments": {
+     "java": "instruments"
+    }
+   },
+   "outputs": [
+    "instruments",
+    "label",
+    "rrao"
    ]
   },
   "risk.frtb.sbm_total": {
@@ -10712,25 +11191,7 @@
  ],
  "spec_only": [
   "paper.pnl.explain",
-  "risk.capital.large_exposures",
-  "risk.capital.leverage",
   "risk.ccr.sa_ccr",
-  "risk.cva.ba",
-  "risk.cva.sa",
-  "risk.frtb.drc_ctp",
-  "risk.frtb.drc_nonsec",
-  "risk.frtb.drc_sec_nonctp",
-  "risk.frtb.ima.capital",
-  "risk.frtb.ima.es_lh",
-  "risk.frtb.ima.es_stressed",
-  "risk.frtb.ima.imcc",
-  "risk.frtb.ima.lh",
-  "risk.frtb.ima.ses",
-  "risk.frtb.pla",
-  "risk.frtb.pla.ks_pvalue",
-  "risk.frtb.rfet",
-  "risk.frtb.rfet.bucket",
-  "risk.frtb.rrao",
   "risk.sbim.placeholder",
   "xva.colva.value",
   "xva.exposure.amc",
@@ -10741,7 +11202,6 @@
   "xva.im.project",
   "xva.mpor.days",
   "xva.mva.value",
-  "xva.sens.aad",
   "xva.stress.shocked",
   "xva.wwr.cva_gaussian_copula"
  ]

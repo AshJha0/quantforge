@@ -11,7 +11,7 @@ quadrature of `int phi(x) Phi((b - c x)/r) dx`; derivatives by `mpmath.diff` at 
 once to binary64. Inputs are binary64 numbers; where a case table writes a formula (`D = exp(-0.03 t)`), the input
 is the binary64 rounding of the exact value, written into the case.
 
-Survival convention: proposed ruling KR-296 (`specifications/stage-k-rulings-xva.md`): FCA, FBA, MVA and the
+Survival convention: ruling KR-296 (confirmed 2026-11-21) (`specifications/stage-k-rulings-xva.md`): FCA, FBA, MVA and the
 ColVA survival weight all take survival at the START of each bucket. `--convention end` recomputes the cases that
 move under the old wording (MVA and ColVA at bucket end) for the ruling's table; it writes nothing.
 
@@ -34,7 +34,7 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "oracle" / "xva_k8b_candidates"
 GEN = "oracle/python/gen_stage_k_xva_k8b.py"
 REVIEWER = "none: self-assessment; no second review (owner decision 2026-11-18)"
-CONV = {"surv": "start"}  # KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA
+CONV = {"surv": "start"}  # KR-296 (confirmed 2026-11-21): survival at the bucket start for FCA, FBA, MVA, ColVA
 
 M = mp.mpf
 

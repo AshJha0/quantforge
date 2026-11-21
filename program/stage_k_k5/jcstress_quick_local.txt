@@ -1,0 +1,31 @@
+RUN RESULTS:
+  Interesting tests: 1 matching test results.
+
+.......... [OK] org.quantforge.jcstress.InPlaceMutationFault
+
+  Results across all configurations:
+
+  RESULT      SAMPLES     FREQ       EXPECT  DESCRIPTION
+    0, 0   92,380,253   41.63%   Acceptable  whole old or whole new
+    0, 1      112,579    0.05%  Interesting  planted fault 3: fields from two versions (in-place mutat...
+    1, 0            0    0.00%  Interesting  planted fault 3: fields from two versions (in-place mutat...
+    1, 1  129,409,617   58.32%   Acceptable  whole old or whole new
+
+
+  Failed tests: No matches.
+
+  Error tests: No matches.
+
+  All remaining tests: 1 matching test results.
+
+.......... [OK] org.quantforge.jcstress.SnapshotPublishTest
+
+  Results across all configurations:
+
+  RESULT     SAMPLES     FREQ      EXPECT  DESCRIPTION
+    0, 1  33,572,139   62.43%  Acceptable  initial snapshot, whole
+    1, 1  20,203,247   37.57%  Acceptable  published snapshot, whole
+
+
+
+  HTML report generated at C:\Work\Claude\qf-wt\k-v1-k5\java25\target-jcstress\jcstress-results\index.html

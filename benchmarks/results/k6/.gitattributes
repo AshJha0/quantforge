@@ -1,0 +1,2 @@
+# keep soak CSV bytes as written, so csv_sha256 in each summary matches the committed file
+*.csv -text

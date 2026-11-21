@@ -1,0 +1,22 @@
+{
+ "note": "Unit-test line coverage per language, copied verbatim from the log of a CI run of .github/workflows/coverage-stage.yml (tools/quality_gate.py --floor --per-file). Refresh: gh run view RUN --log | grep -oE '(java|cpp|rust|python): (library|per-file).*' and replace log_lines, run and head_sha. tools/results_page.py publishes it in docs/results.md.",
+ "workflow": ".github/workflows/coverage-stage.yml",
+ "run": 44791215671,
+ "run_url": "https://github.com/AshJha0/quantforge/actions/runs/44791215671",
+ "event": "pull_request (k-v1 into main)",
+ "head_sha": "146102d2d4c17359e4f7438cebcdb9c176b42bcd",
+ "date": "2026-11-20",
+ "read_on": "2026-11-20",
+ "evidence_class": "measured in CI; read from the run log",
+ "tools": "Java JaCoCo, C++ gcovr, Python coverage.py, Rust cargo-llvm-cov (lcov), as in the workflow",
+ "log_lines": [
+  "cpp: library 48488/49846 lines, 97.3% against the floor 95%",
+  "cpp: per-file gate at 90%: 0 file(s) below",
+  "java: library 24722/25289 lines, 97.8% against the floor 96%",
+  "java: per-file gate at 90%: 0 file(s) below",
+  "python: library 18524/18872 lines, 98.2% against the floor 96%",
+  "python: per-file gate at 90%: 0 file(s) below",
+  "rust: library 40826/42143 lines, 96.9% against the floor 94%",
+  "rust: per-file gate at 90%: 0 file(s) below"
+ ]
+}

@@ -46,11 +46,11 @@ Operations (6; every operation whose name-map spec is the model's spec (shared s
 | `risk.backtest.kupiec` | 20 | 5 | 1 | 1 | `e1_risk`, `risk_f4` | 20 of 20 (stage F) | 0, 0, 1, 0 |
 | `risk.var.filtered_historical` | 6 | 16 | 5 | 5 | `e1_risk`, `risk_f4` | 6 of 6 (stage F) | 0, 0, 1, 0 |
 | `risk.var.historical` | 20 | 9 | 2 | 2 | `e1_risk`, `risk_f4` | 20 of 20 (stage F) | 0, 0, 1, 0 |
-| `risk.var.monte_carlo` | 5 | 15 | 3 | 3 | `e1_risk`, `fuzzfix_j`, `risk_f4` | 0 of 0 (stage J) | 0, 0, 1, 0 |
+| `risk.var.monte_carlo` | 5 | 15 | 3 | 3 | `e1_risk`, `fuzzfix_j`, `risk_f4` | 0 of 4 (stage F) | 0, 0, 1, 0 |
 | `risk.var.parametric` | 11 | 10 | 2 | 2 | `e1_risk`, `risk_f4` | 10 of 10 (stage F) | 0, 0, 1, 0 |
 
 Totals: 79 value-checked, 59 error, 28 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 73 of 73 value cases (100.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Outside-checked: 73 of 77 value cases (94.8%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: modules `F/var_backtest` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.
 

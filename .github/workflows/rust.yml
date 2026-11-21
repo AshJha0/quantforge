@@ -2,7 +2,7 @@ name: Rust
 on:
   push:
     branches: [main]
-    paths: ['rust/**', '.github/workflows/rust.yml']
+    paths: ['rust/**', 'datasets/scenarios/k5_snapshot.json', '.github/workflows/rust.yml']
   pull_request:  # every PR, so these can be required checks on main
   workflow_call:  # release.yml reruns this on a version tag
 permissions:
@@ -26,3 +26,34 @@ jobs:
       - run: cargo fmt --all -- --check
       - run: cargo clippy --workspace --all-targets -- -D warnings
       - run: cargo test --workspace
+  tsan:
+    # Stage K, K-5 (rulings confirmed 2026-11-20, KR-285, KR-288; not yet green in CI): the snapshot race test under ThreadSanitizer. CI only: the pinned
+    # toolchain (1.99.1, stable) cannot build with a sanitizer, so this job uses a dated nightly for this one test
+    # and nothing else. Long mode (1,000,000 publishes at R = 1 and 4,
+    # 200,000 at R = 16), then both planted faults, which ThreadSanitizer must report.
+    # Latency-aware analytics on simulated data; nothing is timed.
+    name: rust-tsan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: rust
+    env:
+      NIGHTLY: nightly-2026-11-01
+      RUSTFLAGS: -Zsanitizer=thread
+      RUSTDOCFLAGS: -Zsanitizer=thread
+      TSAN_OPTIONS: halt_on_error=1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install "$NIGHTLY" --profile minimal --component rust-src
+      - name: race, long mode
+        run: QF_SNAPSHOT_PUBLISHES=1000000 cargo +"$NIGHTLY" test -Zbuild-std --target x86_64-unknown-linux-gnu --release -p quantforge-core --test snapshot_race -- --nocapture
+      - name: planted faults must be reported
+        run: |
+          for f in relaxed skip; do
+            if TSAN_OPTIONS="halt_on_error=1 symbolize=0" QF_SNAPSHOT_FAULTS=1 QF_SNAPSHOT_FAULT=$f cargo +"$NIGHTLY" test -Zbuild-std --target x86_64-unknown-linux-gnu --release -p quantforge-core --test snapshot_race planted_faults_under_tsan > fault_$f.log 2>&1; then echo "fault $f NOT reported"; exit 1; fi
+            grep -q "ThreadSanitizer: data race" fault_$f.log || { echo "fault $f failed without a TSan report"; tail -20 fault_$f.log; exit 1; }
+            echo "fault $f reported by ThreadSanitizer"
+          done

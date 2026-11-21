@@ -29,6 +29,20 @@ public final class Calendars {
         }
     }
 
+    /**
+     * {@code d.plusMonths(months)} for a result that is then adjusted: a target year outside 2000 to 2099 is
+     * {@code E_DATE_RANGE} (as {@link #adjust} would say), decided before {@code plusMonths}, so a huge count cannot
+     * overflow {@code LocalDate} into an internal fault (fuzz run 44815591552).
+     */
+    public static LocalDate plusMonthsInRange(LocalDate d, long months) {
+        long first = 2000L * 12 - (d.getYear() * 12L + d.getMonthValue() - 1);
+        long last = 2099L * 12 + 11 - (d.getYear() * 12L + d.getMonthValue() - 1);
+        if (months < first || months > last) {
+            throw new QfError("E_DATE_RANGE", months + " months from " + d + " leaves 2000 to 2099");
+        }
+        return d.plusMonths(months);
+    }
+
     public static LocalDate easter(int y) {
         int a = y % 19, b = y / 100, c = y % 100, d = b / 4, e = b % 4, f = (b + 8) / 25, g = (b - f + 1) / 3;
         int h = (19 * a + b - d - g + 15) % 30, i = c / 4, k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;

@@ -1238,5 +1238,60 @@ class SiteView(unittest.TestCase):
                           (Path(tmp) / "site-view.md").read_text(encoding="utf-8"))
 
 
+
+class SiteA11y(unittest.TestCase):
+    """tools/check_site_a11y.py (KR-227 read strictly: pa11y AA on every page) and build_site.a11y_fix."""
+
+    def test_self_test_catches_every_planted_fault(self):
+        import contextlib
+        import io
+        sp = importlib.util.spec_from_file_location("check_site_a11y", ROOT / "tools/check_site_a11y.py")
+        m = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(m)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(m.self_test(), 0)
+
+    def test_a11y_fix(self):
+        # a11y_fix needs no Markdown; the docs-site step that runs this file has no `markdown` package, so a
+        # stand-in module lets build_site.py import (the site-build step uses the real, pinned markdown==3.11.2)
+        import types
+        saved = sys.modules.get("markdown")
+        try:
+            import markdown  # noqa: F401
+        except ImportError:
+            sys.modules["markdown"] = types.ModuleType("markdown")
+        try:
+            sp = importlib.util.spec_from_file_location("build_site_a11y", ROOT / "tools/build_site.py")
+            m = importlib.util.module_from_spec(sp)
+            sp.loader.exec_module(m)
+        finally:
+            if saved is None and isinstance(sys.modules.get("markdown"), types.ModuleType)                     and not hasattr(sys.modules["markdown"], "markdown"):
+                del sys.modules["markdown"]
+        nl = chr(10)
+        t1 = nl.join(["<table>", "<thead>", "<tr>", "<th></th>", "<th>A</th>", "</tr>", "</thead>",
+                      "<tbody><tr><td>r</td><td>1</td></tr></tbody></table>"])
+        t2 = nl.join(["<table>", "<thead>", "<tr>", "<th></th>", "<th></th>", "</tr>", "</thead>", "<tbody>",
+                      "<tr>", "<td>k</td>", "<td>v</td>", "</tr>", "</tbody></table>"])
+        out = m.a11y_fix('<h2 id="a">A</h2><h4 id="b">B</h4><pre><code>x</code></pre>' + t1 + t2, "T & U")
+        self.assertTrue(out.startswith("<h1>T &amp; U</h1>"))
+        self.assertIn('<h2 id="a">A</h2><h3 id="b">B</h3>', out)
+        self.assertIn('<pre tabindex="0">', out)
+        self.assertIn("<td></td>" + nl + "<th>A</th>", out)
+        self.assertNotIn("<th></th>", out)
+        self.assertIn('<th scope="row">k</th>', out)
+        self.assertEqual(out.count("<thead>"), 1)
+        svg = ('<svg viewBox="0 0 480 300" role="img" aria-label="betas, synthetic data" '
+               'xmlns="http://www.w3.org/2000/svg" style="fill:currentColor"><text>b</text>'
+               '<line style="stroke:var(--line)"/></svg>')
+        pic = m.chart_images("<p>x</p>" + svg)
+        self.assertNotIn("<svg", pic)
+        self.assertIn('alt="betas, synthetic data" width="480" height="300"', pic)
+        import base64 as b64
+        light, dark = (b64.b64decode(u).decode() for u in reversed(re.findall(r"base64,([A-Za-z0-9+/=]+)", pic)))
+        self.assertNotIn("var(--", light + dark)
+        self.assertIn("fill:#1a1a2e", light)
+        self.assertIn("fill:#e3e6ea", dark)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -360,6 +360,8 @@ fn raised_array_keys(op: &str) -> &'static [&'static str] {
         "research.stats.pbo" => &["performance"], // ruling J-20: rows judged by J-15's cell cap
         // Stage H wave 2: the spec page limits replace the general per-array limit.
         "micro.book.rebuild" => &["messages", "checkpoints"],
+        // Stage K wave 2 (KR-67): 1,000,000 points per P&L list.
+        "risk.frtb.pla" => &["hpl", "rtpl"],
         _ => &[],
     }
 }
@@ -390,6 +392,19 @@ fn too_long_with_raised(op: &str, i: &Json) -> bool {
             return match v {
                 Json::Arr(a) => a.len() > cap || a.iter().any(too_long),
                 _ => false,
+            };
+        }
+        // KR-67: `pnl` holds at most 100,000 lists (five are valid), each of up to 1,000,000 points.
+        if op == "risk.frtb.ima.es_lh" && k == "pnl" {
+            return match v {
+                Json::Arr(rows) => {
+                    rows.len() > MAX_ARRAY
+                        || rows.iter().any(|r| match r {
+                            Json::Arr(pts) => pts.len() > 1_000_000 || pts.iter().any(too_long),
+                            _ => too_long(r),
+                        })
+                }
+                _ => too_long(v),
             };
         }
         if op == "book.marks.resolve" && k == "sources" {

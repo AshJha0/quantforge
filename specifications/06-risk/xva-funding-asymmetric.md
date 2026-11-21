@@ -23,7 +23,7 @@ Inputs: `times` `t_1 < ... < t_n` (buckets from `t_0 = 0`); `discount_factors` `
 
 - Spread at time `T` from a curve: `s(T)` by linear interpolation of `s T` in `T` between pillars, with `s(0) T = 0` at the origin, flat forward beyond the last pillar (KR-164).
 - Forward spread on bucket `i`: `f_i = (s(t_i) t_i - s(t_(i-1)) t_(i-1)) / delta_i`.
-- `FCA = sum_i f_b,i delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i ee_i`; `FBA = sum_i f_l,i' delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i |ene_i|`, `f_l,i' = f_l,i` or, with `exclude_dva_overlap`, `max(f_l,i - h_B (1 - R_B), 0)`; `FVA = FCA - FBA`. `S(t) = exp(-h t)`. Survival at the bucket start `t_(i-1)` is the one convention for FCA, FBA, MVA and the ColVA survival weight (KR-296, proposed 2026-11-20).
+- `FCA = sum_i f_b,i delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i ee_i`; `FBA = sum_i f_l,i' delta_i S_C(t_(i-1)) S_B(t_(i-1)) D_i |ene_i|`, `f_l,i' = f_l,i` or, with `exclude_dva_overlap`, `max(f_l,i - h_B (1 - R_B), 0)`; `FVA = FCA - FBA`. `S(t) = exp(-h t)`. Survival at the bucket start `t_(i-1)` is the one convention for FCA, FBA, MVA and the ColVA survival weight (KR-296, proposed 2026-11-20, confirmed 2026-11-21).
 
 Outputs: `fca`, `fba`, `fva`, `forward_borrow`, `forward_lend` (per bucket, after the overlap rule).
 

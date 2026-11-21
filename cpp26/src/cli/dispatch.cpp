@@ -78,6 +78,10 @@
 #include "quantforge/core/paper.hpp"
 #include "quantforge/core/saccr.hpp"
 #include "quantforge/core/stage_k.hpp"
+#include "quantforge/core/frtb_drc.hpp"
+#include "quantforge/core/frtb_ima.hpp"
+#include "quantforge/core/cva.hpp"
+#include "quantforge/core/leverage.hpp"
 #include "test_functions.hpp"
 
 namespace quantforge::cli {
@@ -338,6 +342,8 @@ struct Entry {
 #include "ops_paper.inc"
 #include "ops_k_w1b.inc"
 #include "ops_stage_k.inc"
+#include "ops_frtb_drc_ima.inc"
+#include "ops_cva_leverage.inc"
 
 // Every verb this build runs. The operations command, and dispatch, are generated from this list alone.
 constexpr std::span<const Entry> registry[] = {
@@ -377,6 +383,8 @@ constexpr std::span<const Entry> registry[] = {
     paper_ops,
     k_w1b_ops,
     stage_k_ops,
+    frtb_drc_ima_ops,
+    cva_leverage_ops,
 };
 
 // Built on first use, never at static initialisation, so no order between translation units matters.
@@ -475,7 +483,8 @@ CaseResult run_case(string_view text) {
             op_name.starts_with("research.") || op_name == "risk.contrib.euler" || op_name == "risk.backtest.es_z2" ||
             op_name == "exec.tca.shortfall" || op_name == "exec.tca.attribution" ||  // HR-9: fills limit 1,000,000
             op_name == "micro.book.rebuild" || op_name == "exec.sim.lit.run" || op_name == "exec.sim.dark.run" ||
-            op_name == "exec.sor.allocate";  // stage H wave 2 page limits
+            op_name == "exec.sor.allocate" ||  // stage H wave 2 page limits
+            op_name == "risk.frtb.pla" || op_name == "risk.frtb.ima.es_lh";  // KR-67: P&L lists up to 1,000,000
         const bool big = !research && oversized(inputs);
         Out out;
         out.values.begin_object();

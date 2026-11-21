@@ -1,0 +1,31 @@
+{
+ "implementation": "python",
+ "host": "local laptop, not the acceptance machine",
+ "commit": "254e61c56bfe7e7190c123ba803645f5dddedc90",
+ "planted": true,
+ "judged_series": "private_bytes",
+ "warmup_end_s": 825.7,
+ "samples_after_warmup": 43,
+ "duration_s": 1281.8,
+ "slope_mib_per_h": -46.9742,
+ "slope_ci95_mib_per_h": null,
+ "median_mib": 429.371,
+ "range_mib": 6.473,
+ "range_fraction_of_median": 0.01507,
+ "longest_stall_s": 0.9000000000000057,
+ "cases": 27694,
+ "drift": 0,
+ "golden_failures": 0,
+ "reasons": [],
+ "rules": {
+  "warmup_s": 600,
+  "slope_max_mib_per_h": 1.0,
+  "range_max_fraction_of_median": 0.05,
+  "min_samples": 660,
+  "min_samples_java_heap": 200,
+  "min_duration_s": 7200,
+  "stall_max_s": 300,
+  "block_s": 600
+ },
+ "verdict": "LEAK MISSED"
+}

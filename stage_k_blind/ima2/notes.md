@@ -1,0 +1,12 @@
+# Notes (blind derivation, ima2)
+- MANIFEST.sha256 check: all 5 files matched.
+- Phi^-1(0.975): bisection on 0.5*erfc(-z/sqrt2) (200 steps) then 5 Newton steps; z = 1.9599639845400565. phi via exp.
+- Spearman (all PLA cases): KR-117 doubled centred average ranks, exact integer sums, r = Sxy / math.sqrt(Sxx*Syy) (int product exact, converted to float by sqrt), clamped to [-1,1]. Ambiguity: float(Sxx)*float(Syy) vs exact int product could differ in last ulp; far inside 1e-12.
+- Zone: r_S compared as binary64 to 0.80/0.70 (KR-56); 100d vs 9n / 12n in integers. Cases pla_k-0001..0006. No case sits at a boundary except none within 1e-12.
+- pla_k-0001 (n=5): d=1 gives 100d=100>60 so RED even though r_S=0.9 (rule: red iff 100d>12n). Applied literally.
+- pla_k-0004: r_S computed as exactly 1.0 (ranks identical); no clamping needed to decide.
+- Q_KS: x = ks*sqrt(n/2) in binary64; x<1 theta series, x>=1 alternating series, terms added until exp underflows to 0.0 (KR-117). Cases with x<1: 0001, 0002, 0005; others x>=1 or theta. pla_k-0005 gives exactly 1.0 (theta sum tiny, 1 - ... rounds to 1.0); taken as computed.
+- Plain `1 - c*sum` for theta series used (no compensated summation); possible last-ulp differences are inside tolerance except where result is near 0 (not the case for x<1 here).
+- ks_count: d = max over pooled distinct values of |#rtpl<=x - #hpl<=x| via bisect.
+- es_lh sigma mode: ES_j = sigma_j*phi(z)/(1-0.975), 1-0.975 computed in binary64 (0.025000000000000022); sigma 0 -> 0. Combination weights sqrt((LH_j-LH_{j-1})/10) as in spec, ES = sqrt(sum). Cases es_k-0001, es_k-0002.
+- No field not derivable.

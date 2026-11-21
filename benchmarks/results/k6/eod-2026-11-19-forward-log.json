@@ -1,0 +1,187 @@
+{
+ "commit": "1ce167bf02dbd134d0001a4fd035f1061d378231",
+ "data_label": "recorded forward-log rows; hashes and aggregates only in this file",
+ "date": "2026-11-19",
+ "deviations": "see the module docstring of tools/eod/rehearse.py, list 'Deviations from the proposed spec'",
+ "dry_run": true,
+ "expected_failing_step": "",
+ "failed_step": "",
+ "format": "qf-eod-rehearsal/1",
+ "host": "local laptop, not the acceptance machine",
+ "inputs_sha256": {
+  "tmp/curve-daily/config-five-tenors.json": "be67a8d12bb65584855d43ae0569a1928488c886d30e51dc4b0a2b75b1169b97",
+  "tmp/forward-log/actions/log.jsonl": "d584421bb4f37ee3702a5c6a1f886ea2a0a1cc366a3bb1c5b085acd35acbd700",
+  "tmp/source/treasury-par-yields.csv": "5b9b3b130f80875e9839a9faa73b5889d2d00a0dc59866df04b365de02a08539",
+  "tools/curve_daily/config.json": "ce3d09665567504f4c7fdd57ad6b07438c56ac501a85250646f6ee5e2c03eccb",
+  "tools/paper_daily/config.json": "8221914842d4715d2a718b21314f1e95db72e0a1e975602ee4505bf35da69ce4"
+ },
+ "log_ref": "origin/forward-log",
+ "outputs_sha256": {
+  "tmp/curve-daily/ledger/curves.jsonl": "26e0e2955186d4ded596b8262cedbbba5f0d9dcdb105df8eb5ee7df86c8901cd",
+  "tmp/curve-daily/ledger/summary.json": "35f8dd57a27671931d63aa738a6454839838db31da21d42c27641a206d30a103",
+  "tmp/paper-ledger/ledger/ledger.jsonl": "b70e73243fc8c3fab93f71dd920435fc62abf1b5be85e2c5cf2a73c98b5c85bb",
+  "tmp/site/dashboard/curve.html": "e399a8cd8ed71cb78d6441083b5809e02533db970c40ad31bfa1ca68559eea44",
+  "tmp/site/dashboard/paper.html": "cf285fc058c8fc0cbc6dc0eb9faf8b429ac1786d5dd0d7e4535607762819a04c",
+  "tmp/site/index.html": "62a15eaeeee7ab7b3427f84414014a158440a05531861c9c50aa6ae4845c714f"
+ },
+ "plant": "",
+ "result": "pass",
+ "runner": "python, in process (quantforge_core.cli.main.run_case)",
+ "source": "forward-log",
+ "spec": "specifications/12-platform/soak-eod-capacity.md section 3 (proposed, branch k-w3-spec)",
+ "steps": [
+  {
+   "evidence": {
+    "chain_head": "375b8678c902648153ccc7b519b727faa403af95ea90f761fd3f1f2bb9354245",
+    "chain_rows": 433,
+    "log_copy_sha256": "d584421bb4f37ee3702a5c6a1f886ea2a0a1cc366a3bb1c5b085acd35acbd700",
+    "origin": "git show origin/forward-log:actions/log.jsonl",
+    "par_row_hash": "1de1323cfae56d38e808002071208a8e749df7a4b50585876e6de98c61a3bf7f",
+    "rows_in_source": 433,
+    "rows_up_to_cutoff": 433,
+    "source_dates": 222,
+    "source_sha256": "5b9b3b130f80875e9839a9faa73b5889d2d00a0dc59866df04b365de02a08539",
+    "state_mismatches": 0,
+    "state_rows_rechecked": 112,
+    "tenors_for_date": 5
+   },
+   "reason": "",
+   "seconds": 0.415,
+   "status": "pass",
+   "step": "E1",
+   "title": "read the day's recorded rows and verify the chain"
+  },
+  {
+   "evidence": {
+    "checked_date": "the run date",
+    "date_hits": [],
+    "row_hits": 0,
+    "rows_scanned": 44,
+    "windows": 3
+   },
+   "reason": "",
+   "seconds": 0.002,
+   "status": "pass",
+   "step": "E2",
+   "title": "holdout check on the date"
+  },
+  {
+   "evidence": {
+    "consistency": "pending",
+    "head": "7ecbdf1826bce8b0157ba7b778e4f2f3f123fc4b3b35529421fff24bf462dba1",
+    "kinds": [
+     "GENESIS",
+     "DAY"
+    ],
+    "labels_ok": true,
+    "ledger_sha256": "26e0e2955186d4ded596b8262cedbbba5f0d9dcdb105df8eb5ee7df86c8901cd",
+    "max_abs_bp": "13.922034528534786",
+    "note": "Rehearsal fit on the five tenors the recorder keeps (3 Mo, 2 Yr, 5 Yr, 10 Yr, 30 Yr), not the scheduled thirteen-tenor run.",
+    "notes": 2,
+    "refit_exact": true,
+    "rmse_bp": "8.310754743870355",
+    "rows_built": 2,
+    "source_sha256": "5b9b3b130f80875e9839a9faa73b5889d2d00a0dc59866df04b365de02a08539",
+    "summary_sha256": "35f8dd57a27671931d63aa738a6454839838db31da21d42c27641a206d30a103",
+    "tau": "3.75",
+    "timing": "on_time",
+    "verify_ok": true,
+    "verify_reason": "",
+    "within_fit_flag": "true"
+   },
+   "reason": "",
+   "seconds": 0.908,
+   "status": "pass",
+   "step": "E3",
+   "title": "daily curve run, dry run, for the date"
+  },
+  {
+   "evidence": {
+    "declared_on_time_days": 2,
+    "explain_sums": true,
+    "head": "d0bc2018a09b6046e40719b981e33d6d933afa81a3b123a1d06828f460a6a4bf",
+    "kinds": [
+     "GENESIS",
+     "DAY",
+     "DAY"
+    ],
+    "ledger_sha256": "b70e73243fc8c3fab93f71dd920435fc62abf1b5be85e2c5cf2a73c98b5c85bb",
+    "orders": 1,
+    "problems": 0,
+    "runs": 2,
+    "timing": "on_time",
+    "unexplained": "0",
+    "verify_ok": true,
+    "verify_reason": ""
+   },
+   "reason": "",
+   "seconds": 0.067,
+   "status": "pass",
+   "step": "E4",
+   "title": "paper ledger run, dry run, for the date"
+  },
+  {
+   "evidence": {
+    "bound": 2.167553752907299e-05,
+    "estimate_pnl": -924.8257111782912,
+    "key_rate_buckets": 30,
+    "key_rate_cases": 2,
+    "key_rate_failed": [],
+    "label": "latency-aware analytics on simulated data",
+    "positions": 2,
+    "shift": 0.0001,
+    "zero_dv01_sum": -1021.4721907327184
+   },
+   "reason": "",
+   "seconds": 0.006,
+   "status": "pass",
+   "step": "E5",
+   "title": "intraday risk on the day's book"
+  },
+  {
+   "evidence": {
+    "claim_lint": [],
+    "counter_rows": 2,
+    "counter_verifier": 2,
+    "holdout_hits": 0,
+    "labels_checked": 9,
+    "pages": [
+     "dashboard/curve.html",
+     "dashboard/paper.html"
+    ]
+   },
+   "reason": "",
+   "seconds": 0.016,
+   "status": "pass",
+   "step": "E6",
+   "title": "render the dashboards into a temporary site"
+  },
+  {
+   "evidence": {
+    "broken": [],
+    "external_links_not_fetched": 0,
+    "internal_links": 15,
+    "no_viewport": [],
+    "pages": 3,
+    "phone_px": 375,
+    "wider_than_phone": []
+   },
+   "reason": "",
+   "seconds": 0.012,
+   "status": "pass",
+   "step": "E7",
+   "title": "site checks on the rendered pages"
+  },
+  {
+   "evidence": {
+    "inputs_hashed": 5,
+    "outputs_hashed": 6
+   },
+   "reason": "",
+   "seconds": 0.0,
+   "status": "pass",
+   "step": "E8",
+   "title": "archive"
+  }
+ ]
+}

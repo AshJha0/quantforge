@@ -1,0 +1,575 @@
+{
+ "schema_version": "1.0",
+ "suite": "lev_ke",
+ "spec": "specifications/06-risk/leverage-large-exposures.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "lev_ke-0001",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 0,
+    "on_balance": [
+     100
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: tier1 0 (spec lev_ke-0001)"
+  },
+  {
+   "case_id": "lev_ke-0002",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "sfts": [
+     {
+      "gross_assets": 1,
+      "mna": true,
+      "exposures": [
+       1,
+       2
+      ],
+      "collateral": [
+       1
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: exposures and collateral of lengths 2 and 1 (spec lev_ke-0002)"
+  },
+  {
+   "case_id": "lev_ke-0003",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "off_balance": [
+     {
+      "notional": -1,
+      "ccf_category": "GUARANTEE"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: two errors: unlisted CCF category and a negative notional (spec lev_ke-0003) [schema] [domain]"
+  },
+  {
+   "case_id": "lev_ke-0004",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100,
+     -1
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative on-balance value"
+  },
+  {
+   "case_id": "lev_ke-0005",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "derivatives": [
+     {
+      "v": 1,
+      "pfe": -1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative pfe in derivatives"
+  },
+  {
+   "case_id": "lev_ke-0006",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "derivatives": [
+     {
+      "v": 1,
+      "pfe": 1,
+      "cvm_received": -1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative cvm_received in derivatives"
+  },
+  {
+   "case_id": "lev_ke-0007",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "derivatives": [
+     {
+      "v": 1,
+      "pfe": 1,
+      "cvm_provided": -1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative cvm_provided in derivatives"
+  },
+  {
+   "case_id": "lev_ke-0008",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "written_credit_derivatives": [
+     {
+      "notional": -1,
+      "fair_value": 0
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative notional in written_credit_derivatives"
+  },
+  {
+   "case_id": "lev_ke-0009",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "written_credit_derivatives": [
+     {
+      "notional": 1,
+      "fair_value": 0,
+      "purchased_offset": -1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative purchased_offset in written_credit_derivatives"
+  },
+  {
+   "case_id": "lev_ke-0010",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "sfts": [
+     {
+      "gross_assets": -1,
+      "mna": false,
+      "exposures": [
+       1
+      ],
+      "collateral": [
+       1
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative gross_assets in sfts"
+  },
+  {
+   "case_id": "lev_ke-0011",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "sfts": [
+     {
+      "gross_assets": 1,
+      "mna": false,
+      "exposures": [
+       -1
+      ],
+      "collateral": [
+       1
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative exposures in sfts"
+  },
+  {
+   "case_id": "lev_ke-0012",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "sfts": [
+     {
+      "gross_assets": 1,
+      "mna": false,
+      "exposures": [
+       1
+      ],
+      "collateral": [
+       -1
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative collateral in sfts"
+  },
+  {
+   "case_id": "lev_ke-0013",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "off_balance": [
+     {
+      "notional": -1,
+      "ccf_category": "COMMITMENT"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: negative notional in off_balance"
+  },
+  {
+   "case_id": "lev_ke-0014",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: exposure measure zero: no ratio (KR-321)"
+  },
+  {
+   "case_id": "lev_ke-0015",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "sfts": [
+     {
+      "gross_assets": 1,
+      "exposures": [],
+      "collateral": []
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: mna missing"
+  },
+  {
+   "case_id": "lev_ke-0016",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 0,
+    "on_balance": [
+     100
+    ],
+    "sfts": [
+     {
+      "gross_assets": 1,
+      "mna": true,
+      "exposures": [
+       1,
+       2
+      ],
+      "collateral": [
+       1
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error"
+   ],
+   "description": "hand: two errors: lengths differ and tier1 0 (structural first) [structural] [domain]"
+  },
+  {
+   "case_id": "lev_ke-0017",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": 10,
+    "on_balance": [
+     100
+    ],
+    "derivatives": [
+     {
+      "v": "NaN",
+      "pfe": 1
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1: v NaN"
+  },
+  {
+   "case_id": "lev_ke-0018",
+   "operation": "risk.capital.leverage",
+   "inputs": {
+    "tier1": "Infinity",
+    "on_balance": [
+     100
+    ],
+    "sfts": [
+     {
+      "gross_assets": 1,
+      "mna": true,
+      "exposures": [
+       1,
+       2
+      ],
+      "collateral": [
+       1
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_DOMAIN"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "stage_k",
+    "leverage_large_exposures",
+    "error",
+    "e1"
+   ],
+   "description": "hand: E1, two errors: tier1 Infinity and lengths differ (the finite rule first) [finite] [structural]"
+  }
+ ]
+}

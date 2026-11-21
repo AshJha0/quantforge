@@ -19,7 +19,7 @@ Spec version 0.1.0. Status: **PROPOSED** (stage K item K-8b; xVA spec lane 2026-
 
 Inputs: `times` `t_0 < t_1 < ... < t_n` (`n >= 1`); `collateral` `C_0 .. C_(n-1)` (expected balance at the start of each bucket, positive = received by us); `discount_factors` `D(t_1) .. D(t_n)` in `(0, inf)`; `spread` either one number or `n` numbers `Delta_i` (collateral rate minus discount rate on `(t_i, t_(i+1)]`); optional `survival` `NONE` (default) or `BOTH` with `counterparty` and `own` `{hazard_rate >= 0}`; optional `overnight_rates` `r_0 .. r_(n-1)` (enables the floor output).
 
-- `colva = - sum_(i=0)^(n-1) C_i Delta_i delta_i D(t_(i+1)) W_i`, `delta_i = t_(i+1) - t_i`, `W_i = 1` (`NONE`) or `exp(-(h_C + h_B) t_i)` (`BOTH`): both names alive at the START of the bucket `(t_i, t_(i+1)]`, the same survival point as FCA, FBA and MVA (KR-297, proposed 2026-11-20; the version-0.1.0 text had `t_(i+1)`).
+- `colva = - sum_(i=0)^(n-1) C_i Delta_i delta_i D(t_(i+1)) W_i`, `delta_i = t_(i+1) - t_i`, `W_i = 1` (`NONE`) or `exp(-(h_C + h_B) t_i)` (`BOTH`): both names alive at the START of the bucket `(t_i, t_(i+1)]`, the same survival point as FCA, FBA and MVA (KR-297, proposed 2026-11-20, confirmed 2026-11-21; the version-0.1.0 text had `t_(i+1)`).
 - `collateral_floor = - sum C_i max(-r_i, 0) delta_i D(t_(i+1)) W_i` (only with `overnight_rates`; reported, not added).
 
 Outputs: `colva`, `terms` (the `n` summands), `collateral_floor` (or absent).

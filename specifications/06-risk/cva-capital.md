@@ -1,6 +1,6 @@
 # CVA risk capital: BA-CVA (reduced and full) and SA-CVA
 
-Spec version 0.1.0. Status: **PROPOSED** (stage K wave 2, item K-8g; spec lane 2026-11-19; nothing implemented, no golden file written). Rulings `stage-k-rulings-w2.md` KR-50, KR-62 to KR-64, KR-67 to KR-69. Parameters `specifications/tables/stage_k/mar50_cva.json`. Gate status: `program/STAGE_K_W2_GATE.md`.
+Spec version 0.1.0. Status: implemented in all four builds (Python `python/quantforge_core/cva.py`; Java, C++ and Rust ports per `program/STAGE_K_W2A_HANDOVER.md` and `program/STAGE_K_W2B_HANDOVER.md`) on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; goldens in `datasets/golden/stage_k/` (spec lane 2026-11-19). The rulings stay PROPOSED except those confirmed in `stage-k-rulings-w2.md` (KR-312, KR-315, KR-319, KR-320, KR-324, KR-327, confirmed 2026-11-20). Rulings `stage-k-rulings-w2.md` KR-50, KR-62 to KR-64, KR-67 to KR-69. Parameters `specifications/tables/stage_k/mar50_cva.json`. Gate status: `program/STAGE_K_W2_GATE.md`.
 
 Every output carries `label`: "regulatory formula on caller inputs; not a regulatory return" (KR-69).
 
@@ -45,7 +45,7 @@ Per class and kind (MAR50.51-50.53, KR-62):
 - `S_b = max(-K_b, min(sum_{k in b} WS_k, K_b))`.
 - `K = m_cva sqrt(max(0, sum_b K_b^2 + sum_{b != c} gamma_bc S_b S_c))`.
 
-Total SA-CVA = sum over the delta and vega capital of every class (MAR50.42-50.45). Risk weights, rho and gamma per MAR50.54-50.77 as tabulated in `mar50_cva.json`: IR specified currencies Table 3/4, other currencies 1.58% and 40%, gamma 0.5; FX 11%, gamma 0.6; CCS Table 7 RW, rho = rho_tenor x rho_name x rho_quality, gamma Table 6 (buckets 1 to 7: rho_name is 1 for the same `name`, 0.90 for different names with the same `legal_group`, 0.50 otherwise; sacva_k-0005: X and Y share a legal group, so rho(X 5Y, Y 5Y) = 0.90 and rho(X 1Y, Y 5Y) = 0.81; inferred from the expected values; blind lane note, stage_k_blind/w2/notes.md); RCS Table 10 RW, gamma Table 9 (halved across quality); EQ Table 12 RW, gamma per MAR50.71; COM Table 14 RW, gamma per MAR50.75; all vega RW 100% except equity large cap 78%.
+Total SA-CVA = sum over the delta and vega capital of every class (MAR50.42-50.45). Risk weights, rho and gamma per MAR50.54-50.77 as tabulated in `mar50_cva.json`: IR specified currencies Table 3/4, other currencies 1.58% and 40%, gamma 0.5; FX 11%, gamma 0.6; CCS Table 7 RW, rho = rho_tenor x rho_name x rho_quality, gamma Table 6 (buckets 1 to 7: rho_name is 1 for the same `name`, 0.90 for different names with the same `legal_group`, 0.50 otherwise; sacva_k-0005: X and Y share a legal group, so rho(X 5Y, Y 5Y) = 0.90 and rho(X 1Y, Y 5Y) = 0.81; inferred from the expected values; blind lane note, stage_k_blind/w2/notes.md); RCS Table 10 RW, gamma Table 9 (halved across quality); EQ Table 12 RW, gamma per MAR50.71; COM Table 14 RW, gamma per MAR50.75; all vega RW 100% except equity large cap 78% (KR-315: buckets 1 to 8 and 12; Table 11 prints size "Large" for 1 to 8 and "Large cap, advanced economies" for the index bucket 12, evidence class read; that MAR50.73(3)'s "large market capitalisation buckets" covers bucket 12 is inferred, since the paragraph lists no buckets). CCS buckets `1a` and `1b` select the Table 7 risk weight only and are aggregated as one bucket `1` (KR-312; read: Table 5 prints one bucket 1 with sub-sectors a) and b), and Table 6 has one row and column for bucket 1).
 
 Outputs: per class and kind `buckets` [{bucket, k_b, s_b, sum_ws, floored}], `k`; `total`; `rwa`. `floored` is a per-bucket flag, true when that bucket's `K_b` radicand was negative and set to 0; the class-level radicand under `K` is floored at 0 as well (KR-62) but carries no flag. No golden case has a negative radicand, so no expected value exercises either floor.
 
@@ -94,7 +94,7 @@ Illustration only, not a value case: with the CRE99 Example 1 EAD (569, USD thou
 
 - A1 All value goldens in all four builds to 1e-12 relative.
 - A2 Properties (10,000 random cases): with one counterparty and no hedges K_reduced = SCVA; K_full <= K_reduced is **not** asserted (an index hedge can raise K_hedged), but K_full >= 0.25 K_reduced always; with one counterparty, IH = 0 and only DIRECT hedges, K_hedged = |SCVA - SNH|; SA-CVA K_b >= 0.1 sqrt(sum WSH_k^2) (the R term) and S_b within [-K_b, K_b]; scaling every sensitivity by c scales every K by |c|.
-- A3 Gate (plan 15): 60% of the 16 value cases outside-checked under KR-68. Strict share now 12.5%; K-8g moves to a point release unless a DR-H2 blind lane re-derives at least 8 B cases (2 + 8 = 10 of 16 = 62.5%), or the ORE lane confirms ORE example outputs for BA-CVA/SA-CVA that can be mapped onto these inputs (`program/STAGE_K_W2_GATE.md`).
+- A3 Gate (plan 15): 60% of the 16 value cases outside-checked under KR-68. Strict share now 12.5%; K-8g moves to a point release unless a DR-H2 blind lane re-derives at least 8 B cases (2 + 8 = 10 of 16 = 62.5%), or the ORE lane confirms ORE example outputs for BA-CVA/SA-CVA that can be mapped onto these inputs (`program/STAGE_K_W2_GATE.md`). Measured 2026-11-20 after the DR-H2 blind lane (`program/STAGE_K_BLIND_W2.md`): 14 of 21 value cases of `cva_k`, `df_k`, `sacva_k` (66.7%), so the 60% gate is met (`oracle/OUTSIDE_SHARES.md`, generated by `tools/outside_shares.py`; evidence class measured).
 
 ## Limits
 
@@ -103,3 +103,4 @@ Illustration only, not a value case: with the CRE99 Example 1 EAD (569, USD thou
 - Qualified-index option of MAR50.50 (bucket 8 of CCS, buckets 16-17 of RCS, 12-13 of EQ) is supported only through the caller's bucket assignment; the 75% sector rule is the caller's.
 - The materiality alternative of MAR50.9 (100% of CCR capital) and the netting-set carve-out of MAR50.8 are not modelled.
 - KR-62 floors are a ruling; the text has none.
+- CCS buckets `1a` and `1b` are one aggregation bucket (KR-312, read from Table 6); there is no gamma between them because the text prints none.

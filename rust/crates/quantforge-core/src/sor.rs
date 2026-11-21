@@ -445,15 +445,15 @@ impl Problem {
         let want_sq = matches!(inp.get("report_se"), Some(Json::Bool(true)));
         let lit: Vec<usize> = (0..lit_kind.len()).filter(|&k| lit_kind[k]).collect();
         let dark: Vec<usize> = (0..lit_kind.len()).filter(|&k| !lit_kind[k]).collect();
+        // Absent or null is no rows; any other non-array is mistyped (cli-contract.md), as a row
+        // that is not an array (fuzz run 44815591552).
         let raw_rows = match inp.get("lit_samples") {
             None | Some(Json::Null) => &[][..],
-            Some(r) => r.as_array().unwrap_or(&[]),
+            Some(r) => r
+                .as_array()
+                .ok_or_else(|| at("E_SCHEMA", "lit_samples", "not an array"))?,
         };
-        let rows_ok = matches!(
-            inp.get("lit_samples"),
-            None | Some(Json::Null | Json::Arr(_))
-        );
-        if !lit.is_empty() && (!rows_ok || raw_rows.is_empty()) {
+        if !lit.is_empty() && raw_rows.is_empty() {
             return Err(at("E_INPUT", "lit_samples", "empty"));
         }
         if raw_rows.len() > MAX_SAMPLES {

@@ -1,0 +1,10 @@
+lev_k-0001 MATCH counted=True
+lev_k-0002 MATCH counted=True
+lev_k-0003 MATCH counted=True
+lev_k-0004 MATCH counted=True
+lev_k-0005 MATCH counted=True
+lev_k-0012 MATCH counted=True
+lev_k-0013 MATCH counted=True
+lex_k-0008 MATCH counted=True
+lex_k-0009 MATCH counted=True
+TOTAL cases=9 counted=9 eligible=9

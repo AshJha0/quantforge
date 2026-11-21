@@ -1,0 +1,96 @@
+{
+ "commit": "1ce167bf02dbd134d0001a4fd035f1061d378231",
+ "data_label": "synthetic recorded day: invented values, no market data",
+ "date": "2026-11-19",
+ "deviations": "see the module docstring of tools/eod/rehearse.py, list 'Deviations from the proposed spec'",
+ "dry_run": true,
+ "expected_failing_step": "E1",
+ "failed_step": "E1",
+ "format": "qf-eod-rehearsal/1",
+ "host": "local laptop, not the acceptance machine",
+ "inputs_sha256": {
+  "tmp/forward-log/actions/log.jsonl": "992ee332268eed409933ab2089fe407e4a4d8680ca1444ce95a479bf3c28be14",
+  "tools/curve_daily/config.json": "ce3d09665567504f4c7fdd57ad6b07438c56ac501a85250646f6ee5e2c03eccb",
+  "tools/paper_daily/config.json": "8221914842d4715d2a718b21314f1e95db72e0a1e975602ee4505bf35da69ce4"
+ },
+ "log_ref": "",
+ "outputs_sha256": {},
+ "plant": "GAP",
+ "result": "fail",
+ "runner": "python, in process (quantforge_core.cli.main.run_case)",
+ "source": "synthetic",
+ "spec": "specifications/12-platform/soak-eod-capacity.md section 3 (proposed, branch k-w3-spec)",
+ "steps": [
+  {
+   "evidence": {
+    "detail": "line 15: hash does not match; the log was changed",
+    "log_copy_sha256": "992ee332268eed409933ab2089fe407e4a4d8680ca1444ce95a479bf3c28be14",
+    "origin": "synthetic log built in the temporary folder",
+    "planted": "the date's par-yield row removed from the copy",
+    "rows_in_source": 16,
+    "rows_up_to_cutoff": 16
+   },
+   "reason": "CHAIN",
+   "seconds": 0.076,
+   "status": "fail",
+   "step": "E1",
+   "title": "read the day's recorded rows and verify the chain"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E2",
+   "title": "holdout check on the date"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E3",
+   "title": "daily curve run, dry run, for the date"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E4",
+   "title": "paper ledger run, dry run, for the date"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E5",
+   "title": "intraday risk on the day's book"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E6",
+   "title": "render the dashboards into a temporary site"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E7",
+   "title": "site checks on the rendered pages"
+  },
+  {
+   "evidence": {},
+   "reason": "",
+   "seconds": 0.0,
+   "status": "not run",
+   "step": "E8",
+   "title": "archive"
+  }
+ ]
+}

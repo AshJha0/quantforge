@@ -46,6 +46,21 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Intraday volume profile (VWAP input)](volume-profile.md) | H | Implemented (v0.10.0), all four languages; `exec.schedule.vwap` cases in `sched_h` (blind re-derived) |
 | [Walk-the-book cost curves (crypto venue, recorded)](walk-the-book.md) | H | Planned; research item H-1(b), no result yet; crypto venue, not equities or rates; aggregates only |
 
+## Method pages
+
+Written by hand rather than generated from `docs/curves/data/`: each explains a curve method with a worked example from the Python build on golden inputs, and says so at its top.
+
+| Page | Operations |
+|---|---|
+| [Central-bank meeting steps and the year-end turn](meeting-steps.md) | `rates.ois.step_curve`, `rates.ois.fit_steps` |
+| [Multi-curve joint solve and its Jacobian](joint-solve.md) | `rates.curve.joint_solve`, `rates.curve.joint_bootstrap` |
+| [Curve risk: par buckets, key rates and the Jacobian](curve-risk.md) | `risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian` |
+| [Incremental curve update (stage K)](incremental-update.md) | `curve.bootstrap.par_annual`, `curve.incremental.update` |
+| [Cross gamma on a curve](cross-gamma.md) | `risk.curve.cross_gamma` |
+| [Principal components of curve moves](curve-pca.md) | `risk.curve.pca` |
+| [Inflation-linked bond priced on a CPI curve](linker-price-curve.md) | `infl.linker.price_curve` |
+| [Cross-currency basis swap PV](xccy-pv.md) | `fx.xccy.pv` |
+
 Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 
 ## Real data
@@ -66,7 +81,7 @@ Some risk and capital figures are themselves functions of tenor or time: a regul
 | Key-rate DV01 ladder | Sensitivity of a position to each curve tenor, money per basis point | `risk.ois.dv01` and the R2 key-rate operations, `specifications/06-risk/par-and-key-rate.md` | goldens; see [Tutorial 1](../getting-started/tutorial-1-swap.md) |
 | Exposure profile under Hull-White | Expected exposure EE(t) and the deflated quantile `deflated_pfe_q(t)` over a swap portfolio's life; the quantile is of deflated value, not PFE as a desk reads it (R6-5.1) | `xva.exposure.portfolio_hw`, `specifications/06-risk/xva-exposure-portfolio.md`, stage G | 80 of 96 value cases within 3 Monte Carlo standard errors of ORE 1.8.17 (`oracle/OUTSIDE_SHARES.md`) |
 
-Not shown here until released (stage K): SA-CCR supervisory duration and maturity factors (built in all four builds, on main since 2026-11-20, released with v1.0.0), FRTB internal-model liquidity horizons (wave 2, specification only), and the sensitivity-based margin's tenor weights, which use placeholder weights from a stated rule.
+Not shown here until released (stage K): SA-CCR supervisory duration and maturity factors (built in all four builds, on main since 2026-11-20, released with v1.0.0), FRTB internal-model liquidity horizons (`risk.frtb.ima.lh`, `risk.frtb.ima.es_lh`, wave 2: implemented in all four builds and on main since 2026-11-20, pull request #63, not tagged; most wave 2 rulings still proposed), and the sensitivity-based margin's tenor weights, which use placeholder weights from a stated rule.
 
 ## How the gallery is built
 

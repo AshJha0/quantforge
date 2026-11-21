@@ -8,9 +8,9 @@ Every capability moves through `Proposed → Specified → Implemented → Valid
 
 | Rung | What it takes (source) | Where QuantForge is |
 |---|---|---|
-| Proposed | a capability named in a plan or a spec draft | stage K wave 2 items, the sensitivity-based initial margin (`sbim`, K-8h) |
-| Specified | a spec with inputs, outputs, errors, golden cases and an acceptance test fixed before any run | stage K wave 2 specs merged on the integration branch `k-r1` without an implementation |
-| Implemented | all four languages pass the goldens (`docs/model-inventory.md`, "Status words") | stages A to J, R6 and H, released; stage K round 1 items, merged to main by 2026-11-20 (pull requests #58 and #59), not tagged, released with v1.0.0 |
+| Proposed | a capability named in a plan or a spec draft | the sensitivity-based initial margin (`sbim`, K-8h) |
+| Specified | a spec with inputs, outputs, errors, golden cases and an acceptance test fixed before any run | none at present (stage K wave 2 was Specified until its four builds passed the goldens on 2026-11-20) |
+| Implemented | all four languages pass the goldens (`docs/model-inventory.md`, "Status words") | stages A to J, R6 and H, released; stage K round 1 items, merged to main by 2026-11-20 (pull requests #58 and #59), not tagged, released with v1.0.0; stage K wave 2 (K-8a, K-8f, K-8g, K-8i, 18 operations), all four builds passing the goldens on the integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending, rulings partly PROPOSED (`docs/known-issues.md`) |
 | Validated | tested on real data against an independent benchmark, with a written report (`docs/model-inventory.md`) | **nothing**; every golden input to date is synthetic, except the stage J shock-library Treasury yields and the stage H crypto book |
 | Benchmarked | timed against targets fixed before the run, on the stated acceptance machine | nothing; H-9 has laptop timings only, labelled "local laptop, not the acceptance machine", and its workload R result of 2026-11-19 is a recorded MISS |
 | Operationally tested | run on a schedule, unattended, with its own evidence trail | nothing; the stage K paper ledger is built, is scheduled on main since 2026-11-20 (pull request #59), and had 0 of the 20 recorded days its gate needs as of 2026-11-20 13:00 UTC |
@@ -44,7 +44,7 @@ Source: `oracle/OUTSIDE_SHARES.json` (written by `tools/outside_shares.py`). Flo
 | I | 153 | 102 | 66.7% | 102 | 66.7% | met |
 | J | 215 | 143 | 66.5% | 143 | 66.5% | met |
 | H | 205 | 0 | 0.0% | 160 | 78.0% | met |
-| K | 136 | 0 | 0.0% | 97 | 71.3% | met |
+| K | 231 | 0 | 0.0% | 171 | 74.0% | met |
 
 Stage H per plan item (plan section 15: at least 60.0% of each item's value cases):
 
@@ -81,8 +81,12 @@ Stage K per plan item (plan section 15: at least 60.0% of each item's value case
 | K-8 | `k8_k` | 7 | 7 | 100.0% | met |
 | K-8 AAD | `aadadj_k` | 13 | 0 | 0.0% | NOT MET |
 | K-8 guard | `rich_k` | 6 | 6 | 100.0% | met |
+| K-8a | `drc_k` | 18 | 15 | 83.3% | met |
 | K-8d | `saccr_k` | 19 | 12 | 63.2% | met |
 | K-8e | `btk_k` | 28 | 23 | 82.1% | met |
+| K-8f | `ima_k` | 33 | 23 | 69.7% | met |
+| K-8g | `cva_k`, `df_k`, `sacva_k` | 21 | 14 | 66.7% | met |
+| K-8i | `lev_k`, `lex_k` | 23 | 22 | 95.7% | met |
 <!-- generated:status-ladder:end -->
 
 ## Stage K, round 1: what the generated table does not cover

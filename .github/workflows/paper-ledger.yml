@@ -140,7 +140,7 @@ jobs:
         continue-on-error: true
         run: |
           pip install --quiet opentimestamps-client==0.7.2
-          (cd anchors/anchors && ots upgrade *.json.ots || true)
+          (cd anchors/anchors && ots upgrade *.json.ots) || echo "::warning::ots upgrade exited $? (a proof still waiting for its Bitcoin attestation also exits non-zero); proofs not upgraded now are retried on a later run; the new anchor below is still made"
           rm -f anchors/anchors/*.bak
           python3 code/tools/paper_daily/verify_ledger.py anchor --ledger ledger/ledger/ledger.jsonl --out-dir anchors/anchors --stamp --if-uncovered
           cd anchors
@@ -152,7 +152,7 @@ jobs:
           ok=""
           for i in 1 2 3; do
             if git push origin paper-ledger-anchors; then ok=1; break; fi
-            git pull --rebase -q origin paper-ledger-anchors || true
+            git pull --rebase -q origin paper-ledger-anchors || echo "::warning::git pull --rebase of paper-ledger-anchors failed (try $i); retrying the push"
           done
           if [ -z "$ok" ]; then echo "the anchor was not pushed after three tries"; exit 1; fi
       - name: Fail on a failed soft step

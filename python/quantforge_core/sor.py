@@ -146,7 +146,12 @@ class Problem:
                 self.tails.append([])
             else:
                 self.Q.append(0)
-                tail = [_frac(t, f"venues/{k}/tail") for t in v.get("tail", [])]
+                raw_tail = v.get("tail")
+                if raw_tail is None:  # absent or null is no tail, as C++ and Rust
+                    raw_tail = []
+                if not isinstance(raw_tail, list):
+                    raise QfError("E_SCHEMA", f"venues/{k}/tail: not an array", "venues")
+                tail = [_frac(t, f"venues/{k}/tail") for t in raw_tail]
                 if any(not 0 <= t <= 1 for t in tail) or any(
                     a < b for a, b in itertools.pairwise(tail)
                 ):
@@ -157,12 +162,23 @@ class Problem:
         )  # only then is sum p c^2 computed (and range-checked)
         self.lit = [k for k, kd in enumerate(self.kinds) if kd == "LIT"]
         self.dark = [k for k, kd in enumerate(self.kinds) if kd == "DARK"]
-        rows = inp.get("lit_samples", [])
-        if self.lit and (not isinstance(rows, list) or not rows):
+        # Absent or null is no rows; any other non-array, or a row that is not an array, is mistyped:
+        # E_SCHEMA (cli-contract.md), in all four builds (fuzz run 44815591552, sor_h-0002).
+        rows = inp.get("lit_samples")
+        if rows is None:
+            rows = []
+        if not isinstance(rows, list):
+            raise QfError("E_SCHEMA", "lit_samples: not an array", "lit_samples")
+        if self.lit and not rows:
             raise QfError("E_INPUT", "lit_samples: empty", "lit_samples")
         if len(rows) > MAX_SAMPLES:
             raise QfError("E_LIMIT", "more than 10^6 samples", "lit_samples")
-        self.rows = [[_lots(x, f"lit_samples/{i}") for x in r] for i, r in enumerate(rows)] or [[]]
+        self.rows: list[list[int]] = []
+        for i, r in enumerate(rows):  # row by row, as the C++, Java and Rust ports
+            if not isinstance(r, list):
+                raise QfError("E_SCHEMA", f"lit_samples/{i}: not an array", "lit_samples")
+            self.rows.append([_lots(x, f"lit_samples/{i}") for x in r])
+        self.rows = self.rows or [[]]
         if any(len(r) != len(self.lit) for r in self.rows):
             raise QfError("E_INPUT", "lit_samples: one value per LIT venue per row", "lit_samples")
 

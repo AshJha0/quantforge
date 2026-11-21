@@ -43,11 +43,11 @@ Operations (3; every operation whose name-map spec is the model's spec (shared s
 | Operation | Value-checked | Error | Invariance | Invariance base | Suites | Outside-checked value cases | Unit-test files (Python, Java, C++, Rust) |
 |---|---:|---:|---:|---:|---|---|---|
 | `vol.ssvi.to_svi` | 5 | 14 | 3 | 3 | `e1_vol_2`, `surf_e` | 0 of 4 (stage E) | 1, 1, 1, 0 |
-| `vol.svi.fit_surface` | 2 | 28 | 8 | 8 | `e1_vol_3`, `fuzzfix_j`, `surf_e` | 0 of 0 (stage J) | 1, 0, 1, 0 |
+| `vol.svi.fit_surface` | 2 | 28 | 8 | 8 | `e1_vol_3`, `fuzzfix_j`, `surf_e` | 0 of 2 (stage E) | 1, 0, 1, 0 |
 | `vol.svi.surface_check` | 11 | 36 | 7 | 7 | `e1_vol_3`, `rulings_e_a`, `surf_e` | 0 of 10 (stage E) | 1, 0, 1, 0 |
 
 Totals: 18 value-checked, 78 error, 36 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 0 of 14 value cases (0.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Outside-checked: 0 of 16 value cases (0.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: modules `E/surfaces_local_vol` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.
 
