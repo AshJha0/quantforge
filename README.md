@@ -151,11 +151,11 @@ It cannot show tradable profitability. That needs instrument-level prices, bid a
 
 ## Start here
 
-1. [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md), about 10 minutes from clone to a priced swap and its DV01; then the [tutorial series](docs/getting-started/README.md) (50 tutorials). Then `LEARN.md` for the maths by topic and `COOKBOOK.md` for commands.
+1. [Tutorial 1: price your first swap](docs/getting-started/tutorial-1-swap.md), about 10 minutes from clone to a priced swap and its DV01; then the [tutorial series](docs/getting-started/README.md) (63 tutorials). Then `LEARN.md` for the maths by topic and `COOKBOOK.md` for commands.
 2. `ARCHITECTURE.md`, the ADRs in `architecture/decisions/`, and [determinism](docs/determinism.md) for what is bit-exact and what is within tolerance.
 3. `ROADMAP.md` for the stages and their history, `GLOSSARY.md` for terms.
 4. [Curves gallery](docs/curves/README.md): every implemented curve, with charts from real CLI runs on synthetic inputs.
-5. [Question bank](docs/question-bank/README.md): 470 knowledge-check questions in 14 sets with worked answers and verify scripts.
+5. [Question bank](docs/question-bank/README.md): 500 knowledge-check questions in 14 sets with worked answers and verify scripts.
 
 ### Status
 
