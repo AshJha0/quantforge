@@ -30,6 +30,11 @@ Branch `k-v1-fuzz2` (cut from main 11ba1b40). Worktree C:/Work/Claude/qf-wt/k-v1
   rulings*_d, acls_h, e1_h2, e1_h4, sorx_h.
 - Targeted sweep (scratch script, not committed): 2^53, -2^53, 1 and "x" into first/last slots of up to 3
   golden cases per operation: Java 0 internal faults in 9,162 inputs after the fix.
+- Full Java suite `mvn -B test`: 1,090 tests, 0 failures, 0 errors, 1 skipped; `mvn -Pcoverage verify` and the
+  stage E per-file coverage gate: 8 modules at 85%, 0 below. Java conformance: 16,563 of 16,563 pass.
+- Full Python suite in four shards (no xdist): 4,330 passed, 4 skipped, 0 failed (shard 1 rerun after the
+  two-error descriptions gained [step] brackets). Python conformance: 16,563 of 16,563 pass. Python coverage
+  gate (coverage run) NOT run.
 - ruff, ruff format, mypy clean; repo-gate tools run locally pass (hygiene, job names, case_figures, results,
   model_reports, share figures, known issues, quality_gate, gen_cli_cases, build_references, test_preregs).
 
