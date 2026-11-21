@@ -81,7 +81,7 @@ Some risk and capital figures are themselves functions of tenor or time: a regul
 | Key-rate DV01 ladder | Sensitivity of a position to each curve tenor, money per basis point | `risk.ois.dv01` and the R2 key-rate operations, `specifications/06-risk/par-and-key-rate.md` | goldens; see [Tutorial 1](../getting-started/tutorial-1-swap.md) |
 | Exposure profile under Hull-White | Expected exposure EE(t) and the deflated quantile `deflated_pfe_q(t)` over a swap portfolio's life; the quantile is of deflated value, not PFE as a desk reads it (R6-5.1) | `xva.exposure.portfolio_hw`, `specifications/06-risk/xva-exposure-portfolio.md`, stage G | 80 of 96 value cases within 3 Monte Carlo standard errors of ORE 1.8.17 (`oracle/OUTSIDE_SHARES.md`) |
 
-Not shown here until released (stage K): SA-CCR supervisory duration and maturity factors (built in all four builds, on main since 2026-11-20, released with v1.0.0), FRTB internal-model liquidity horizons (wave 2, specification only), and the sensitivity-based margin's tenor weights, which use placeholder weights from a stated rule.
+Not shown here until released (stage K): SA-CCR supervisory duration and maturity factors (built in all four builds, on main since 2026-11-20, released with v1.0.0), FRTB internal-model liquidity horizons (`risk.frtb.ima.lh`, `risk.frtb.ima.es_lh`, wave 2: implemented in all four builds and on main since 2026-11-20, pull request #63, not tagged; most wave 2 rulings still proposed), and the sensitivity-based margin's tenor weights, which use placeholder weights from a stated rule.
 
 ## How the gallery is built
 
