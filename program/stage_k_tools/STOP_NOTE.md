@@ -51,7 +51,7 @@ All on the local laptop, not the acceptance machine, 2026-11-21 [measured]:
 - `python -m pytest -q tools`: 118 passed, 4 skipped (before the wave 2 mapping commit; after it, the mutation and model-report subset: 21 passed).
 - `python conformance/mutation/test_gates.py`: 0 failures; `check_stages.py`: 0 problems; `python -m pytest -q benchmarks/soak/test_soak.py`: 15 passed; `tools/validation/model_reports.py --check` and `--self-test`: pass.
 - No C++, Rust or Java code changed; no WSL or Maven run. No mutation run locally.
-- Branch dispatch of `mutation-stage.yml` (`paths` = the 16 wave 2 source files plus `python/quantforge_core/daycount.py`, 21 jobs): DISPATCH_LINE
+- Branch dispatch of `mutation-stage.yml` (`paths` = the 16 wave 2 source files plus `python/quantforge_core/daycount.py`, 21 jobs): run 44928637420, started 17:11 UTC on `k-v1-tools` (gate input false, MAX 40); the plan job planned all 21 jobs; results not read by this lane (it was still running at hand-over). Read its `mutation-report` artifact for the wave 2 scores and the daycount job time.
 
 ## Proposed text for rows the docs lane owns (not edited here)
 
@@ -65,7 +65,7 @@ All on the local laptop, not the acceptance machine, 2026-11-21 [measured]:
 
 `docs/known-issues.md`, row "K-8a, K-8f, K-8g, K-8i (mutation)", replace "Proposed mapping, not yet applied" onward with:
 
-> Mapped 2026-11-21 (branch `k-v1-tools`): stage K modules `frtb_drc` on `drc_k`, `frtb_ima` on `ima_k`, `cva_capital` on `cva_k,cva_ke,df_k,sacva_k,sacva_ke`, `leverage` on `lev_k,lev_ke,lex_k,lex_ke`, all four languages, 80 % target, no exception; the Python trace (`conformance/mutation/trace_suites.py`) finds no other golden file calling them. Python has no kill tests in the mutmut `tests_dir` for them (the wave 2 test files read files outside `python/`), so Python scores on golden cases only. Kill rates not yet measured: DISPATCH_RESULT. | open until a run scores all 20 cells; a cell below the gate is a recorded miss, not a reason to unmap
+> Mapped 2026-11-21 (branch `k-v1-tools`): stage K modules `frtb_drc` on `drc_k`, `frtb_ima` on `ima_k`, `cva_capital` on `cva_k,cva_ke,df_k,sacva_k,sacva_ke`, `leverage` on `lev_k,lev_ke,lex_k,lex_ke`, all four languages, 80 % target, no exception; the Python trace (`conformance/mutation/trace_suites.py`) finds no other golden file calling them. Python has no kill tests in the mutmut `tests_dir` for them (the wave 2 test files read files outside `python/`), so Python scores on golden cases only. Kill rates not yet measured: branch dispatch 44928637420 (2026-11-21) is the first run; read its report. | open until a run scores all 20 cells; a cell below the gate is a recorded miss, not a reason to unmap
 
 `CHANGELOG.md`, under "Fixed":
 
