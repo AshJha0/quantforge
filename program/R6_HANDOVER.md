@@ -366,3 +366,7 @@ TOTALS: 16547 value 8099 error 5894 invariance 2554
 Stage K fuzz fixes (branch `k-v1-fuzz2`, merged into `k-v1` 2026-11-21, counted 2026-11-21 by `tools/check_case_total.py`, measured): new golden set `fuzzfix_k` adds 16 error cases (fuzz run 44815591552 findings and the same fault class in sibling handlers).
 
 TOTALS: 16563 value 8099 error 5910 invariance 2554
+
+Stage K v1 integration plus branch `k-v1-rev1` (2026-11-21, merge of local `k-v1` 47072365 into `k-v1-rev1`, counted by `tools/check_case_total.py`, measured): `fuzzfix_k` (lane `k-v1-fuzz2`, 16 error), `sabrz_c` (32 value, KR-340), `ivdeep_c` (11 value, 1 error, KR-341), `fuzzrev_k` (2 error, K-9 finding 1)
+
+TOTALS: 16609 value 8142 error 5913 invariance 2554

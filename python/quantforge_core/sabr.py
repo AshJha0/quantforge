@@ -52,6 +52,26 @@ def _check(p: Sabr, strikes: Floats) -> None:
         raise _domain("a shifted strike is not above 0", "strikes")
 
 
+def _chi(z: float, rho: float) -> float:
+    """chi(z) = ln((sqrt(1 - 2 rho z + z^2) + z - rho)/(1 - rho)) without cancellation (ruling KR-340).
+
+    The direct form takes the log of 1 + O(z) and loses digits as eps/|z| for small z (2.7e-9 relative at
+    z = 1.01e-7), and its s + z - rho cancels for large negative z. Here s = sqrt(1 - 2 rho z + z^2),
+    w = s + z - rho and u = w/(1 - rho) - 1 are each formed from terms of one sign.
+    """
+    d = z - rho
+    omr = 1 - rho
+    q = omr * (1 + rho)
+    s = math.hypot(d, math.sqrt(q))
+    w = s + d if d >= 0 else q / (s - d)
+    u = z / (s + 1) * (w / omr + 1)
+    if abs(u) < 0.5:
+        return math.log1p(u)
+    if d >= 0:
+        return math.log(s + d) - math.log1p(-rho)
+    return math.log1p(rho) - math.log(s - d)
+
+
 def _hagan(p: Sabr, strike: float) -> float:
     f, x = p.forward + p.shift, strike + p.shift
     alpha, beta, rho, nu, t = p.alpha, p.beta, p.rho, p.nu, p.expiry_years
@@ -63,8 +83,7 @@ def _hagan(p: Sabr, strike: float) -> float:
     if abs(z) < 1e-7:
         m = 1 - rho * z / 2 - (3 * rho * rho - 2) * z * z / 12
     else:
-        chi = math.log((math.sqrt(1 - 2 * rho * z + z * z) + z - rho) / (1 - rho))
-        m = z / chi
+        m = z / _chi(z, rho)
     den = root_a * (1 + c / 24 + c * c / 1920)
     h = 1 + t * (
         (1 - beta) ** 2 * alpha * alpha / (24 * big_a)
