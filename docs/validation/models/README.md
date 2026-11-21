@@ -22,7 +22,7 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [M12](m12.md) | Equity | Implemented | 10 | 28 | 0 of 15 (0.0%) |
 | [M13](m13.md) | Inflation | Implemented | 4 | 11 | 0 of 11 (0.0%) |
 | [M14](m14.md) | Black-76 and Bachelier | Implemented | 2 | 218 | 5 of 5 (100.0%) |
-| [M15](m15.md) | Caps, floors, swaptions | Implemented | 2 | 22 | 22 of 22 (100.0%) |
+| [M15](m15.md) | Caps, floors, swaptions | Implemented | 2 | 22 | not in the share table |
 | [M16](m16.md) | Smile, SVI, SSVI, surface | Implemented | 9 | 35 | not in the share table |
 | [M17](m17.md) | SABR | Implemented | 4 | 35 | not in the share table |
 | [M18](m18.md) | Commodities | Implemented | 2 | 4 | 0 of 4 (0.0%) |
@@ -43,10 +43,10 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [EB1](eb1.md) | GARCH(1,1) | Implemented | 4 | 28 | 5 of 7 (71.4%) |
 | [EB2](eb2.md) | Variance swap | Implemented | 2 | 23 | 18 of 22 (81.8%) |
 | [EB3](eb3.md) | VIX-style index | Implemented | 2 | 23 | 0 of 8 (0.0%) |
-| [EB4](eb4.md) | SABR swaption cube | Implemented | 6 | 74 | 24 of 30 (80.0%) |
-| [EB5](eb5.md) | Caplet stripping | Implemented | 6 | 74 | 24 of 30 (80.0%) |
-| [EB6](eb6.md) | Bond futures options | Implemented | 6 | 74 | 24 of 30 (80.0%) |
-| [EB7](eb7.md) | Inflation caps | Implemented | 6 | 74 | 24 of 30 (80.0%) |
+| [EB4](eb4.md) | SABR swaption cube | Implemented | 6 | 74 | 16 of 22 (72.7%) |
+| [EB5](eb5.md) | Caplet stripping | Implemented | 6 | 74 | 16 of 22 (72.7%) |
+| [EB6](eb6.md) | Bond futures options | Implemented | 6 | 74 | 16 of 22 (72.7%) |
+| [EB7](eb7.md) | Inflation caps | Implemented | 6 | 74 | 16 of 22 (72.7%) |
 | [EB8](eb8.md) | Correlation repair | Implemented | 4 | 41 | 0 of 9 (0.0%) |
 | [EB9](eb9.md) | Implied correlation and dispersion | Implemented | 4 | 41 | 0 of 9 (0.0%) |
 | [EB10](eb10.md) | CDS options | Implemented | 6 | 254 | 222 of 253 (87.7%) |
@@ -101,7 +101,7 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [MH-2](mh-2.md) | Low-latency order book (stage H wave 1b) | Implemented | 1 | 10 | 8 of 10 (80.0%) |
 | [MH-3](mh-3.md) | Simulated lit matching engine (stage H wave 1b) | Implemented | 1 | 16 | 10 of 16 (62.5%) |
 | [MH-4](mh-4.md) | Simulated dark pool (stage H wave 1b) | Implemented | 1 | 5 | 3 of 5 (60.0%) |
-| [MH-5](mh-5.md) | Smart order router (stage H wave 1b) | Implemented | 1 | 8 | 3 of 8 (37.5%) |
+| [MH-5](mh-5.md) | Smart order router (stage H wave 1b) | Implemented | 1 | 8 | not in the share table |
 | [MH-6](mh-6.md) | Almgren-Chriss trajectory and frontier (stage H wave 1) | Implemented | 2 | 6 | 4 of 6 (66.7%) |
 | [MH-7](mh-7.md) | Market impact (stage H wave 1) | Implemented | 2 | 4 | 4 of 4 (100.0%) |
 | [MH-8](mh-8.md) | Execution schedules (stage H wave 1) | Implemented | 4 | 12 | 9 of 12 (75.0%) |

@@ -41,10 +41,9 @@ Operations (1; named on the inventory entry's Purpose line): `exec.sor.allocate`
 
 | Operation | Value-checked | Error | Invariance | Invariance base | Suites | Outside-checked value cases | Unit-test files (Python, Java, C++, Rust) |
 |---|---:|---:|---:|---:|---|---|---|
-| `exec.sor.allocate` | 8 | 10 | 0 | 0 | `acls_h`, `e1_h2`, `e1_h4`, `sor_h`, `sorx_h` | 3 of 8 (stage H) | 1, 1, 1, 0 |
+| `exec.sor.allocate` | 8 | 15 | 0 | 0 | `acls_h`, `e1_h2`, `e1_h4`, `fuzzfix_k`, `sor_h`, `sorx_h` | 0 of 0 (stage K) | 1, 1, 1, 0 |
 
-Totals: 8 value-checked, 10 error, 0 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 3 of 8 value cases (37.5%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Totals: 8 value-checked, 15 error, 0 invariance cases (measured from `datasets/golden` at generation).
 
 Mutation testing: no module of `conformance/mutation/stages.json` names one of this model's value-checked suites by a pattern narrower than the whole stage (patterns such as `*` or `*_d` run every suite of a stage), so no mutation result maps to this model alone.
 

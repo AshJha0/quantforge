@@ -44,7 +44,7 @@ Read from the register table in [known issues](known-issues.md); a miss stays a 
 
 ## Golden cases and outside checks per stage
 
-All suites: 8,099 value-checked, 5,894 error and 2,554 invariance cases (16,547 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
+All suites: 8,099 value-checked, 5,910 error and 2,554 invariance cases (16,563 in all; [case figures](case-figures.md)). A value-checked case must return the oracle's numbers within a stated tolerance; an error case checks the error code only; an invariance case checks that two related inputs get the same answer.
 
 Outside-checked share: value-checked cases re-derived outside the author's own code, by an outside library or, where the rule allows it, by a blind re-derivation by a second AI lane that saw the rules and inputs but not the answers; never by a person (README, "Words used here"). One definition on every page: `tools/case_figures.py outside_pair()` (rule R6-13, decision D6; floor 60.0% per stage, and from stage H on per plan item). Stages A to C, R2 and R6 are outside the share table. The share's denominator is the share table's own count (without generated sweeps), so it can be smaller than the value-checked column. The tag column is the plan's tag from ROADMAP: stage K is not tagged yet (target v1.0.0).
 
@@ -62,7 +62,7 @@ Outside-checked share: value-checked cases re-derived outside the author's own c
 | R6 |  |  |  | 43 | 93 | 0 | not in the share table |  |
 | J | Research and portfolio | v0.9 | Published study reports | 215 | 229 | 0 | 143 of 215 (66.5%) | met |
 | H | Microstructure and execution | v0.10 | Use case 5 | 205 | 207 | 0 | 160 of 205 (78.0%) | met |
-| K | Platform and release | v1.0.0 | Clean-machine run of all examples | 218 | 293 | 16 | 171 of 218 (78.4%) | met |
+| K | Platform and release | v1.0.0 | Clean-machine run of all examples | 218 | 309 | 16 | 171 of 218 (78.4%) | met |
 
 Stage H per plan item:
 

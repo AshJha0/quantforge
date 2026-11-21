@@ -46,11 +46,11 @@ Operations (6; every operation whose name-map spec is the model's spec (shared s
 | `infl.cap.zc_price` | 6 | 20 | 6 | 6 | `e1_infl`, `ratesvol_e`, `rulings_e_b` | 0 of 6 (stage E) | 1, 0, 0, 0 |
 | `rates.bondfut.implied_vol` | 5 | 24 | 7 | 7 | `e1_rates_1`, `ratesvol_e`, `rulings_e_b` | 5 of 5 (stage E) | 1, 0, 3, 0 |
 | `rates.bondfut.option_price` | 6 | 20 | 6 | 6 | `e1_rates_1`, `ratesvol_e`, `rulings_e_b` | 6 of 6 (stage E) | 1, 0, 3, 0 |
-| `rates.cap.strip` | 8 | 31 | 8 | 8 | `e1_rates_1`, `ratesvol_e`, `rulings_e_b` | 8 of 8 (stage E) | 2, 0, 3, 0 |
-| `rates.swaption.price_cube` | 42 | 76 | 22 | 22 | `e1_rates_2`, `fuzzfix_j`, `ratesvol_e` | 0 of 0 (stage J) | 2, 0, 3, 0 |
+| `rates.cap.strip` | 8 | 33 | 8 | 8 | `e1_rates_1`, `fuzzfix_k`, `ratesvol_e`, `rulings_e_b` | 0 of 0 (stage K) | 2, 0, 3, 0 |
+| `rates.swaption.price_cube` | 42 | 81 | 22 | 22 | `e1_rates_2`, `fuzzfix_j`, `fuzzfix_k`, `ratesvol_e` | 0 of 0 (stage K) | 2, 0, 3, 0 |
 
-Totals: 74 value-checked, 208 error, 118 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 24 of 30 value cases (80.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Totals: 74 value-checked, 215 error, 118 invariance cases (measured from `datasets/golden` at generation).
+Outside-checked: 16 of 22 value cases (72.7%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: modules `E/rates_vol` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.
 
