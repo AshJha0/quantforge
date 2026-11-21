@@ -581,6 +581,9 @@ public:
         }
         const Value* rows = inp.find("lit_samples");
         const bool rows_list = rows && rows->kind == Kind::Array;
+        // Absent or null is no rows; any other non-array is mistyped (cli-contract.md), as a row that is not an
+        // array (fuzz run 44815591552).
+        if (present(rows) && !rows_list) fail("E_SCHEMA", "lit_samples", "not an array");
         if (!lit_.empty() && (!rows_list || rows->items.empty())) fail("E_INPUT", "lit_samples", "empty");
         if (rows_list && rows->items.size() > max_samples) fail("E_LIMIT", "lit_samples", "more than 10^6 samples");
         if (rows_list)

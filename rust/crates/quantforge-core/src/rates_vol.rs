@@ -88,8 +88,16 @@ pub fn price_cube(
             "cube matrices must be expiries x tenors on increasing nodes",
         );
     }
-    if t.expiry_months < 1 {
-        return fail("E_INPUT", "expiry_months must be at least 1");
+    // Every month count runs from 1 to 1200 (projection-and-fra.md, D40), node expiries too, checked
+    // before any date is built, in the C++ order (fuzz run 44815591552).
+    if !(1..=1200).contains(&t.expiry_months) {
+        return fail("E_INPUT", "expiry_months must be 1 to 1200");
+    }
+    if !(1..=1200).contains(&t.tenor_months) {
+        return fail("E_INPUT", "tenor_months must be 1 to 1200");
+    }
+    if c.expiries_months.iter().any(|m| !(1..=1200).contains(m)) {
+        return fail("E_INPUT", "a node expiry is out of range");
     }
     let as_of = discount.as_of;
     let node_t = c
@@ -165,8 +173,8 @@ pub fn strip_caplets(
     if x.flat_vols.iter().any(|v| v.is_nan() || *v <= 0.0) {
         return fail("E_DOMAIN", "flat vols must be above 0");
     }
-    if x.start_months < 1 {
-        return fail("E_INPUT", "start_months must be at least 1");
+    if !(1..=1200).contains(&x.start_months) {
+        return fail("E_INPUT", "start_months must be 1 to 1200");
     }
     let as_of = discount.as_of;
     let longest = tenors[tenors.len() - 1];
