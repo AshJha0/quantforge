@@ -200,7 +200,7 @@ public final class Black {
     /**
      * The lognormal branch of {@link #solve} with t &gt; 0, computing the same floating-point expressions in the
      * same order (so the same iterates, result and errors), but evaluating each one once: ln(F/K) and sqrt(T) are
-     * hoisted out of the loop, vega reuses d1 from the price, and the closing checks plus {@link #identified} share
+     * hoisted out of the loop, vega reuses n(d1) from the price, and the closing checks plus {@link #identified} share
      * one price evaluation and its two N() terms. In the loop v stays inside (lo, hi) with lo &gt;= 0, so v &gt; 0
      * and finite, which is when {@link #lognormal} takes its general branch.
      */
@@ -208,22 +208,25 @@ public final class Black {
                                          double lo, double hi, double v) {
         double lf = Math.log(f / x);
         double r = Math.sqrt(t);
+        // n(phi d1) = n(d1) exactly when |phi| = 1 (pdf takes |x| first), so the density is shared with vega.
+        boolean unit = phi == 1.0 || phi == -1.0;
         for (int i = 0; i < 400; i++) {
             double s = v * r;
             double d1 = (lf + v * v * t / 2.0) / s;
-            double c1 = Normal.cdf(phi * d1);
+            double n1 = Normal.pdf(d1);
+            double c1 = unit ? Normal.cdf(phi * d1, n1) : Normal.cdf(phi * d1);
             double c2 = Normal.cdf(phi * (d1 - s));
             double val = d * phi * (f * c1 - x * c2);
             double diff = val - price;
             if (diff == 0.0) {
-                return identifiedLognormal(f, x, d, v, price, s, d1, c1, c2, val, r);
+                return identifiedLognormal(f, x, d, v, price, s, n1, c1, c2, val, r);
             }
             if (diff > 0.0) {
                 hi = v;
             } else {
                 lo = v;
             }
-            double vega = d * f * r * Normal.pdf(d1);
+            double vega = d * f * r * n1;
             // Newton on ln V - ln price (ruling KR-341): the same step near the root, and it keeps its size far
             // out of the money, where V spans hundreds of decades over the bracket.
             double next = vega > 0.0 && val > 0.0 ? v - Math.log(val / price) * val / vega : Double.NaN;
@@ -238,7 +241,8 @@ public final class Black {
         }
         double s = v * r;
         double d1 = (lf + v * v * t / 2.0) / s;
-        double c1 = Normal.cdf(phi * d1);
+        double n1 = Normal.pdf(d1);
+        double c1 = unit ? Normal.cdf(phi * d1, n1) : Normal.cdf(phi * d1);
         double c2 = Normal.cdf(phi * (d1 - s));
         double val = d * phi * (f * c1 - x * c2);
         // Accept a tiny price error, or a vol bracket collapsed to a few ulps: there the price formula's own
@@ -248,14 +252,14 @@ public final class Black {
         if (!priced && !collapsed) {
             throw new QfError("E_NO_CONVERGENCE", "implied vol did not converge: f=" + f + " x=" + x + " t=" + t + " d=" + d + " price=" + price + " v=" + v + " value=" + val);
         }
-        return identifiedLognormal(f, x, d, v, price, s, d1, c1, c2, val, r);
+        return identifiedLognormal(f, x, d, v, price, s, n1, c1, c2, val, r);
     }
 
     /** {@link #identified} for the lognormal model, given the terms of V(v) already evaluated at v. */
     private static double identifiedLognormal(double f, double x, double d, double v, double price, double root,
-                                              double d1, double c1, double c2, double val, double r) {
+                                              double n1, double c1, double c2, double val, double r) {
         double mag = d * (f * c1 + x * c2);
-        double scale = v * (d * f * r * Normal.pdf(d1));
+        double scale = v * (d * f * r * n1);
         double error = Math.abs(val - price) + 0x1p-52 * mag
                 + 0x1p-1070 * (1.0 + d * (Math.abs(f) + Math.abs(x) + root));
         if (!(scale > 0.0) || error > 1e-10 * scale) {
