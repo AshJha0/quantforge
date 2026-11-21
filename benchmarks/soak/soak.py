@@ -272,9 +272,16 @@ class Soak:
 
 
 def commit():
-    return subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=False
-    ).stdout.strip()
+    """The commit the run measured. In the C++ CI job (a `gcc` container running as root on a checkout owned by the
+    runner user) `git rev-parse` refuses the repository as unsafe and prints nothing, which left `"commit": ""` in
+    run 44824197236; GitHub's own GITHUB_SHA is then used. Empty only when neither is available."""
+    try:
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=False
+        ).stdout.strip()
+    except OSError:  # no git on PATH
+        head = ""
+    return head or os.environ.get("GITHUB_SHA", "")
 
 
 def main(argv=None):
