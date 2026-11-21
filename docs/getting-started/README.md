@@ -1,6 +1,6 @@
 # Tutorials
 
-Fifty-nine guided tutorials (51 to 58 cover stage K round 1 and 59 stage K wave 2, merged to main by 2026-11-20 and released with v1.0.0), each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`). Pages 51 to 58 are listed apart under [Stage K, in progress](#stage-k-in-progress); stage K continues toward v1.0.0.
+Sixty guided tutorials (51 to 58 cover stage K round 1, 59 stage K wave 2 and 60 the K-6 soak, merged to main by 2026-11-20 and released with v1.0.0), each 10 to 15 minutes, that walk through what QuantForge already does. Each one starts from small synthetic data you can follow by hand, runs it in Python first, then sends the same operations to the Rust, Java and C++ builds, which print the same digits. Every number on every page is real output, and CI runs each page in all four languages and fails if a printed line differs (`.github/workflows/tutorial.yml`, `tools/check_tutorial.py`). Pages 51 to 58 are listed apart under [Stage K, in progress](#stage-k-in-progress); stage K continues toward v1.0.0.
 
 Each tutorial explains its results in the same order: the plain idea, the formal statement from the spec, then a worked example with a check you can do in your head. Each ends with notes for practitioners, common mistakes, what you just did, and references.
 
@@ -61,7 +61,7 @@ Do [Tutorial 1](tutorial-1-swap.md) first: it sets up the tools and builds the f
 
 ## Stage K, in progress
 
-Pages 51 to 58 cover stage K round 1; page 59 covers stage K wave 2 (merged 2026-11-20, merge 37292e4f) and is checked by CI in Step 2 like 51 to 57. They are merged to main by 2026-11-20 (pull requests #58 and #59), not tagged, and released with v1.0.0, in all four builds. Each page first restates the spec's rule with the standard library on the golden inputs; Tutorials 51 to 57 then call the library in Step 2 through the Python build, and CI checks that Step 2 prints the page's lines (turned on at integration, `program/STAGE_K_DOCS_PENDING.md`). Tutorial 58 checks Step 1 only, because the paper ledger had 0 recorded days as of 2026-11-20 13:00 UTC (it is scheduled on main since 2026-11-20, pull request #59). Numbers are taken from evidence files and goldens, and each page names the file.
+Pages 51 to 58 cover stage K round 1; page 59 covers stage K wave 2 (merged 2026-11-20, merge 37292e4f) and page 60 the K-6 soak analysis (merge 62d77666); both are checked by CI in Step 2 like 51 to 57. They are merged to main by 2026-11-20 (pull requests #58 and #59), not tagged, and released with v1.0.0, in all four builds. Each page first restates the spec's rule with the standard library on the golden inputs; Tutorials 51 to 57 then call the library in Step 2 through the Python build, and CI checks that Step 2 prints the page's lines (turned on at integration, `program/STAGE_K_DOCS_PENDING.md`). Tutorial 58 checks Step 1 only, because the paper ledger had 0 recorded days as of 2026-11-20 13:00 UTC (it is scheduled on main since 2026-11-20, pull request #59). Numbers are taken from evidence files and goldens, and each page names the file.
 
 | Tutorial | What you do | Operations | Stage |
 |---|---|---|---|
@@ -74,6 +74,7 @@ Pages 51 to 58 cover stage K round 1; page 59 covers stage K wave 2 (merged 2026
 | [57. The backtesting traffic light](tutorial-57-backtesting-traffic-light.md) | MAR99 Table 2 from the binomial distribution, zone boundaries, desk limits | `risk.frtb.backtest.zone`, `.desk` | K, in progress |
 | [58. The daily paper ledger](tutorial-58-daily-paper-ledger.md) | One day replayed in exact decimal with zero unexplained; a hash chain catches an edit; the verifier's order of checks | `tools/paper_daily/`; not running yet, 0 of 20 days | K, in progress |
 | [59. FRTB internal models, PLA to capital](tutorial-59-frtb-ima-pla-to-capital.md) | The P&L attribution test on a golden and four synthetic desks, ES with liquidity horizons, stress calibration, SES, the capital charge with multiplier and surcharge | `risk.frtb.pla`, `risk.frtb.ima.es_lh`, `.imcc`, `.ses`, `.capital` | K wave 2 |
+| [60. Is the process leaking? Read a soak run](tutorial-60-read-a-soak-run.md) | The frozen K-6 soak rule applied by hand to three recorded Python runs: the main run's recorded MISS on slope, a planted leak too small to catch, one caught | `benchmarks/soak/analyse.py` on `benchmarks/results/k6/` | K-6 |
 
 ## How the scripts work
 
