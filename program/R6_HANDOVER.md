@@ -382,3 +382,11 @@ TOTALS: 16632 value 8142 error 5936 invariance 2554
 Merge of `k-v1-fix` into `k-v1` (2026-11-21, after `k-v1-fin`; counted by `tools/check_case_total.py`, measured): 16,610 + 23 error goldens of `k-v1-fix`.
 
 TOTALS: 16633 value 8143 error 5936 invariance 2554
+
+Stage K lane `k-v1-fuzz3` (2026-11-21, counted by `tools/check_case_total.py`, measured): new golden set `fuzzfix_k2` adds 19 error cases (fuzz run 44937631714, Python `paper.book.apply_fill` with an array `side`, and the same fault class in the sibling `paper.*` handlers; `oracle/python/gen_stage_k_fuzz3.py`).
+
+TOTALS: 16629 value 8143 error 5932 invariance 2554
+
+Merge of `k-v1-fuzz3` into `k-v1` (2026-11-21, after `k-v1-fix`; counted by `tools/check_case_total.py`, measured): 16,633 + 19 error goldens of `fuzzfix_k2`.
+
+TOTALS: 16652 value 8143 error 5955 invariance 2554

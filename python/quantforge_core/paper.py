@@ -66,7 +66,11 @@ def dec(value: Any, name: str) -> Decimal:
     return check_range(d, name)
 
 
-def side_sign(side: str) -> int:
+def side_sign(side: Any) -> int:
+    """+1 BUY, -1 SELL. A side that is not a JSON string is mistyped, E_SCHEMA (cli-contract.md, error
+    table); a string that is not listed is E_INPUT (paper-trading.md, Errors; rule_h-0040)."""
+    if not isinstance(side, str):
+        raise QfError("E_SCHEMA", "side must be a string", "side")
     if side not in SIDES:
         raise QfError("E_INPUT", f"unknown side {side!r}", "side")
     return SIDES[side]
@@ -335,6 +339,8 @@ def pretrade_check(
         raise QfError("E_UNSUPPORTED_OPERATION", "paper trading never places live orders", "mode")
     s = side_sign(order.get("side", ""))
     otype = order.get("type")
+    if otype is not None and not isinstance(otype, str):
+        raise QfError("E_SCHEMA", "type must be a string", "type")
     if otype not in TYPES:
         raise QfError("E_INPUT", f"unknown type {otype!r}", "type")
     q = dec(order["quantity"], "quantity")
@@ -389,23 +395,47 @@ def input_decimal(v: Any, name: str) -> Decimal:
     return check_range(dec(v, name), name, MAX_INPUT_SCALE)
 
 
-def _fill_list(fills: Sequence[Any]) -> list[dict[str, Any]]:
-    out = []
+def fill_schema(fills: Sequence[Any]) -> None:
+    """The E_SCHEMA checks of every fill, before any other check of the case (KR-230, HR-122):
+    each fill an object, `side`, `quantity` and `price` present, and `side` and each decimal a JSON
+    string (fuzz run 44937631714: a `side` that was an array crashed the side lookup)."""
     for k, f in enumerate(fills):
         w = f"fills/{k}/"
         if not isinstance(f, Mapping):
             raise QfError("E_SCHEMA", f"{w} is not an object", w)
-        side = _req(f, "side", w)
-        side_sign(side)
-        q, p = (
-            input_decimal(_req(f, "quantity", w), w + "quantity"),
-            input_decimal(_req(f, "price", w), w + "price"),
+        for key in ("side", "quantity", "price"):
+            if not isinstance(_req(f, key, w), str):
+                raise QfError("E_SCHEMA", f"{w}{key} must be a string", w + key)
+        if "fee" in f and not isinstance(f["fee"], str):
+            raise QfError("E_SCHEMA", f"{w}fee must be a decimal string", w + "fee")
+
+
+def _fill_list(fills: Sequence[Any]) -> list[dict[str, Any]]:
+    """Fills in the KR-230 order over the whole list: schema, decimals (malformed, then E_LIMIT),
+    unknown side (structural E_INPUT), then non-positive quantity or price (E_DOMAIN)."""
+    fill_schema(fills)
+    parsed = [
+        (
+            input_decimal(f["quantity"], f"fills/{k}/quantity"),
+            input_decimal(f["price"], f"fills/{k}/price"),
+            input_decimal(f.get("fee", "0"), f"fills/{k}/fee"),
         )
-        fee = input_decimal(f.get("fee", "0"), w + "fee")
+        for k, f in enumerate(fills)
+    ]
+    for f in fills:
+        side_sign(f["side"])
+    out = []
+    for k, (f, (q, p, fee)) in enumerate(zip(fills, parsed, strict=True)):
         if q <= 0 or p <= 0:
-            raise QfError("E_DOMAIN", "quantity and price must be positive", w + "quantity")
+            raise QfError("E_DOMAIN", "quantity and price must be positive", f"fills/{k}/quantity")
         out.append(
-            {"symbol": _SYM, "side": side, "quantity": fmt(q), "price": fmt(p), "fee": fmt(fee)}
+            {
+                "symbol": _SYM,
+                "side": f["side"],
+                "quantity": fmt(q),
+                "price": fmt(p),
+                "fee": fmt(fee),
+            }
         )
     return out
 
@@ -416,6 +446,7 @@ def book_case(
 ) -> dict[str, Any]:
     """`paper.book.apply_fill`: fills in order on one symbol (HR-50). Without `cash` the output
     gives `cash_delta` (the change of cash) instead of `cash`."""
+    fill_schema(fills)
     start = Decimal(0) if cash is None else input_decimal(cash, "cash")
     book = Book(cash=start)
     pos = book.pos(_SYM)
@@ -447,6 +478,7 @@ def day_case(
     borrow_rate: Any = "0",
 ) -> dict[str, Any]:
     """`paper.book.end_of_day` with `paper.pnl.explain` for one symbol (HR-51 to HR-53)."""
+    fill_schema(fills)
     cash = input_decimal(cash_open, "cash_open")
     n = input_decimal(position_open, "position_open")
     fl = _fill_list(fills)
@@ -505,6 +537,9 @@ def pretrade_case(
     """`paper.pretrade.check` over the CLI: schema first, then HR-42, then the checks."""
     for k in ("side", "type", "quantity"):
         _req(order, k, "order/")
+    for k in ("side", "type"):  # mistyped is E_SCHEMA; an unlisted string is E_INPUT later
+        if not isinstance(order[k], str):
+            raise QfError("E_SCHEMA", f"order/{k} must be a string", "order/" + k)
     input_decimal(order["quantity"], "order/quantity")
     if order.get("limit_price") is not None:
         input_decimal(order["limit_price"], "order/limit_price")
