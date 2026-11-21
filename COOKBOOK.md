@@ -1765,13 +1765,16 @@ By hand at `b = 0`: every path has hazard `h = 0.03`, so `a_i = ln 0.03 = -3.506
 } | uv run --locked --project python quantforge batch
 ```
 <!-- cookbook:expect
-"cva":0.04362773322524349
-"cva":0.06114835388862783
-"cva":0.08648730471425058
-"cva":0.015569211034720719
-"cva":0.11347051247504979,"a":[-14.605170185988092,-14.605170185988092]
+"cva":0.043627733225243
+"cva":0.061148353888627
+"cva":0.086487304714250
+"cva":0.015569211034720
+"cva":0.11347051247504
+"a":[-14.605170185988
 "code":"E_DOMAIN"
 -->
+
+The table shows the Windows output (local laptop, 2026-11-21). On the Linux GitHub runner (Docs run 44895037149) two values differ in the 16th and 17th significant digits: `b = 0.1` gives 0.061148353888627785 and `b = -0.2` gives 0.015569211034720722 (the root finder and `exp` round differently across platforms). The recipe check asserts the first 14 significant digits, which both platforms print.
 
 | Case | `wwr_b` | `cva` | `a` first bucket | Golden |
 |---|---|---|---|---|
