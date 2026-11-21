@@ -1,4 +1,38 @@
-# STOP NOTE, lane k-v1-aad (K-8 AAD of the valuation adjustments)
+# STOP NOTE, lane k-v1-aad (K-8 AAD of the valuation adjustments, now also holding k-xva-spec)
+
+## Update 2026-11-21 (branch-update lane, session 5)
+
+Branch `k-v1-aad` now holds `k-xva-spec` (c7a036cc, merge 1st) and local `k-v1` (47072365, merge 2nd); `k-xva-spec` itself is unchanged. Local laptop, not the acceptance machine.
+
+**Merges.** `git merge k-xva-spec`: one conflict, `docs/model-inventory.md` (both entries kept: MK-12 and MKX-1..9). `git merge k-v1`: conflicts in hand docs (CHANGELOG, LEARN, README, ROADMAP, known-issues, results, release notes v0.10.1), code counts (C++ `test_cli.cpp` operations 387 + 1 = 388; Rust `golden_replay.rs` stage K minimum, set to the 580 cases found after the first run failed on a guessed 601), `specifications/cli-contract.md` (both sections kept), `tools/results_verdicts.json` (both rows kept) and generated files (taken from `k-v1`, then regenerated with `gen_name_map.py`, `build_references.py`, `build_checklists.py`, `case_figures.py --write`, `outside_shares.py`, `model_reports.py`, `status_ladder.py`, `results_page.py`). `program/R6_HANDOVER.md` has a new TOTALS line.
+
+**Content.** KR-296 and KR-297 marked CONFIRMED (coordinator, 2026-11-21) in `specifications/stage-k-rulings-xva.md`, the three K-8b specs, the oracle comments (the candidate files and MANIFEST are unchanged, they already use the bucket start), CHANGELOG, model inventory and known-issues. New known-issues row "K-8 AAD = bump (plan 14.8)" (K-9 part 2, Major 3): the 1e-8 clause is delivered for `xva.adjustments.value` only (13 value goldens, tolerance fixed failing-first in 7ea4d91f, passing in all four builds below) and NOT delivered for the other six KR-162 operations; generated into `docs/results.md`.
+
+**Merged head counts** (generated): 388 operations, 16,600 cases (8,112 value-checked, 5,934 error, 2,554 invariance).
+
+| Language | Command | Result (2026-11-21) |
+|---|---|---|
+| Python (Windows) | `uv run ruff check .`, `ruff format --check .`, `mypy .` | rc 0, rc 0, rc 0 |
+| Python | `coverage run -m pytest -q` + per-file coverage gate | 4,419 passed, 3 skipped; gate rc 0 |
+| Python | conformance runner, full tree; `check_tutorial.py --lang python` | 16,600 of 16,600 (aadadj_k 37/37); rc 0 |
+| Java (Windows) | `mvn -B -Pcoverage verify` (under the mvn lock) + coverage gate | 1,095 tests, 0 failures, 1 skipped; 8 modules at 85%, 0 below |
+| Java | package, conformance runner, `check_tutorial.py --lang java` | 16,600 of 16,600 (aadadj_k 37/37); rc 0 |
+| Rust (WSL) | `cargo fmt --check`, `clippy -D warnings`, `cargo test --workspace` | rc 0, rc 0, 801 passed in 39 binaries (second run; first failed only on the replay minimum) |
+| Rust | release CLI conformance | 16,600 of 16,600 |
+| C++ (WSL) | Release `-Werror` build, ctest, conformance | build rc 0; 6 of 6 ctest; 16,600 of 16,600 |
+| C++ | ASan/UBSan build and ctest | build rc 0; the 5 small ctest tests pass; `ctest` hit the 10-minute cap on `quantforge_core_tests` (the same TIMEOUT on k-v1-fix, k-v1-rev1 and m5); rerun in 6 Catch2 shards, each under the lock: RESULT PENDING |
+| Repo | `python -m pytest -q tools`; `check_case_total.py`; `research/test_preregs.py` | 110 passed, 4 skipped; rc 0 (after the TOTALS line); OK |
+| Repo | the 18 gates of `_h4ci/kv1/gates.sh` | 17 rc 0; `outside_shares.py --check` rc 1 (below) |
+
+**Open.**
+1. `outside_shares.py --check` is red: K-8 AAD (`aadadj_k`) 0 of 13 outside-checked. The tool credits only goldens in `datasets/golden/stage_k/` whose `verified_by` records a DR-H2 MATCH on every compared output. The 41 blind v2 matches are on the K-8b candidates, which are not goldens (KR-299), and no blind packet covered the `aadadj_k` outputs (the `hazard_buckets` entries were never in a packet). Nothing was credited. Route: a blind packet over the 13 `aadadj_k` value inputs, or the K-8b build.
+2. K-8b operations not implemented in any build (MVA, ColVA, funding curves, stressed exposure, MPoR close-out, WWR copula, shock library, AMC, the AAD extension). Not tractable in this session (nine operations times four builds, plus error goldens). Spec conflict to rule on first: `xva-aad-sensitivities.md` (K-8b, `aadx_k`) and `xva-aad-adjustments.md` (K-8 AAD, built) both define `xva.sens.aad`, with different `wrt` grammars (indexed paths and an `outputs` list against KR-263 keys with array values).
+3. ORE runs for MVA and the shock library: not run, not claimed. WWR SciPy checks are not counted as outside checks.
+4. Mutation samples for the xva cells (Python and Rust) still not run (unchanged from 2026-11-20 below).
+
+---
+
+## Earlier note (2026-11-20)
 
 Written 2026-11-20 before the 23:00 UTC shutdown. Branch `k-v1-aad` (off `k-v1` at 105f7f96), pushed. Local laptop, not the acceptance machine.
 

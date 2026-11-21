@@ -15,3 +15,7 @@ Written before the 23:00 UTC shutdown. Repo gates: 0 failures on the pushed head
 1. Coordinator: confirm or reject KR-296 to KR-299. If KR-296/297 are rejected, run `python -I oracle/python/gen_stage_k_xva_k8b.py --convention end` for the old values, set `CONV` default to `end`, regenerate, and rerun packet v2 (mva and colva cases change).
 2. Implementation lane (after k-v1-aad lands): implement the K-8b operations in four builds; move each `oracle/xva_k8b_candidates/<suite>.json` into `datasets/golden/stage_k/`, add the suites to `tools/outside_shares.py` `STAGE_K_ITEMS` (K-8b items), add `DR-H2 blind v2 MATCH` to `verified_by` of the 41 matched cases, add error goldens (`*_ke-*`, two errors at once, HR-66), and update hard-coded golden counts in the C++ and Rust tests.
 3. MVA and the shock library stay under 60% until ORE runs pass (one `dimModel Flat` case; two shock cases); those need a WSL slot.
+
+## 2026-11-21
+
+This branch was merged into `k-v1-aad` (with `k-v1`); KR-296 and KR-297 are CONFIRMED there. Current state: `program/stage_k_aad/STOP_NOTE.md` on `k-v1-aad`.
