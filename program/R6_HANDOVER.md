@@ -362,3 +362,7 @@ TOTALS: 16545 value 8084 error 5901 invariance 2560
 Stage K `k-v1` parts (pull requests #60 to #64, main `11ba1b40`, counted 2026-11-21 by `tools/check_case_total.py`, measured): `wwr_g` grows from 6 to 26 cases (+15 value, +5 error; WWR CVA root fix, KR-257), `e1g_xva` is regenerated from 343 to 324 cases (-1 value, -12 error, -6 invariance), `lex_k` grows from 9 to 10 value cases: +2 cases in all. The line above was read at `k-r2` and was not updated when these merged; the count, not the line, is the truth (it equals the generated `docs/case-figures.md`). `check_case_total.py` is not run by any workflow (`grep -r check_case_total .github/workflows`: none, read 2026-11-21), so CI did not catch the drift.
 
 TOTALS: 16547 value 8099 error 5894 invariance 2554
+
+Stage K fuzz fixes (branch `k-v1-fuzz2`, merged into `k-v1` 2026-11-21, counted 2026-11-21 by `tools/check_case_total.py`, measured): new golden set `fuzzfix_k` adds 16 error cases (fuzz run 44815591552 findings and the same fault class in sibling handlers).
+
+TOTALS: 16563 value 8099 error 5910 invariance 2554
