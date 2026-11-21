@@ -34,7 +34,7 @@ Branch `k-v1-docs-b`, cut from main 11ba1b40. Files owned: LEARN.md, ARCHITECTUR
 - Generator text fixed: liquidity horizons implemented in all four builds (Python ops_k_w2a.py, Java OpsStageKW2a, Rust kw2a.rs, C++ ops_frtb_drc_ima.inc) and on main via #63.
 
 ## Checks run (Windows, 2026-11-21)
-check_md_anchors (843 files, 0 problems), check_hygiene (0 problems), research/test_preregs (OK), check_links (0 unreachable; 12 refused external), build_site (0 broken links), check_site_a11y --static (no error-level finding), check_site_view on docs/diagrams/README.html (64 of 64 diagrams render, 3 views), build_gallery --check (0 differences), check_docs_status (0 problems), verify/v14_stage_k.py (55 strings), git grep -i interview (none).
+check_md_anchors (843 files, 0 problems), check_hygiene (0 problems), research/test_preregs (OK), check_links (0 unreachable; 12 refused external), build_site (0 broken links), check_site_a11y --static (no error-level finding), check_site_view on docs/diagrams/README.html (64 of 64 diagrams render, 3 views), build_gallery --check (0 differences), check_docs_status (0 problems), verify/v14_stage_k.py (55 strings), `git grep -i` for the word the lane rules ban (none).
 
 ## Not done / for the coordinator
 - Adding the incremental page to the generated Curves index needs a row in tools/build_gallery.py (not this lane's file).
