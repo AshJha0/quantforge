@@ -970,6 +970,12 @@ class SiteHome(unittest.TestCase):
         for needle in ('class="skip"', '<main id="main"', "search.js"):
             self.assertIn(needle, bs.PAGE)
         self.assertIn(":focus-visible", bs.CSS)
+        # KR-227, run 44805977858: a multi-line inline <code> in a <pre> that scrolls made axe-core 4.2.4 color-contrast
+        # throw; as one block box its middle is on its own grid cells. Not wider than the visible <pre> (run 44920662025:
+        # width:max-content put the middle of long blocks out of view and axe could not measure them)
+        rule = bs.CSS.split("pre code{", 1)[1].split("}", 1)[0]
+        self.assertIn("display:block", rule)
+        self.assertNotIn("max-content", rule)
 
 
 class DoctorAndQuickstart(unittest.TestCase):
@@ -1280,6 +1286,12 @@ class SiteA11y(unittest.TestCase):
         self.assertNotIn("<th></th>", out)
         self.assertIn('<th scope="row">k</th>', out)
         self.assertEqual(out.count("<thead>"), 1)
+        # a paragraph that is one <em> (run 44922499739) is shown as a block; mixed or split emphasis is left alone
+        para = m.a11y_fix("<h1>t</h1><p><em>Level: x. Source: <code>a/b.md</code></em></p><p>a <em>b</em></p>"
+                          "<p><em>c</em> d <em>e</em></p>", "t")
+        self.assertIn('<p><em class="para">Level: x. Source: <code>a/b.md</code></em></p>', para)
+        self.assertIn("<p>a <em>b</em></p><p><em>c</em> d <em>e</em></p>", para)
+        self.assertIn("em.para,strong.para{display:block}", m.CSS)
         svg = ('<svg viewBox="0 0 480 300" role="img" aria-label="betas, synthetic data" '
                'xmlns="http://www.w3.org/2000/svg" style="fill:currentColor"><text>b</text>'
                '<line style="stroke:var(--line)"/></svg>')
