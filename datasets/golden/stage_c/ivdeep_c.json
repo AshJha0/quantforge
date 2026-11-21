@@ -1,0 +1,411 @@
+{
+ "schema_version": "1.0",
+ "suite": "ivdeep_c",
+ "spec": "specifications/05-volatility/black-models.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_rev1.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "ivdeep_c-0001",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "forward": 100.0,
+    "strike": 160.0,
+    "expiry_years": 1.0,
+    "discount_factor": 1.0,
+    "price": 0.0795975479655561
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 0.0796; KR-341 estimate 8.3e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0002",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "forward": 100.0,
+    "strike": 300.0,
+    "expiry_years": 1.0,
+    "discount_factor": 1.0,
+    "price": 1.1685827631371399e-07
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 1.17e-07; KR-341 estimate 3.9e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0003",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "forward": 100.0,
+    "strike": 40.0,
+    "expiry_years": 0.5,
+    "discount_factor": 1.0,
+    "price": 2.1935491952071358e-07
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.25
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 2.19e-07; KR-341 estimate 4.7e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0004",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "PUT",
+    "forward": 100.0,
+    "strike": 10.0,
+    "expiry_years": 2.0,
+    "discount_factor": 1.0,
+    "price": 6.519385337541076e-08
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 6.52e-08; KR-341 estimate 1.9e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0005",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "forward": 100.0,
+    "strike": 1000.0,
+    "expiry_years": 1.0,
+    "discount_factor": 1.0,
+    "price": 9.773187944442035e-14
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.3
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 9.77e-14; KR-341 estimate 1.9e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0006",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "forward": 100.0,
+    "strike": 160.0,
+    "expiry_years": 1.0,
+    "discount_factor": 1.0,
+    "price": 3.2921422676670126e-14
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 8.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 3.29e-14; KR-341 estimate 4.4e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0007",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "forward": 100.0,
+    "strike": 20.0,
+    "expiry_years": 1.0,
+    "discount_factor": 1.0,
+    "price": 3.29640364632522e-41
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 6.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 3.3e-41; KR-341 estimate 4.4e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0008",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "forward": 100.0,
+    "strike": 300.0,
+    "expiry_years": 0.1,
+    "discount_factor": 1.0,
+    "price": 1.4825672732865197e-265
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.1
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 1.48e-265; KR-341 estimate 4e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0009",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "forward": 100.0,
+    "strike": 500.0,
+    "expiry_years": 1.0,
+    "discount_factor": 1.0,
+    "price": 4.3934227564100866e-228
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.05
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 4.39e-228; KR-341 estimate 2.8e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0010",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BLACK_76",
+    "option_type": "CALL",
+    "forward": 100.0,
+    "strike": 1000.0,
+    "expiry_years": 0.1,
+    "discount_factor": 1.0,
+    "price": 9.020588182524785e-291
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 0.2
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 9.02e-291; KR-341 estimate 1.9e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  },
+  {
+   "case_id": "ivdeep_c-0011",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "PUT",
+    "forward": 100.0,
+    "strike": 86.83731917681901,
+    "expiry_years": 2.9082679923151997,
+    "discount_factor": 1.0,
+    "price": 1.5826e-319
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_NO_CONVERGENCE"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm",
+    "not_identified"
+   ],
+   "description": "price 1.58e-319; KR-341 estimate 6.5e-05: the price does not identify the vol"
+  },
+  {
+   "case_id": "ivdeep_c-0012",
+   "operation": "vol.option.implied",
+   "inputs": {
+    "model": "BACHELIER",
+    "option_type": "CALL",
+    "forward": 100.0,
+    "strike": 130.0,
+    "expiry_years": 1.0,
+    "discount_factor": 1.0,
+    "price": 1.631956734091401e-199
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "vol": 1.0
+    }
+   },
+   "tolerance_class": "root_finding",
+   "verified_by": [
+    "mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)",
+    "scipy brentq on ln V with log_ndtr / erfcx, a different formulation (library-primitive), within 1e-12"
+   ],
+   "tags": [
+    "stage_k",
+    "deep_otm"
+   ],
+   "description": "price 1.63e-199; KR-341 estimate 4.4e-16 at the true vol",
+   "tolerance_limit": {
+    "absolute": 0.0,
+    "relative": 1e-09,
+    "reason": "KR-341: an accepted vol has estimated relative error at most 1e-10"
+   }
+  }
+ ]
+}

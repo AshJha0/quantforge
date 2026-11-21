@@ -32,10 +32,10 @@ ISDA_3M_SPREAD = 0.0026161
 WINDOWS = (30, 90, 180)
 
 
-def load(name, url, data_dir):
+def load(name, url, data_dir, expect_json=False):
     if data_dir:
         return (Path(data_dir) / name).read_bytes()
-    return c.fetch(url)
+    return c.fetch(url, expect_json=expect_json)
 
 
 def window_case(case_id, T, n, fixings):
@@ -70,8 +70,8 @@ def main():
     # fallback period is checked only once its whole window lies on or after the forward start.
     start = max((today - dt.timedelta(days=400)).isoformat(), c.FORWARD_START)
     sofr_url = c.SOURCES["nyfed-sofr"]["url"].split("?")[0] + f"?startDate={start}&endDate={today.isoformat()}"
-    fixings = sorted((x["effectiveDate"], x["percentRate"] / 100) for x in json.loads(load("nyfed-sofr-400d.json", sofr_url, a.data))["refRates"])
-    avgs = sorted(json.loads(load("nyfed-sofrai.json", AVG_URL.format(start=start, end=today.isoformat()), a.data))["refRates"],
+    fixings = sorted((x["effectiveDate"], x["percentRate"] / 100) for x in json.loads(load("nyfed-sofr-400d.json", sofr_url, a.data, expect_json=True))["refRates"])
+    avgs = sorted(json.loads(load("nyfed-sofrai.json", AVG_URL.format(start=start, end=today.isoformat()), a.data, expect_json=True))["refRates"],
                   key=lambda x: x["effectiveDate"])
     T_last = avgs[-1]["effectiveDate"]
     r = c.Report("SOFR check", T_last, a.out)

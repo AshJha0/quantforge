@@ -1,13 +1,21 @@
-# Stop note: lane k-v1-a11y (2026-11-20, second round)
+# Stop note: lane k-v1-a11y2 (2026-11-21)
 
-Branch `k-v1-a11y`, merged with `origin/k-v1` before each round. Evidence class in brackets.
+Branch `k-v1-a11y2`, from `k-v1` 47072365. Not merged, no pull request. Evidence class in brackets.
 
-**Run 44797986161 (head 801033aa) read from its logs and the 12 shard artifacts.** docs-site green. Every docs-site-a11y shard now processes all its pages: light 1/6 ran 138 pages in 24 pa11y-ci runs, 10 pages retried, 0 left unloadable (read). The line "pa11y-ci on 4 pages in 5 runs" in the log is the self-test's stand-in run, not the shard. What failed: `color-contrast` on 33 pages in each mode, 0 other rules, 0 load failures (read):
+**Result.** Docs run 44926203225 (workflow_dispatch on `k-v1-a11y2`, head cffcfe31) is green in every job: docs-site, docs-site-view, all 12 docs-site-a11y shards and docs-site-a11y-summary. pa11y AA passes on 861 of 861 pages in light and 861 of 861 in dark, 0 errors (read from its `a11y-summary.md`). KR-227 is met on this branch; it is met on main only after the merge and a green Docs run there.
 
-| Pages | Cause | Fix |
-|---|---|---|
-| 30 Curves gallery pages | text inside inline SVG charts: axe 4.2.4 cannot measure a drawn background and returns "incomplete"; pa11y 6.2.3 `lib/runners/axe.js` maps an incomplete result of serious impact to an error (read from the pa11y source at tag 6.2.3). The diagnostic step's plain `axe.run` reported no violation on these pages (read). | `tools/build_site.py` `chart_images`: each chart is a `<picture>` with light and dark SVG images, the same alt text (tested locally: 136 images valid, no unresolved colour token, widths pass on 37 Curves pages in all three views, dark screenshot checked) |
-| `program/R6_EVIDENCE_HANDOVER` | bold text holding inline code, incomplete (inferred) | bold ends before the code |
-| tutorials 36 and 39 | an incomplete with no element and no impact: axe reports a rule that threw that way (inferred); cause not established | none yet; the diagnostic step now prints incomplete results, rule errors and axe's reason data at 1280 x 1024 |
+**What was done.**
 
-**Untested until the next CI run:** all three fixes under pa11y; the diagnostic output for tutorials 36 and 39. If only those two remain, the run stays red with 2 pages per mode; they are listed in `docs/known-issues.md` (G10 row), never excluded.
+| Step | Run | Finding | Fix |
+|---|---|---|---|
+| Restore the jobs | | `docs-site-a11y` and `docs-site-a11y-summary` had been cut from `docs.yml` by 1263f32b ("Split") | the removed hunk applied in reverse, header comment updated |
+| Tutorials 36 and 39 | 44805977858 (diagnostic) | axe-core 4.2.4 threw `Cannot read property 'filter' of undefined` in color-contrast (read). Cause: the middle of a multi-line inline `<code>` in a `<pre>` that scrolls sideways falls in a 200 px grid cell none of its line boxes touch (read from the axe source at v4.2.4; a local replay found exactly these 2 of 836 pages, measured) | `pre code{display:block}` in `tools/build_site.py` |
+| First try | 44920662025 | `width:max-content` on the block made axe unable to measure 44 COOKBOOK elements (read) | dropped; the block stays as wide as the visible `<pre>` |
+| README table | 44919988589 | docs-site refused a stale Status at a glance after the fuzzfix_k goldens (read) | `tools/status_glance.py --write` |
+| Question bank 14 | 44922499739 | 860 of 861 pages per mode; one `<em>` "Unable to determine contrast ratio" with no reason (read): an inline element on two lines with all its own text on the first, middle in the gap between its line boxes (inferred; replay with Verdana as a stand-in font finds exactly this element, measured) | a paragraph that is one `<em>` or `<strong>` gets class `para`, shown as a block |
+
+`tools/check_site_a11y.py --browser` now replays both axe 4.2.4 traps (rules `axe-4.2.4-grid-gap`, `axe-4.2.4-own-stack-miss`); `tools/test_tools.py` checks the CSS and the paragraph rule (90 tests pass locally). Local passes after the fixes, local laptop, not the acceptance machine: browser pass no finding on 861 pages x 2 modes, width check 861 of 861 in three views (measured). Details: `benchmarks/results/k7/a11y-local-2026-11-20.md`.
+
+**Nothing was excluded, no rule ignored, no threshold changed.**
+
+**For the coordinator.** Merge `k-v1-a11y2` into `k-v1` (it carries the README status table regenerated after the fuzz goldens; `k-v1` itself should fail docs-site on that table, inferred from run 44919988589). The local replay depends on fonts: the runner's fallback font wraps lines the laptop's fonts do not, so a green local pass does not prove a green CI run.

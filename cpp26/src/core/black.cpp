@@ -118,13 +118,29 @@ double implied_vol_unchecked(const OptionInput& in, double price) {
         }
         if (g == 0) break;
         (g > 0 ? hi : lo) = v;
-        const double slope = vega(v);
-        double next = slope > 0 ? v - g / slope : lo;
+        const double slope = vega(v), val = g + price;
+        // Newton on ln V - ln price (ruling KR-341): the same step near the root, and it keeps its size far out of
+        // the money, where V spans hundreds of decades over the bracket.
+        double next = slope > 0 && val > 0 ? v - std::log(val / price) * val / slope : lo;
         if (!(next > lo && next < hi)) next = (lo + hi) / 2;
         if (std::fabs(next - v) <= 1e-16 * v) break;
         v = next;
     }
     if (best_gap > 1e-13 * std::max(1.0, price)) throw Error("E_NO_CONVERGENCE", "implied vol did not converge");
+    // KR-341: the price must identify the vol in binary64. Estimated vol error (|V - price| + 2^-52 M + 2^-1070 (1 +
+    // D (|F| + |K| + v sqrt T)))/(v vega), M the sum of the magnitudes of the two terms of V; above 1e-10, refused.
+    const double root = best * root_t;
+    double mag;
+    if (normal) {
+        const double x = (f - k) / root;
+        mag = d * (std::fabs(f - k) * normal_cdf(phi * x) + root * density(x));
+    } else {
+        const double d1 = (std::log(f / k) + root * root / 2) / root;
+        mag = d * (f * normal_cdf(phi * d1) + k * normal_cdf(phi * (d1 - root)));
+    }
+    const double scale = best * vega(best);
+    const double error = std::fabs(gap(best)) + 0x1p-52 * mag + 0x1p-1070 * (1 + d * (std::fabs(f) + std::fabs(k) + root));
+    if (!(scale > 0) || error > 1e-10 * scale) throw Error("E_NO_CONVERGENCE", "the price does not identify the vol in binary64");
     return best;
 }
 

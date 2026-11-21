@@ -367,6 +367,10 @@ Stage K fuzz fixes (branch `k-v1-fuzz2`, merged into `k-v1` 2026-11-21, counted 
 
 TOTALS: 16563 value 8099 error 5910 invariance 2554
 
-Stage K error-parity fixes (branch `k-v1-fix`, merged with `k-v1` 19399ec0 on 2026-11-21, counted 2026-11-21 by `tools/check_case_total.py`, measured): 12 error goldens tag `kr258` (`wwr_g-0027` to `-0032`, `xvaadj_g-0013` to `-0018`) and 11 two-error goldens tag `hr122` add 23 error cases.
+Stage K v1 integration plus branch `k-v1-rev1` (2026-11-21, merge of local `k-v1` 47072365 into `k-v1-rev1`, counted by `tools/check_case_total.py`, measured): `fuzzfix_k` (lane `k-v1-fuzz2`, 16 error), `sabrz_c` (32 value, KR-340), `ivdeep_c` (11 value, 1 error, KR-341), `fuzzrev_k` (2 error, K-9 finding 1)
 
-TOTALS: 16586 value 8099 error 5933 invariance 2554
+TOTALS: 16609 value 8142 error 5913 invariance 2554
+
+Stage K error-parity fixes (branch `k-v1-fix`, merged with `k-v1` 19399ec0, then with `origin/k-v1` 5e4facc9 on 2026-11-21, counted 2026-11-21 by `tools/check_case_total.py`, measured): 12 error goldens tag `kr258` (`wwr_g-0027` to `-0032`, `xvaadj_g-0013` to `-0018`) and 11 two-error goldens tag `hr122` add 23 error cases.
+
+TOTALS: 16632 value 8142 error 5936 invariance 2554

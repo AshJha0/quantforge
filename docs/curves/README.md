@@ -19,7 +19,7 @@ An outside library in `verified_by` means QuantLib or Strata. The other cases ha
 | [Equity forward, discrete dividends](equity-forward.md) | C | 4 golden cases for `eq.forward.outright`, 2 with an outside library in `verified_by` |
 | [SVI smile](svi-smile.md) | C | 2 golden cases for `vol.svi.evaluate`, 2 with an outside library in `verified_by` |
 | [SSVI surface](ssvi-surface.md) | C | 3 golden cases for `vol.ssvi.evaluate`, 3 with an outside library in `verified_by` |
-| [SABR](sabr.md) | C | 32 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by` |
+| [SABR](sabr.md) | C | 64 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by` |
 | [Full SOFR, ESTR, SONIA OIS](ois-full.md) | D | 81 golden cases |
 | [Bond and sovereign fits](bond-fit.md) | D | 2 golden cases |
 | [Repo and special repo](repo.md) | D | 4 golden cases |

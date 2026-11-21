@@ -15,6 +15,18 @@ using Vec = std::vector<double>;
 
 [[noreturn]] void domain(const char* why) { throw Error("E_DOMAIN", why); }
 
+// chi(z) = ln((sqrt(1 - 2 rho z + z^2) + z - rho)/(1 - rho)) without cancellation (ruling KR-340): the direct form
+// loses digits as eps/|z| for small z and cancels in s + z - rho for large negative z.
+double sabr_chi(double z, double rho) {
+    const double d = z - rho, omr = 1 - rho, q = omr * (1 + rho);
+    const double s = std::hypot(d, std::sqrt(q));
+    const double w = d >= 0 ? s + d : q / (s - d);
+    const double u = z / (s + 1) * (w / omr + 1);
+    if (std::fabs(u) < 0.5) return std::log1p(u);
+    if (d >= 0) return std::log(s + d) - std::log1p(-rho);
+    return std::log1p(rho) - std::log(s - d);
+}
+
 }  // namespace
 
 void require_finite(const SabrParameters& p, std::string_view field) {
@@ -44,7 +56,7 @@ double hagan_vol(double f, double x, double t, const SabrParameters& p) {
     if (std::fabs(z) < 1e-7) {
         m = 1 - p.rho * z / 2 - (3 * p.rho * p.rho - 2) * z * z / 12;
     } else {
-        m = z / std::log((std::sqrt(1 - 2 * p.rho * z + z * z) + z - p.rho) / (1 - p.rho));
+        m = z / sabr_chi(z, p.rho);
     }
     const double den = root * (1 + c / 24 + c * c / 1920);
     const double h = 1 + t * (one * one * p.alpha * p.alpha / (24 * a) + p.rho * p.beta * p.nu * p.alpha / (4 * root) +

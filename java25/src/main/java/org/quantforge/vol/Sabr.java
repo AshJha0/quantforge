@@ -28,6 +28,26 @@ public final class Sabr {
     }
 
     /** {@code f}, {@code x} are shifted. */
+    /**
+     * chi(z) = ln((sqrt(1 - 2 rho z + z^2) + z - rho)/(1 - rho)) without cancellation (ruling KR-340): the direct
+     * form loses digits as eps/|z| for small z and cancels in s + z - rho for large negative z.
+     */
+    static double chi(double z, double rho) {
+        double d = z - rho;
+        double omr = 1.0 - rho;
+        double q = omr * (1.0 + rho);
+        double s = Math.hypot(d, Math.sqrt(q));
+        double w = d >= 0 ? s + d : q / (s - d);
+        double u = z / (s + 1.0) * (w / omr + 1.0);
+        if (Math.abs(u) < 0.5) {
+            return Math.log1p(u);
+        }
+        if (d >= 0) {
+            return Math.log(s + d) - Math.log1p(-rho);
+        }
+        return Math.log1p(rho) - Math.log(s - d);
+    }
+
     public static double hagan(double f, double x, double t, Params p) {
         Finite.check("f", f);
         Finite.check("x", x);
@@ -46,7 +66,7 @@ public final class Sabr {
         if (Math.abs(z) < 1e-7) {
             m = 1.0 - rho * z / 2.0 - (3.0 * rho * rho - 2.0) * z * z / 12.0;
         } else {
-            m = z / Math.log((Math.sqrt(1.0 - 2.0 * rho * z + z * z) + z - rho) / (1.0 - rho));
+            m = z / chi(z, rho);
         }
         double den = root * (1.0 + c / 24.0 + c * c / 1920.0);
         double h = 1.0 + t * (ob * ob * a * a / (24.0 * bigA) + rho * b * nu * a / (4.0 * root)

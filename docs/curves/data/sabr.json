@@ -317,13 +317,14 @@
    "vol.sabr.density",
    "vol.sabr.arbfree"
   ],
-  "cases": 32,
+  "cases": 64,
   "by_source": {
    "vol.sabr.hagan: quantlib-1.44": 5,
    "vol.sabr.density: analytic-replay": 3,
    "vol.sabr.arbfree: quantlib-1.44-cev": 2,
    "vol.sabr.arbfree: hagan-formula-near, quantlib-1.44-noarbsabr-near": 1,
    "vol.sabr.arbfree: mass-and-mean": 3,
+   "vol.sabr.hagan: mpmath 50 digits (independent oracle, gen_stage_k_rev1.py), scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14": 32,
    "vol.sabr.hagan: strata-2.12.78, quantlib-1.44": 18
   }
  }
