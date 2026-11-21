@@ -156,7 +156,14 @@ public final class Paper {
         return BigDecimal.valueOf(v);
     }
 
+    /**
+     * +1 BUY, -1 SELL. A present side that is not a JSON string is mistyped, E_SCHEMA (cli-contract.md, error
+     * table; fuzz run 44937631714); a string that is not listed is E_INPUT (paper-trading.md, Errors; rule_h-0040).
+     */
     static int sideSign(Object side) {
+        if (side != null && !(side instanceof String)) {
+            throw new QfError("E_SCHEMA", "side must be a string", "side");
+        }
         if ("BUY".equals(side)) {
             return 1;
         }
@@ -738,6 +745,9 @@ public final class Paper {
         simulatedOnly(order);
         int s = sideSign(order.containsKey("side") ? order.get("side") : "");
         Object otype = order.get("type");
+        if (otype != null && !(otype instanceof String)) {
+            throw new QfError("E_SCHEMA", "type must be a string", "type");
+        }
         if (!(otype instanceof String t) || !TYPES.contains(t)) {
             throw new QfError("E_INPUT", "unknown type " + otype, "type");
         }
@@ -793,28 +803,57 @@ public final class Paper {
         return v;
     }
 
-    private static List<DayFill> fillList(List<?> fills) {
-        List<DayFill> out = new ArrayList<>();
+    /**
+     * The E_SCHEMA checks of every fill, before any other check of the case (KR-230, HR-122): each fill an object,
+     * side, quantity and price present, and side and each decimal a JSON string (fuzz run 44937631714).
+     */
+    private static void fillSchema(List<?> fills) {
         for (int k = 0; k < fills.size(); k++) {
             String w = "fills/" + k + "/";
             if (!(fills.get(k) instanceof Map<?, ?> f)) {
                 throw new QfError("E_SCHEMA", w + " is not an object", w);
             }
-            Object side = req(f, "side", w);
-            sideSign(side);
-            BigDecimal q = dstr(req(f, "quantity", w), w + "quantity");
-            BigDecimal p = dstr(req(f, "price", w), w + "price");
-            BigDecimal fee = dstr(f.containsKey("fee") ? f.get("fee") : "0", w + "fee");
-            if (q.signum() <= 0 || p.signum() <= 0) {
-                throw new QfError("E_DOMAIN", "quantity and price must be positive", w + "quantity");
+            for (String key : List.of("side", "quantity", "price")) {
+                if (!(req(f, key, w) instanceof String)) {
+                    throw new QfError("E_SCHEMA", w + key + " must be a string", w + key);
+                }
             }
-            out.add(new DayFill(SYM, side, q, p, fee));
+            if (f.containsKey("fee") && !(f.get("fee") instanceof String)) {
+                throw new QfError("E_SCHEMA", w + "fee must be a decimal string", w + "fee");
+            }
+        }
+    }
+
+    /**
+     * Fills in the KR-230 order over the whole list: schema, decimals (malformed, then E_LIMIT), unknown side
+     * (structural E_INPUT), then a non-positive quantity or price (E_DOMAIN).
+     */
+    private static List<DayFill> fillList(List<?> fills) {
+        fillSchema(fills);
+        List<BigDecimal[]> parsed = new ArrayList<>();
+        for (int k = 0; k < fills.size(); k++) {
+            String w = "fills/" + k + "/";
+            Map<?, ?> f = (Map<?, ?>) fills.get(k);
+            parsed.add(new BigDecimal[] {dstr(f.get("quantity"), w + "quantity"), dstr(f.get("price"), w + "price"),
+                dstr(f.containsKey("fee") ? f.get("fee") : "0", w + "fee")});
+        }
+        for (Object f : fills) {
+            sideSign(((Map<?, ?>) f).get("side"));
+        }
+        List<DayFill> out = new ArrayList<>();
+        for (int k = 0; k < fills.size(); k++) {
+            BigDecimal[] v = parsed.get(k);
+            if (v[0].signum() <= 0 || v[1].signum() <= 0) {
+                throw new QfError("E_DOMAIN", "quantity and price must be positive", "fills/" + k + "/quantity");
+            }
+            out.add(new DayFill(SYM, ((Map<?, ?>) fills.get(k)).get("side"), v[0], v[1], v[2]));
         }
         return out;
     }
 
     /** {@code paper.book.apply_fill}: fills in order on one symbol (HR-50); {@code cash_delta} without {@code cash}. */
     public static Map<String, Object> bookCase(List<?> fills, Object cash, Object position, Object avgCost) {
+        fillSchema(fills);
         BigDecimal start = cash == null ? BigDecimal.ZERO : dstr(cash, "cash");
         Book book = new Book(start);
         Position pos = book.pos(SYM);
@@ -836,6 +875,7 @@ public final class Paper {
     /** {@code paper.book.end_of_day} with {@code paper.pnl.explain} for one symbol (HR-51 to HR-53). */
     public static Map<String, Object> dayCase(Object cashOpen, List<?> fills, Object positionOpen, Object avgCostOpen,
             Object prevClose, Object close, long days, Object cashRate, Object debitRate, Object borrowRate) {
+        fillSchema(fills);
         BigDecimal cash = dstr(cashOpen, "cash_open");
         BigDecimal n = dstr(positionOpen, "position_open");
         List<DayFill> fl = fillList(fills);
@@ -891,6 +931,11 @@ public final class Paper {
             long ordersToday, Map<?, ?> limits) {
         for (String k : List.of("side", "type", "quantity")) {
             req(order, k, "order/");
+        }
+        for (String k : List.of("side", "type")) { // mistyped is E_SCHEMA; an unlisted string is E_INPUT later
+            if (!(order.get(k) instanceof String)) {
+                throw new QfError("E_SCHEMA", "order/" + k + " must be a string", "order/" + k);
+            }
         }
         dstr(order.get("quantity"), "order/quantity");
         if (order.get("limit_price") != null) {
@@ -1376,6 +1421,13 @@ public final class Paper {
                 for (String key : List.of("order_id", "symbol", "side", "type", "quantity")) {
                     if (order.get(key) == null) {
                         throw new QfError("E_SCHEMA", w + "order/" + key + " is missing", w + "order/" + key);
+                    }
+                }
+                // mistyped text fields are E_SCHEMA (fuzz run 44937631714 class); a null venue stays E_INPUT
+                for (String key : List.of("order_id", "symbol", "side", "type", "venue")) {
+                    Object v = order.get(key);
+                    if (v != null && !(v instanceof String)) {
+                        throw new QfError("E_SCHEMA", w + "order/" + key + " must be a string", w + "order/" + key);
                     }
                 }
                 for (String key : List.of("quantity", "limit_price")) {

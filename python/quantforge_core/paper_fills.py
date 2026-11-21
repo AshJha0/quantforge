@@ -383,6 +383,11 @@ def session_case(
             for key in ("order_id", "symbol", "side", "type", "quantity"):
                 if order.get(key) is None:
                     raise QfError("E_SCHEMA", f"{w}order/{key} is missing", w + "order/" + key)
+            # mistyped text fields are E_SCHEMA (an array symbol crashed the symbol set; fuzz run
+            # 44937631714 found the same fault in paper.book.apply_fill); a null venue stays E_INPUT
+            for key in ("order_id", "symbol", "side", "type", "venue"):
+                if order.get(key) is not None and not isinstance(order[key], str):
+                    raise QfError("E_SCHEMA", f"{w}order/{key} must be a string", w + "order/" + key)
             for key in ("quantity", "limit_price"):
                 if order.get(key) is not None:
                     input_decimal(order[key], f"{w}order/{key}")
