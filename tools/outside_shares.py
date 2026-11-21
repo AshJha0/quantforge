@@ -256,7 +256,11 @@ STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-
                  "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)",
                  "sbim_alias_k": None,  # KR-153: the deprecated alias's invariance and error cases; no value case
                  "lim_k": None,  # KR-230/KR-231: size-limit error cases only (bitemporal_query, trigger.check)
-                 "fuzzfix_k": None}  # K-9 finding 1: two fuzz inputs, error cases only
+                 "fuzzfix_k": None,  # fuzz run 44815591552 and siblings: error cases only (gen_stage_k_fuzz.py)
+                 "fuzzrev_k": None,  # K-9 finding 1: fuzz runs 2026-11-09..16, error cases only (gen_stage_k_rev1.py)
+                 "drc_k": "K-8a", "ima_k": "K-8f", "cva_k": "K-8g", "sacva_k": "K-8g", "df_k": "K-8g",
+                 "lev_k": "K-8i", "lex_k": "K-8i",
+                 "cva_ke": None, "sacva_ke": None, "lev_ke": None, "lex_ke": None}  # wave 2 _ke: error cases only
 K_PUBLISHED_SRC = "figure printed in the regulator text (Basel Framework CRE99, MAR99 Table 2)"
 
 

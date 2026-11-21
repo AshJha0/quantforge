@@ -15,6 +15,8 @@ from . import (  # noqa: F401 - imported to register their verbs
     ops_hedging,
     ops_inflation,
     ops_k_w1b,
+    ops_k_w2a,
+    ops_k_w2b,
     ops_lmm_xva_frtb,
     ops_mbs,
     ops_micro,

@@ -30,7 +30,8 @@ public final class Projection {
 
     /** {@code date} plus months, MODIFIED_FOLLOWING. */
     public static LocalDate plusMonths(Conventions.RateIndex ix, LocalDate date, long months) {
-        return Calendars.adjust(ix.calendar(), date.plusMonths(months), Calendars.Convention.MODIFIED_FOLLOWING);
+        return Calendars.adjust(ix.calendar(), Calendars.plusMonthsInRange(date, months),
+                Calendars.Convention.MODIFIED_FOLLOWING);
     }
 
     /** Simple forward on the projection curve. */

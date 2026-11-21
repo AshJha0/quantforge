@@ -1,11 +1,12 @@
 name: C++ sanitizers
-# ASan and UBSan over the unit tests and every golden case. Runs only when C++ or its inputs change.
+# ASan and UBSan over the unit tests and every golden case; ThreadSanitizer over the K-5 snapshot race test. Runs only when C++ or its inputs change.
 on:
   push:
     branches: [main]
     paths:
       - 'cpp26/**'
       - 'datasets/golden/**'
+      - 'datasets/scenarios/k5_snapshot.json'
       - 'conformance/runner/**'
       - '.github/workflows/sanitizers.yml'
   pull_request:  # every PR, so these can be required checks on main
@@ -37,3 +38,33 @@ jobs:
       - run: cmake --build cpp26/build --parallel
       - run: ctest --test-dir cpp26/build --output-on-failure
       - run: python3 conformance/runner/runner.py --impl cpp
+  tsan:
+    # Stage K, K-5 (rulings confirmed 2026-11-20, KR-285, KR-288; not yet green in CI): the snapshot race test under ThreadSanitizer, long mode (1,000,000
+    # publishes at R = 1 and 4, 200,000 at R = 16), then both planted faults, each of which ThreadSanitizer must report. Latency-aware
+    # analytics on simulated data; nothing is timed. Clang 23 with libc++, as the cpp26-clang job.
+    name: sanitizers-tsan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      TSAN_OPTIONS: halt_on_error=1 second_deadlock_stack=1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: |
+          wget -q https://apt.llvm.org/llvm.sh
+          echo "03878e08f47b66cc95bc4b544b0db3c6d9ce8d60e6cf2492ae357984330a9eae  llvm.sh" | sha256sum -c -
+          sudo bash llvm.sh 23
+          sudo apt-get install -y ninja-build libc++-23-dev libc++abi-23-dev
+      - run: cmake -S cpp26 -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DQF_SANITIZE=thread -DQF_WERROR=ON -DCMAKE_CXX_COMPILER=clang++-23 -DCMAKE_CXX_FLAGS=-stdlib=libc++
+      - run: cmake --build build --target qf_snapshot_race --parallel
+      - run: ./build/qf_snapshot_race unit
+      - name: race, long mode
+        run: ./build/qf_snapshot_race race 1 1000000 && ./build/qf_snapshot_race race 4 1000000 && ./build/qf_snapshot_race race 16 200000
+      - name: planted faults must be reported
+        run: |
+          for f in relaxed skip; do
+            if TSAN_OPTIONS="halt_on_error=1 symbolize=0" ./build/qf_snapshot_race race 4 20000 $f > fault_$f.log 2>&1; then echo "fault $f NOT reported"; exit 1; fi
+            grep -q "ThreadSanitizer: data race" fault_$f.log || { echo "fault $f failed without a TSan report"; tail -20 fault_$f.log; exit 1; }
+            echo "fault $f reported by ThreadSanitizer"
+          done

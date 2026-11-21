@@ -1,0 +1,759 @@
+{
+ "schema_version": "1.0",
+ "suite": "cva_k",
+ "spec": "specifications/06-risk/cva-capital.md",
+ "spec_version": "1.0.0",
+ "generator": "oracle/python/gen_stage_k_w2b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "cases": [
+  {
+   "case_id": "cva_k-0001",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "REDUCED",
+     "counterparties": [
+      {
+       "id": "C1",
+       "scva": 157999.44066328224,
+       "snh": null,
+       "hma": null,
+       "netting_sets": [
+        {
+         "df": 0.8847968677143805
+        }
+       ]
+      }
+     ],
+     "ih": null,
+     "k_reduced": 157999.44066328224,
+     "k_hedged": null,
+     "k_full": null,
+     "capital": 102699.63643113345,
+     "rwa": 1283745.455389168,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "one counterparty, reduced (worked example)",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "cva_k-0002",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     },
+     {
+      "id": "C2",
+      "sector": "sovereign",
+      "quality": "HY_NR",
+      "netting_sets": [
+       {
+        "ead": 500000,
+        "m": 1,
+        "imm": false
+       },
+       {
+        "ead": 2000000,
+        "m": 10,
+        "imm": false
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "REDUCED",
+     "counterparties": [
+      {
+       "id": "C1",
+       "scva": 157999.44066328224,
+       "snh": null,
+       "hma": null,
+       "netting_sets": [
+        {
+         "df": 0.8847968677143805
+        }
+       ]
+      },
+      {
+       "id": "C2",
+       "scva": 231806.8480926789,
+       "snh": null,
+       "hma": null,
+       "netting_sets": [
+        {
+         "df": 0.9754115099857198
+        },
+        {
+         "df": 0.7869386805747332
+        }
+       ]
+      }
+     ],
+     "ih": null,
+     "k_reduced": 311465.7513160206,
+     "k_hedged": null,
+     "k_full": null,
+     "capital": 202452.7383554134,
+     "rwa": 2530659.2294426677,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "two counterparties, reduced",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "cva_k-0003",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "basic_materials_energy_industrials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 2.5,
+        "imm": true
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "REDUCED",
+     "counterparties": [
+      {
+       "id": "C1",
+       "scva": 53571.42857142857,
+       "snh": null,
+       "hma": null,
+       "netting_sets": [
+        {
+         "df": 1.0
+        }
+       ]
+      }
+     ],
+     "ih": null,
+     "k_reduced": 53571.42857142857,
+     "k_hedged": null,
+     "k_full": null,
+     "capital": 34821.42857142857,
+     "rwa": 435267.85714285716,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "IMM netting set: DF 1",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "cva_k-0004",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "C1",
+      "relation": "DIRECT",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 5,
+      "notional": 500000
+     }
+    ],
+    "index_hedges": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "FULL",
+     "counterparties": [
+      {
+       "id": "C1",
+       "scva": 157999.44066328224,
+       "snh": 110599.60846429756,
+       "hma": 0.0,
+       "netting_sets": [
+        {
+         "df": 0.8847968677143805
+        }
+       ]
+      }
+     ],
+     "ih": 0.0,
+     "k_reduced": 157999.44066328224,
+     "k_hedged": 47399.83219898467,
+     "k_full": 75049.73431505906,
+     "capital": 48782.32730478839,
+     "rwa": 609779.0913098549,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "direct hedge, full (worked example)",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "cva_k-0005",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     },
+     {
+      "id": "C2",
+      "sector": "sovereign",
+      "quality": "HY_NR",
+      "netting_sets": [
+       {
+        "ead": 500000,
+        "m": 1,
+        "imm": false
+       },
+       {
+        "ead": 2000000,
+        "m": 10,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [],
+    "index_hedges": [
+     {
+      "m": 5,
+      "notional": 1000000,
+      "constituents": [
+       {
+        "sector": "financials",
+        "quality": "IG",
+        "weight": 1
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "FULL",
+     "counterparties": [
+      {
+       "id": "C1",
+       "scva": 157999.44066328224,
+       "snh": 0.0,
+       "hma": 0.0,
+       "netting_sets": [
+        {
+         "df": 0.8847968677143805
+        }
+       ]
+      },
+      {
+       "id": "C2",
+       "scva": 231806.8480926789,
+       "snh": 0.0,
+       "hma": 0.0,
+       "netting_sets": [
+        {
+         "df": 0.9754115099857198
+        },
+        {
+         "df": 0.7869386805747332
+        }
+       ]
+      }
+     ],
+     "ih": 154839.4518500166,
+     "k_reduced": 311465.7513160206,
+     "k_hedged": 246229.11690822535,
+     "k_full": 262538.27551017416,
+     "capital": 170649.8790816132,
+     "rwa": 2133123.488520165,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "index hedge, full",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "cva_k-0006",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "C1",
+      "sector": "financials",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 1000000,
+        "m": 5,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "C1",
+      "relation": "SECTOR_REGION",
+      "sector": "financials",
+      "quality": "IG",
+      "m": 5,
+      "notional": 500000
+     }
+    ],
+    "index_hedges": []
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "FULL",
+     "counterparties": [
+      {
+       "id": "C1",
+       "scva": 157999.44066328224,
+       "snh": 55299.80423214878,
+       "hma": 9174205044.341942,
+       "netting_sets": [
+        {
+         "df": 0.8847968677143805
+        }
+       ]
+      }
+     ],
+     "ih": 0.0,
+     "k_reduced": 157999.44066328224,
+     "k_hedged": 140432.97464423708,
+     "k_full": 144824.59114899838,
+     "capital": 94135.98424684894,
+     "rwa": 1176699.8030856117,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "blind re-derivation DR-H2 2026-11-19 (program/STAGE_K_BLIND_W2.md): MATCH"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand",
+    "outside_checked",
+    "blind"
+   ],
+   "description": "sector/region hedge, full: HMA",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "cva_k-0007",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "FULL",
+    "counterparties": [
+     {
+      "id": "A",
+      "sector": "technology_telecom",
+      "quality": "HY_NR",
+      "netting_sets": [
+       {
+        "ead": 300000,
+        "m": 3,
+        "imm": false
+       },
+       {
+        "ead": 150000,
+        "m": 0.5,
+        "imm": true
+       }
+      ]
+     },
+     {
+      "id": "B",
+      "sector": "health_utilities_professional",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 800000,
+        "m": 7,
+        "imm": false
+       }
+      ]
+     }
+    ],
+    "single_name_hedges": [
+     {
+      "counterparty": "A",
+      "relation": "LEGAL",
+      "sector": "technology_telecom",
+      "quality": "HY_NR",
+      "m": 3,
+      "notional": 100000
+     },
+     {
+      "counterparty": "B",
+      "relation": "DIRECT",
+      "sector": "health_utilities_professional",
+      "quality": "IG",
+      "m": 5,
+      "notional": 900000
+     }
+    ],
+    "index_hedges": [
+     {
+      "m": 5,
+      "notional": 400000,
+      "constituents": [
+       {
+        "sector": "financials",
+        "quality": "IG",
+        "weight": 0.25
+       },
+       {
+        "sector": "other",
+        "quality": "HY_NR",
+        "weight": 0.75
+       }
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "FULL",
+     "counterparties": [
+      {
+       "id": "A",
+       "scva": 35779.548414093515,
+       "snh": 12257.698074594913,
+       "hma": 84516278.67445941,
+       "netting_sets": [
+        {
+         "df": 0.9286134904996146
+        },
+        {
+         "df": 1.0
+        }
+       ]
+      },
+      {
+       "id": "B",
+       "scva": 50624.898905363414,
+       "snh": 59723.78857072069,
+       "hma": 0.0,
+       "netting_sets": [
+        {
+         "df": 0.8437483150893902
+        }
+       ]
+      }
+     ],
+     "ih": 126968.3505170136,
+     "k_reduced": 68910.9895776156,
+     "k_hedged": 122078.96895605014,
+     "k_full": 108786.97411144151,
+     "capital": 70711.53317243698,
+     "rwa": 883894.1646554623,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand"
+   ],
+   "description": "hand: LEGAL and DIRECT hedges on two names plus a mixed index (name-weighted RW, MAR50.24(4)); B over-hedged",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  },
+  {
+   "case_id": "cva_k-0008",
+   "operation": "risk.cva.ba",
+   "inputs": {
+    "version": "REDUCED",
+    "counterparties": [
+     {
+      "id": "L",
+      "sector": "local_gov",
+      "quality": "IG",
+      "netting_sets": [
+       {
+        "ead": 250000,
+        "m": 12,
+        "imm": false
+       }
+      ]
+     },
+     {
+      "id": "K",
+      "sector": "consumer_transport_admin",
+      "quality": "HY_NR",
+      "netting_sets": [
+       {
+        "ead": 0,
+        "m": 2,
+        "imm": false
+       }
+      ]
+     },
+     {
+      "id": "E",
+      "sector": "other",
+      "quality": "IG",
+      "netting_sets": []
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "version": "REDUCED",
+     "counterparties": [
+      {
+       "id": "L",
+       "scva": 16113.870139499057,
+       "snh": null,
+       "hma": null,
+       "netting_sets": [
+        {
+         "df": 0.7519806065099559
+        }
+       ]
+      },
+      {
+       "id": "K",
+       "scva": 0.0,
+       "snh": null,
+       "hma": null,
+       "netting_sets": [
+        {
+         "df": 0.9516258196404043
+        }
+       ]
+      },
+      {
+       "id": "E",
+       "scva": 0.0,
+       "snh": null,
+       "hma": null,
+       "netting_sets": []
+      }
+     ],
+     "ih": null,
+     "k_reduced": 16113.870139499057,
+     "k_hedged": null,
+     "k_full": null,
+     "capital": 10474.015590674386,
+     "rwa": 130925.19488342982,
+     "label": "regulatory formula on caller inputs; not a regulatory return"
+    }
+   },
+   "tolerance_class": "simple_analytic",
+   "verified_by": [
+    "hand",
+    "mpmath 50 digits (independent oracle, gen_stage_k_w2b.py)",
+    "added by the wave 2b Python lane 2026-11-19: hand, not blind re-derived"
+   ],
+   "tags": [
+    "stage_k",
+    "cva_capital",
+    "hand"
+   ],
+   "description": "hand: no five-year cap on M (12y); a zero EAD and a counterparty with no netting set",
+   "output_classes": {
+    "version": "date_and_convention",
+    "label": "date_and_convention"
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12
+   }
+  }
+ ]
+}

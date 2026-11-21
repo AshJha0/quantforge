@@ -1,14 +1,14 @@
 """Stage K review-fix goldens (lane k-v1-rev1, rulings KR-340 onwards in specifications/stage-k-rulings-rev1.md).
 
 Suites: sabrz_c and ivdeep_c in datasets/golden/stage_c (regression cases for stage C operations; stage C has no
-outside-share floor, and these are not stage K plan items), fuzzfix_k in datasets/golden/stage_k (error cases only).
+outside-share floor, and these are not stage K plan items), fuzzrev_k in datasets/golden/stage_k (error cases only).
 - sabrz_c: vol.sabr.hagan where z = (nu/alpha) sqrt(A) L is small (|z| about 1e-8 to 1e-4) or large and negative,
   both signs of rho (K-9 review finding 7, ruling KR-340). The direct chi(z) loses digits as eps/|z| for small z
   and cancels in s + z - rho for large negative z; a tight relative limit (1e-12) makes those visible.
 - ivdeep_c: vol.option.implied far out of the money (finding 8, ruling KR-341): prices down to about 1e-80 that
   still identify the vol (value cases), and prices of 1e-200 and below, or subnormal, that do not
   (E_NO_CONVERGENCE). The oracle prices at 60 digits and computes the KR-341 estimate at the true vol.
-- fuzzfix_k: fuzz inputs from the failed scheduled runs on main (2026-11-09 to 11-16) that were fixed without
+- fuzzrev_k: fuzz inputs from the failed scheduled runs on main (2026-11-09 to 11-16) that were fixed without
   a golden of the exact input (K-9 finding 1).
 
 This oracle is written from specifications/05-volatility/sabr.md in mpmath, at 50 digits plus two digits per
@@ -186,14 +186,14 @@ def ivdeep():
     s.write()
 
 
-def fuzzfix():
+def fuzzrev():
     """Two fuzz inputs fixed before stage K without a golden of the exact input (oracle/python/data/fuzz_k_inputs.jsonl).
 
     Expected codes follow R6-8.1 (a finite input whose required intermediate is not finite is E_NON_FINITE):
     CIR with sigma = 5e297 needs sigma^2 = 2.5e595 (above the largest binary64, about 1.8e308); the GARCH
     Student-t estimate on a return of 2.68e297 needs its square for the sample variance start.
     """
-    s = Suite("fuzzfix_k", "specifications/01-core/limits.md", G)
+    s = Suite("fuzzrev_k", "specifications/01-core/limits.md", G)
     big = mp.mpf(2) ** 1024
     for line in (Path(__file__).parent / "data" / "fuzz_k_inputs.jsonl").read_text("utf-8").splitlines():
         row = json.loads(line)
@@ -215,7 +215,7 @@ def main():
         sabrz()
         ivdeep()
         common.GOLDEN = keep.parent / "stage_k"
-        fuzzfix()
+        fuzzrev()
     finally:
         common.GOLDEN = keep
 

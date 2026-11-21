@@ -1,121 +1,237 @@
 #!/usr/bin/env python3
-"""A scheduled workflow whose last run on main failed must be named in the known-issues register (ruling KR-342,
-PROPOSED; K-9 review finding 1).
+"""Every scheduled workflow whose last run on main failed is named in an open known-issues row (K-9 review finding 1).
 
-    python tools/check_scheduled_runs.py               ask GitHub (needs gh and a token with actions: read)
-    python tools/check_scheduled_runs.py --runs F.json  judge recorded results: {"fuzz.yml": "failure", ...}
-    python tools/check_scheduled_runs.py --self-test   planted faults must fail
+    python tools/check_scheduled_runs.py              read the runs from the GitHub API and check the register
+    python tools/check_scheduled_runs.py --self-test  planted faults must fail (no network)
 
-Plain idea: a weekly job that fails on main tells nobody. The fuzz workflow failed on main at every run from
-2026-11-09 to 2026-11-16 while the README said fuzzing had not run since the v0.8.3 fixes, and no row of
-docs/known-issues.md named it. This check makes a red scheduled run either visible in the register or a failing
-check.
+Plain idea: the README once said fuzzing had not run on main when four scheduled fuzz runs had run and failed. Nobody
+reads the Actions tab every day, so a red scheduled job must show up where readers look: docs/known-issues.md.
 
-Formal statement. For every file in .github/workflows whose `on:` block has a `schedule:` trigger, take the
-conclusion of the most recent run on branch main (any event). Exit 1 if a conclusion is failure, timed_out or
-startup_failure and the "## Open" section of docs/known-issues.md does not contain the workflow's file name
-(for example `fuzz.yml`). A workflow with no run on main passes. Exit 2 if gh cannot be run or answers
-something unreadable: the check never passes for want of data.
+Formal statement. A workflow is scheduled if its file under .github/workflows has an `on.schedule` entry. For each
+one, the check reads the most recent completed run on branch main whose event is `schedule` or `workflow_dispatch`
+(GitHub REST API, `GET /repos/{repo}/actions/workflows/{file}/runs`). If its conclusion is failure, timed_out or
+startup_failure, the workflow is red, and the check fails unless a line in the "Open" or "Recorded misses" section
+of docs/known-issues.md names the workflow file in backticks (for example `fuzz.yml`). A workflow with no completed
+run is listed as "no run yet" and passes. A green workflow that still has a row passes too (the row is closed by a
+person's edit that names its evidence, as for every other row). An API error fails the check: a guard that passes
+when it cannot see is no guard.
 
-What it does not show: why the run failed, or that a named row is still accurate.
+Worked example: fuzz.yml's last run on main (2026-11-16, schedule) concluded failure, so the check passes only while
+the register's Open table has a row that contains `fuzz.yml`.
 
-Standard library only.
+Token: GITHUB_TOKEN or GH_TOKEN from the environment (in CI, the job's GITHUB_TOKEN with `actions: read`), else the
+output of `gh auth token` if gh is installed, else unauthenticated (public repository, 60 requests an hour; the
+check makes one request per scheduled workflow). Standard library only.
 """
+
 import argparse
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+REGISTER = Path("docs") / "known-issues.md"
+REPO = os.environ.get("GITHUB_REPOSITORY", "AshJha0/quantforge")
 RED = {"failure", "timed_out", "startup_failure"}
+OPEN_SECTIONS = ("## Open", "## Recorded misses")
 
 
-def scheduled(workflows: Path) -> list[str]:
+def scheduled_workflows(root=ROOT):
+    """File names of workflows with an `on.schedule` trigger (a `schedule:` key followed by a `- cron:` line)."""
     out = []
-    for p in sorted(workflows.glob("*.yml")):
-        if re.search(r"^\s+schedule:\s*$", p.read_text(encoding="utf-8"), re.M):
+    for p in sorted((Path(root) / ".github" / "workflows").glob("*.yml")):
+        text = p.read_text(encoding="utf-8")
+        if re.search(r"^\s+schedule:\s*\n(\s*#.*\n)*\s+- cron:", text, re.MULTILINE):
             out.append(p.name)
     return out
 
 
-def open_section(register: Path) -> str:
-    text = register.read_text(encoding="utf-8")
-    m = re.search(r"^## Open\s*$(.*?)(?=^## )", text, re.M | re.S)
-    return m.group(1) if m else ""
+def open_text(root=ROOT):
+    """The text of the register's open sections (everything from an open heading to the next level-2 heading)."""
+    lines = (Path(root) / REGISTER).read_text(encoding="utf-8").splitlines()
+    keep, on = [], False
+    for line in lines:
+        if line.startswith("## "):
+            on = line.startswith(OPEN_SECTIONS)
+        elif on:
+            keep.append(line)
+    return "\n".join(keep)
 
 
-def last_conclusions(names: list[str], gh: str) -> dict[str, str | None]:
-    out: dict[str, str | None] = {}
-    for name in names:
-        cmd = [gh, "run", "list", "--workflow", name, "--branch", "main", "--limit", "1", "--json", "conclusion,status"]
-        p = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT, check=False)
-        if p.returncode != 0:
-            raise RuntimeError(f"gh failed for {name}: {p.stderr.strip()[:200]}")
-        rows = json.loads(p.stdout)
-        out[name] = rows[0].get("conclusion") or None if rows else None
-    return out
+def token():
+    for k in ("GITHUB_TOKEN", "GH_TOKEN"):
+        if os.environ.get(k):
+            return os.environ[k]
+    if shutil.which("gh"):
+        r = subprocess.run(
+            ["gh", "auth", "token"], capture_output=True, text=True, check=False
+        )
+        if r.returncode == 0 and r.stdout.strip():
+            return r.stdout.strip()
+    return None
 
 
-def problems(conclusions: dict[str, str | None], register_open: str) -> list[str]:
-    bad = []
-    for name, c in sorted(conclusions.items()):
-        if c in RED and name not in register_open:
-            bad.append(f"{name}: last run on main is {c} and the Open section of docs/known-issues.md does not name it")
-    return bad
+def registered_workflows(tok):
+    """File names of the workflows GitHub has registered for the repository (default branch)."""
+    names, page = set(), 1
+    while True:
+        url = f"https://api.github.com/repos/{REPO}/actions/workflows?per_page=100&page={page}"
+        req = urllib.request.Request(
+            url,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "quantforge-check",
+            },
+        )
+        if tok:
+            req.add_header("Authorization", f"Bearer {tok}")
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            items = json.load(resp)["workflows"]
+        names.update(w["path"].rsplit("/", 1)[-1] for w in items)
+        if len(items) < 100:
+            return names
+        page += 1
 
 
-def self_test() -> int:
-    with tempfile.TemporaryDirectory() as d:
-        wf = Path(d) / "wf"
-        wf.mkdir()
-        (wf / "a.yml").write_text("on:\n  schedule:\n    - cron: '1 1 * * 1'\n", encoding="utf-8")
-        (wf / "b.yml").write_text("on:\n  push:\n", encoding="utf-8")
-        reg = Path(d) / "known.md"
-        reg.write_text("# R\n\n## Open\n\n| x | `b.yml` |\n\n## Closed\n\n| y | `a.yml` closed |\n", encoding="utf-8")
-        names = scheduled(wf)
-        checks = [
-            (names == ["a.yml"], "schedule detection"),
-            (bool(problems({"a.yml": "failure"}, open_section(reg))), "red run named only under Closed must fail"),
-            (not problems({"a.yml": "success"}, open_section(reg)), "green run passes"),
-            (not problems({"a.yml": None}, open_section(reg)), "no run passes"),
-            (bool(problems({"a.yml": "timed_out"}, "")), "timed_out counts as red"),
-            (not problems({"a.yml": "failure"}, "| KV-F1 | `a.yml` failing |"), "named in Open passes"),
-        ]
-    failed = [why for ok, why in checks if not ok]
-    for why in failed:
-        print("self-test FAILED:", why)
-    print("self-test", "FAILED" if failed else "passed", f"({len(checks)} checks)")
-    return 1 if failed else 0
+def last_run(workflow, tok):
+    """(conclusion, created_at, html_url) of the last completed schedule or workflow_dispatch run on main, or None."""
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{workflow}/runs?branch=main&status=completed&per_page=20"
+    req = urllib.request.Request(
+        url,
+        headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "quantforge-check",
+        },
+    )
+    if tok:
+        req.add_header("Authorization", f"Bearer {tok}")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            runs = json.load(resp)["workflow_runs"]
+    except urllib.error.HTTPError as e:
+        # A workflow file added by the pull request under test is not registered on the default branch yet, so the
+        # API answers 404 for it. That is "no run to judge" only if the list of registered workflows is readable
+        # and does not hold the file; anything else still fails the gate (pull request #64, k6-soak.yml).
+        if e.code == 404 and workflow not in registered_workflows(tok):
+            return None
+        raise
+    for r in runs:
+        if r["event"] in ("schedule", "workflow_dispatch"):
+            return r["conclusion"], r["created_at"], r["html_url"]
+    return None
 
 
-def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--runs", type=Path, help="JSON object: workflow file name to last conclusion on main")
-    ap.add_argument("--gh", default="gh")
+def judge(runs, register_open):
+    """runs: {workflow: (conclusion, created_at, url) or None}. Returns (problems, report lines)."""
+    problems, report = [], []
+    for wf, run in sorted(runs.items()):
+        if run is None:
+            report.append(f"{wf}: no completed scheduled or manual run on main yet")
+            continue
+        concl, when, url = run
+        named = f"`{wf}`" in register_open
+        report.append(
+            f"{wf}: {concl} ({when[:10]}){'; named in the register' if named else ''}"
+        )
+        if concl in RED and not named:
+            problems.append(
+                f"{wf}: last run on main {when[:10]} concluded {concl} ({url}), and no open row of {REGISTER.as_posix()} names `{wf}`"
+            )
+    return problems, report
+
+
+def self_test():
+    failures = []
+    reg_with = "# K\n\n## Open\n\n| Id | x |\n|---|---|\n| F1 | `fuzz.yml` fails |\n\n## Closed\n\n| `bench.yml` |\n"
+    reg_closed_only = (
+        "# K\n\n## Open\n\n| Id |\n|---|\n\n## Closed\n\n| F1 | `fuzz.yml` fixed |\n"
+    )
+    red = ("failure", "2026-11-16T11:33:00Z", "u")
+    green = ("success", "2026-11-17T05:17:00Z", "u")
+    cases = {
+        "red workflow with an open row": (
+            {"fuzz.yml": red, "bench.yml": green},
+            reg_with,
+            False,
+        ),
+        "green workflows and a never-run one": (
+            {"bench.yml": green, "paper-ledger.yml": None},
+            reg_closed_only,
+            False,
+        ),
+        "red workflow with no row": ({"mutation-stage.yml": red}, reg_with, True),
+        "red workflow named only under Closed": (
+            {"fuzz.yml": red},
+            reg_closed_only,
+            True,
+        ),
+        "timed-out run counts as red": (
+            {"bench.yml": ("timed_out", "2026-11-17T05:17:00Z", "u")},
+            reg_with,
+            True,
+        ),
+    }
+    with tempfile.TemporaryDirectory() as tmp:
+        t = Path(tmp)
+        (t / "docs").mkdir()
+        for name, (runs, reg, should_fail) in cases.items():
+            (t / REGISTER).write_text(reg, encoding="utf-8")
+            got, _ = judge(runs, open_text(t))
+            if bool(got) != should_fail:
+                failures.append(
+                    f"{name}: expected {'a failure' if should_fail else 'a pass'}, got {got}"
+                )
+        wf = t / ".github" / "workflows"
+        wf.mkdir(parents=True)
+        (wf / "a.yml").write_text(
+            "on:\n  schedule:\n    - cron: '1 2 * * 1'\n", encoding="utf-8"
+        )
+        (wf / "b.yml").write_text(
+            "on:\n  push:\n# schedule: not this\n", encoding="utf-8"
+        )
+        if scheduled_workflows(t) != ["a.yml"]:
+            failures.append(
+                f"schedule parse: expected ['a.yml'], got {scheduled_workflows(t)}"
+            )
+    if failures:
+        print("self-test FAILED:\n" + "\n".join(failures), file=sys.stderr)
+        return 1
+    print(
+        f"self-test: 2 passing cases pass, {len(cases) - 2} planted faults fail, the schedule parser finds only scheduled files"
+    )
+    return 0
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser()
     ap.add_argument("--self-test", action="store_true")
     a = ap.parse_args(argv)
     if a.self_test:
         return self_test()
-    names = scheduled(ROOT / ".github" / "workflows")
+    tok = token()
+    runs = {}
     try:
-        if a.runs:
-            recorded = json.loads(a.runs.read_text(encoding="utf-8"))
-            conclusions = {n: recorded.get(n) for n in names}
-        else:
-            conclusions = last_conclusions(names, a.gh)
-    except (OSError, RuntimeError, ValueError) as e:
-        print(f"cannot check: {e}")
-        return 2
-    bad = problems(conclusions, open_section(ROOT / "docs" / "known-issues.md"))
-    for name in names:
-        print(f"{name}: {conclusions.get(name)}")
-    for b in bad:
-        print("FAIL", b)
-    print("scheduled runs:", "FAIL" if bad else "ok", f"({len(names)} scheduled workflows)")
-    return 1 if bad else 0
+        for wf in scheduled_workflows():
+            runs[wf] = last_run(wf, tok)
+    except Exception as e:  # noqa: BLE001 - any API failure fails the gate, with the reason
+        print(
+            f"scheduled runs: could not read the GitHub API ({type(e).__name__}: {e}); failing, because a guard that cannot see must not pass",
+            file=sys.stderr,
+        )
+        return 1
+    problems, report = judge(runs, open_text())
+    for line in report:
+        print(f"scheduled runs: {line}")
+    for p in problems:
+        print(f"::error::scheduled runs: {p}")
+    return 1 if problems else 0
 
 
 if __name__ == "__main__":

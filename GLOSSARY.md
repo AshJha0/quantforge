@@ -2,6 +2,18 @@
 
 Terms are listed under the stage that first needed them. The [Curves gallery](docs/curves/README.md) shows most stage B terms on real output.
 
+## Words that qualify a claim
+
+Defined once here and in the README ("Words used here"); every page uses them in this sense (K-9 review finding 6, 2026-11-20).
+
+| Term | Meaning |
+|---|---|
+| Outside-checked | A value-checked case whose expected values were reproduced outside the code that produced them: by an outside library (QuantLib, Strata, ORE, NumPy, SciPy and others) or by a blind re-derivation by a second AI lane (DR-H2). Never a check by a person; no person has reviewed the work (owner decision 2026-11-18). Shares use one definition, rule D6, computed by `tools/case_figures.py outside_pair()` |
+| Audit | A different-model AI audit: an AI model other than the one that wrote the work reads the specs and code and reports findings (plan rule 14.10-5). Not a person and not an outside firm |
+| Self-assessment | Every check designed and run by the project itself (one person and AI lanes), with no second human review |
+| Sampled mutation score | Share of a sample of injected faults that the tests catch; 40 mutants per module and language on pull requests, quoted with a Wilson 95% interval. Equivalent-mutant judgements are the project's own |
+| Evidence class of a golden case | Where a value-checked case's expected values were checked, read from its `verified_by` labels: outside library, printed published figure, blind re-derivation, own mpmath oracle, own float64 or exact oracle, reference-computed, hand-derived only, or implementation-sourced (`docs/case-figures.md`) |
+
 ## Stage A: Foundation
 
 | Term | Meaning |
@@ -146,7 +158,7 @@ Terms are listed under the stage that first needed them. The [Curves gallery](do
 | Large homogeneous pool (LHP) | Vasicek's limit of a very large pool of identical names: losses depend on one common factor only |
 | Tranche, attachment, detachment | A slice of pool losses between two levels; the slice's expected loss as a fraction of its width |
 
-Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value-checked and error cases counted together) at merge `597abf2`). All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, and no SLV or American FD reference, so those goldens rest on hand cases and high-precision replicas; 557 of 895 stage E cases (62.2%) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28.
+Stage E is Implemented in all four languages (6,817 of 6,817 golden cases (value-checked and error cases counted together) at merge `597abf2`). All inputs are synthetic. QuantLib's Python wheel has no GARCH, VIX, bivariate t or large-pool model, and no SLV or American FD reference, so those goldens rest on hand cases and high-precision replicas; 557 of 895 stage E cases (62.2%) (stage E counted error cases in that denominator; under the one definition now used everywhere, value-checked cases only, rule D6, it is 557 of 710, 78.5%: `docs/results.md`) are outside-checked under rule 11.2.5 and rulings E-A17 and E-B28.
 
 ## Stage F terms
 
@@ -330,7 +342,7 @@ Stage H (v0.10.0, execution and microstructure) is implemented in all four langu
 
 ## Stage K terms (in progress)
 
-Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), not tagged, and released with v1.0.0; these terms are defined as its specs use them (read 2026-11-19). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
+Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59) and the parts toward v1.0.0 by pull requests #60 to #64 the same day, not tagged, and released with v1.0.0; these terms are defined as its specs use them (read 2026-11-19; the K-3, K-5, K-6, KR-257 and IMA rows read 2026-11-21). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
 
 | Term | Meaning |
 |---|---|
@@ -364,6 +376,43 @@ Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), not
 | Anchor | The head hash and row count of a ledger stamped with OpenTimestamps on a separate branch, so that a consistent rewrite of old rows or a truncated tail becomes visible |
 | Blind re-derivation | An outside check where no library exists: a lane on a different model derives the answers from a spec stripped of every expected value, freezes them with a hash, and a fixed script compares them with the goldens; a leaked case does not count (DR-H2) |
 | Placeholder weights | Risk weights or impact parameters that are not calibrated to any market; every output that uses them says "placeholder weights" (the sensitivity-based margin, `sbim`, in stages G and K) |
+| Default risk charge (DRC) | FRTB standardised capital for the loss if issuers default: jump-to-default per position, netted per obligor, weighted by rating, then `max(sum RW net_long - HBR sum RW abs(net_short), 0)` per bucket (`06-risk/frtb-drc-rrao.md`, MAR22) |
+| Jump-to-default (JTD) | The loss on a position if its issuer defaults now: `LGD x notional + PnL`, with `PnL = market value - notional`, floored at 0 for a long and capped at 0 for a short, before netting (MAR22.11, MAR22.12) |
+| Hedge benefit ratio (HBR) | Net longs over net longs plus absolute net shorts in a DRC bucket; it limits how much the shorts reduce the charge |
+| RRAO | Residual risk add-on: 1% of the gross notional of exotic instruments and 0.1% of other instruments with residual risks (MAR23) |
+| Liquidity horizon | The number of days (10, 20, 40, 60 or 120) assumed to exit a risk factor; FRTB IMA scales expected shortfall by it (MAR33) |
+| NMRF and SES | Non-modellable risk factors, which fail the eligibility test, and the stressed expected shortfall charged for them instead (MAR33) |
+| RFET | Risk factor eligibility test: enough real-price observations, spread through the year, for a factor to be modellable (MAR31) |
+| PLA test | P&L attribution test: Spearman correlation and Kolmogorov-Smirnov distance between hypothetical and risk-theoretical P&L decide a desk's zone (MAR32) |
+| BA-CVA and SA-CVA | The basic and standardised approaches to CVA risk capital: one from EAD, maturity and a supervisory weight; one from CVA sensitivities by risk class (`06-risk/cva-capital.md`, MAR50) |
+| Leverage ratio | Tier 1 capital over an exposure measure without risk weights; the minimum is 3% (`06-risk/leverage-large-exposures.md`, LEV20) |
+| Large exposure | An exposure to one counterparty or connected group of at least 10% of Tier 1; the limit is 25%, 15% between global systemically important banks (LEX) |
+| IMCC | Internal models capital charge: `0.5 IMCC(C) + 0.5 sum_i IMCC(C_i)`, half the all-classes stressed ES and half the sum over risk classes (MAR33.15; `risk.frtb.ima.imcc`) |
+| Stressed ES ratio floor | In `ES = ES_R,S max(1, ES_F,C / ES_R,C)` the ratio of full to reduced current ES is floored at 1, so the reduced set's stressed figure is never scaled down (MAR33.6, KR-58); a floored class is listed in `classes_floored` |
+| Capital multiplier m_c | The factor on average IMCC in the IMA capital, 1.50 to 2.00 by backtesting exceptions (MAR32.9 table) plus any qualitative add-on; six exceptions give 1.76 (`cap_k-0001`) |
+| Capital surcharge (IMA) | `k max(0, SA_G,A - IMA_G,A)` with `k = 0.5 x` the amber desks' share of standardised capital; added when amber desks exist and the standardised figure exceeds the model figure (MAR33.41 to 33.45, KR-61) |
+| Wrong-way risk hazard (G-44) | The hazard `exp(a(t) + b V(t))` of `xva.wwr.cva_hw`: `b > 0` wrong way, `b < 0` right way; `a(t)` is solved per bucket so the average survival matches the survival curve |
+| Bracketed root | A root finder started on an interval proved to contain the root, so it cannot wander off; KR-257 brackets the wrong-way level in `[ln h - max bV - 1, ln h - min bV + 1]` |
+| Safeguarded Newton (rtsafe) | Newton's method that takes a Newton step only if it stays inside the current bracket and is at most half the step before last, else bisects (Numerical Recipes; KR-257) |
+| Snapshot (K-5) | An immutable 72-byte value holding a version, a logical event number, the cumulative shift, five derived numbers and a 64-bit checksum; published whole, never edited (KR-280, KR-287) |
+| Torn read | A read that sees fields from two different versions of shared data; the K-5 checksum lets every read detect one |
+| Hazard pointer | A per-reader shared slot where a reader announces the object it is using, so the writer reuses only objects no reader has announced (Michael, 2004; K-5 in C++ and Rust) |
+| Wait-free | Every call finishes in a bounded number of its own steps whatever other threads do; the K-5 writer is wait-free (one scan of `R` hazards) |
+| Lock-free | Some thread always makes progress, but one thread can in principle retry forever; the K-5 readers are lock-free, not wait-free (KR-282) |
+| ThreadSanitizer | A compiler-inserted race detector for C, C++ and Rust (`-fsanitize=thread`); runs 5 to 15 times slower and only sees code built with it |
+| jcstress | The OpenJDK harness that runs small concurrent Java tests many millions of times and grades each outcome ACCEPTABLE, FORBIDDEN or ACCEPTABLE_INTERESTING; probabilistic, not a proof |
+| Soak (K-6) | A run of at least two hours of one long-lived process on the golden cases, judged for flat memory (slope at most 1 MiB/h, range at most 5% of the median) and unchanged answers (KR-217, KR-218) |
+| Idle-point reading | Measuring a soak's memory only after the driver has drained every case in flight, so a heavy case's transient peak is not counted as growth |
+| Drift (soak) | A later answer to a golden case that is not byte-identical to the first answer to the same case in the same process; any drift fails a soak |
+| End-of-day rehearsal | A scripted run of one recorded date through steps E1 to E8 (log check, holdout check, curve run and paper ledger as dry runs, intraday risk, page render, site checks, archive) that stops at the first failing step (KR-220, KR-221) |
+| Planted fault | A fault put in on purpose to show a check can fail: a leak, a wrong expected value, a broken hash; a check whose planted fault is not caught is a recorded miss (plan 14.10 rule 1) |
+| Round trip (K-3) | Sending 10,000 committed records through an adapter and its store and reading them back: count first (`COUNT`), then one SHA-256 over the canonical form (`HASH`), then the store's own count (`BYPASS`) |
+| BYPASS (verdict) | The K-3 verdict when the store's count query disagrees with 10,000 while the read list looks right: a reader that returned the sender's list without reading the store |
+| Canonical encoding | An encoding with exactly one byte string per value, so `encode(decode(b)) = b` for every valid `b`; required for the K-3 round-trip law (KR-276) |
+| Stop-bit integer | An integer written in 7-bit groups with the high bit set on the last byte only, so small numbers take one byte (FAST-style; 300 is `02 ac`) |
+| Presence map | A stop-bit coded bit string at the start of a FAST-style message saying which optional fields follow; an absent field takes its value from the previous message by the field's operator |
+| Gap detector (K-3) | Receiver state for sequenced multicast packets: records a gap when a packet starts beyond the next expected number, drops duplicates, delivers only the new part of an overlap; no retransmission is simulated |
+| Simulated feed format | One of `QF-FIX-S`, `QF-ITCH-S`, `QF-OUCH-S`, `QF-FAST-S`, `QF-MOLD-S`: this project's own simplified formats, labelled "simulated; not a certified implementation; not connected to any venue" |
 
 ## Tutorial terms
 

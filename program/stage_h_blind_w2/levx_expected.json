@@ -1,0 +1,796 @@
+{
+ "lev_k-0001": {
+  "outputs": {
+   "on_balance": 0.0,
+   "derivatives": 569.8,
+   "derivative_netting_sets": 569.8,
+   "written_credit_derivatives": 0.0,
+   "sfts": 0.0,
+   "off_balance": 0.0,
+   "exposure": 569.8,
+   "ratio": 0.1755001755001755,
+   "meets_minimum": true,
+   "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "lev_k-0002": {
+  "outputs": {
+   "on_balance": 0.0,
+   "derivatives": 5405.4,
+   "derivative_netting_sets": 5405.4,
+   "written_credit_derivatives": 0.0,
+   "sfts": 0.0,
+   "off_balance": 0.0,
+   "exposure": 5405.4,
+   "ratio": 0.0185000185000185,
+   "meets_minimum": false,
+   "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "lev_k-0003": {
+  "outputs": {
+   "on_balance": 0.0,
+   "derivatives": 936.6,
+   "derivative_netting_sets": 936.6,
+   "written_credit_derivatives": 0.0,
+   "sfts": 0.0,
+   "off_balance": 0.0,
+   "exposure": 936.6,
+   "ratio": 0.10676916506512919,
+   "meets_minimum": true,
+   "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "lev_k-0004": {
+  "outputs": {
+   "on_balance": 0.0,
+   "derivatives": 90.0,
+   "derivative_netting_sets": 0.0,
+   "written_credit_derivatives": 90.0,
+   "sfts": 0.0,
+   "off_balance": 0.0,
+   "exposure": 90.0,
+   "ratio": 1.1111111111111112,
+   "meets_minimum": true,
+   "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "lev_k-0005": {
+  "outputs": {
+   "on_balance": 0.0,
+   "derivatives": 100.0,
+   "derivative_netting_sets": 0.0,
+   "written_credit_derivatives": 100.0,
+   "sfts": 0.0,
+   "off_balance": 0.0,
+   "exposure": 100.0,
+   "ratio": 1.0,
+   "meets_minimum": true,
+   "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "lev_k-0012": {
+  "outputs": {
+   "on_balance": 40.0,
+   "derivatives": 30.0,
+   "derivative_netting_sets": 14.0,
+   "written_credit_derivatives": 16.0,
+   "sfts": 0.0,
+   "off_balance": 37.0,
+   "exposure": 107.0,
+   "ratio": 0.04672897196261682,
+   "meets_minimum": true,
+   "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "lev_k-0013": {
+  "outputs": {
+   "on_balance": 0.0,
+   "derivatives": 0.0,
+   "derivative_netting_sets": 0.0,
+   "written_credit_derivatives": 0.0,
+   "sfts": 36.0,
+   "off_balance": 0.0,
+   "exposure": 36.0,
+   "ratio": 0.05555555555555555,
+   "meets_minimum": true,
+   "label": "simplified leverage ratio (LEV30 subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "lex_k-0008": {
+  "outputs": {
+   "counterparties": [
+    {
+     "id": "N00",
+     "banking_book": 10.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 10.0
+    },
+    {
+     "id": "N01",
+     "banking_book": 11.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 11.0
+    },
+    {
+     "id": "N02",
+     "banking_book": 12.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 12.0
+    },
+    {
+     "id": "N03",
+     "banking_book": 13.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 13.0
+    },
+    {
+     "id": "N04",
+     "banking_book": 14.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 14.0
+    },
+    {
+     "id": "N05",
+     "banking_book": 15.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 15.0
+    },
+    {
+     "id": "N06",
+     "banking_book": 16.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 16.0
+    },
+    {
+     "id": "N07",
+     "banking_book": 17.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 17.0
+    },
+    {
+     "id": "N08",
+     "banking_book": 18.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 18.0
+    },
+    {
+     "id": "N09",
+     "banking_book": 19.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 19.0
+    },
+    {
+     "id": "N10",
+     "banking_book": 20.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 20.0
+    },
+    {
+     "id": "N11",
+     "banking_book": 21.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 21.0
+    },
+    {
+     "id": "N12",
+     "banking_book": 22.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 22.0
+    },
+    {
+     "id": "N13",
+     "banking_book": 23.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 23.0
+    },
+    {
+     "id": "N14",
+     "banking_book": 24.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 24.0
+    },
+    {
+     "id": "N15",
+     "banking_book": 25.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 25.0
+    },
+    {
+     "id": "N16",
+     "banking_book": 26.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 26.0
+    },
+    {
+     "id": "N17",
+     "banking_book": 27.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 27.0
+    },
+    {
+     "id": "N18",
+     "banking_book": 28.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 28.0
+    },
+    {
+     "id": "N19",
+     "banking_book": 29.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 29.0
+    },
+    {
+     "id": "N20",
+     "banking_book": 30.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 30.0
+    },
+    {
+     "id": "N21",
+     "banking_book": 31.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 31.0
+    },
+    {
+     "id": "N22",
+     "banking_book": 32.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 32.0
+    },
+    {
+     "id": "X",
+     "banking_book": 200.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 200.0
+    },
+    {
+     "id": "Y",
+     "banking_book": 100.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 100.0
+    },
+    {
+     "id": "Z",
+     "banking_book": 400.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 400.0
+    }
+   ],
+   "groups": [
+    {
+     "group": "GX",
+     "members": [
+      "X",
+      "Y"
+     ],
+     "exposure": 300.0,
+     "share": 0.3,
+     "large": true,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N00",
+     "members": [
+      "N00"
+     ],
+     "exposure": 10.0,
+     "share": 0.01,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N01",
+     "members": [
+      "N01"
+     ],
+     "exposure": 11.0,
+     "share": 0.011,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N02",
+     "members": [
+      "N02"
+     ],
+     "exposure": 12.0,
+     "share": 0.012,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N03",
+     "members": [
+      "N03"
+     ],
+     "exposure": 13.0,
+     "share": 0.013,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N04",
+     "members": [
+      "N04"
+     ],
+     "exposure": 14.0,
+     "share": 0.014,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N05",
+     "members": [
+      "N05"
+     ],
+     "exposure": 15.0,
+     "share": 0.015,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N06",
+     "members": [
+      "N06"
+     ],
+     "exposure": 16.0,
+     "share": 0.016,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N07",
+     "members": [
+      "N07"
+     ],
+     "exposure": 17.0,
+     "share": 0.017,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N08",
+     "members": [
+      "N08"
+     ],
+     "exposure": 18.0,
+     "share": 0.018,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N09",
+     "members": [
+      "N09"
+     ],
+     "exposure": 19.0,
+     "share": 0.019,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N10",
+     "members": [
+      "N10"
+     ],
+     "exposure": 20.0,
+     "share": 0.02,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N11",
+     "members": [
+      "N11"
+     ],
+     "exposure": 21.0,
+     "share": 0.021,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N12",
+     "members": [
+      "N12"
+     ],
+     "exposure": 22.0,
+     "share": 0.022,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N13",
+     "members": [
+      "N13"
+     ],
+     "exposure": 23.0,
+     "share": 0.023,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N14",
+     "members": [
+      "N14"
+     ],
+     "exposure": 24.0,
+     "share": 0.024,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N15",
+     "members": [
+      "N15"
+     ],
+     "exposure": 25.0,
+     "share": 0.025,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N16",
+     "members": [
+      "N16"
+     ],
+     "exposure": 26.0,
+     "share": 0.026,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N17",
+     "members": [
+      "N17"
+     ],
+     "exposure": 27.0,
+     "share": 0.027,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N18",
+     "members": [
+      "N18"
+     ],
+     "exposure": 28.0,
+     "share": 0.028,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N19",
+     "members": [
+      "N19"
+     ],
+     "exposure": 29.0,
+     "share": 0.029,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N20",
+     "members": [
+      "N20"
+     ],
+     "exposure": 30.0,
+     "share": 0.03,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N21",
+     "members": [
+      "N21"
+     ],
+     "exposure": 31.0,
+     "share": 0.031,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "N22",
+     "members": [
+      "N22"
+     ],
+     "exposure": 32.0,
+     "share": 0.032,
+     "large": false,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "Z",
+     "members": [
+      "Z"
+     ],
+     "exposure": 400.0,
+     "share": 0.4,
+     "large": true,
+     "limit": 250.0,
+     "breach": false,
+     "exempt": true
+    }
+   ],
+   "report": [
+    "Z",
+    "GX",
+    "N22",
+    "N21",
+    "N20",
+    "N19",
+    "N18",
+    "N17",
+    "N16",
+    "N15",
+    "N14",
+    "N13",
+    "N12",
+    "N11",
+    "N10",
+    "N09",
+    "N08",
+    "N07",
+    "N06",
+    "N05"
+   ],
+   "label": "simplified large exposures (LEX subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ },
+ "lex_k-0009": {
+  "outputs": {
+   "counterparties": [
+    {
+     "id": "P",
+     "banking_book": 0.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": -8.0,
+     "protected": 0.0,
+     "received": 0.0,
+     "exposure": 0.0
+    },
+    {
+     "id": "Q",
+     "banking_book": 0.0,
+     "off_balance": 0.0,
+     "trading_book_net_long": 3.0,
+     "trading_book_net_short": 0.0,
+     "protected": 0.0,
+     "received": 20.0,
+     "exposure": 23.0
+    },
+    {
+     "id": "R",
+     "banking_book": 0.0,
+     "off_balance": 50.0,
+     "trading_book_net_long": 0.0,
+     "trading_book_net_short": 0.0,
+     "protected": 20.0,
+     "received": 0.0,
+     "exposure": 30.0
+    }
+   ],
+   "groups": [
+    {
+     "group": "GP",
+     "members": [
+      "P",
+      "Q"
+     ],
+     "exposure": 23.0,
+     "share": 0.0575,
+     "large": false,
+     "limit": 60.0,
+     "breach": false,
+     "exempt": false
+    },
+    {
+     "group": "R",
+     "members": [
+      "R"
+     ],
+     "exposure": 30.0,
+     "share": 0.075,
+     "large": false,
+     "limit": 100.0,
+     "breach": false,
+     "exempt": false
+    }
+   ],
+   "report": [
+    "R",
+    "GP"
+   ],
+   "label": "simplified large exposures (LEX subset); not a regulatory return"
+  },
+  "tolerance_limit": {
+   "absolute": 1e-15,
+   "relative": 1e-12
+  }
+ }
+}

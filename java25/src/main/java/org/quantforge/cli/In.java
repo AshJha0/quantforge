@@ -53,7 +53,8 @@ final class In {
                 || operation.startsWith("research.drift.") || operation.startsWith("risk.scenario.")
                 || operation.equals("exec.tca.shortfall") || operation.equals("exec.tca.attribution")
                 || operation.equals("micro.book.rebuild") || operation.equals("exec.sim.lit.run")
-                || operation.equals("exec.sim.dark.run") || operation.equals("exec.sor.allocate");
+                || operation.equals("exec.sim.dark.run") || operation.equals("exec.sor.allocate")
+                || OpsStageKW2a.PAGE_LIMITED.contains(operation);
     }
 
     private void scanArrays(Object v) {

@@ -52,7 +52,7 @@ F, G and I are under 60%. Each has a dated plan (2027-01-31, stage J close-out J
 
 ## For the language lanes (G4 rename, via the coordinator)
 
-Stage-letter or wave module names at v0.8.0: C++ `cpp26/src/core/risk_f3.cpp`, `risk_f4.cpp`, `hedging_w2.cpp`, `hedging_w3.cpp`, `hedging_w4.cpp`, with `cpp26/include/quantforge/core/risk_f3.hpp` and `risk_f4.hpp`; Java `cli/OpsHedgeI.java`, `OpsRatesG.java`, `OpsRiskF.java`, `OpsWave2b.java`; Python `quantforge_core/cli/ops_stage_g2.py`. Rust: none. **When you rename one, update `conformance/mutation/stages.json`**. `check_stages.py` (in `repo-gates`) fails on a target that matches no file. Stages F and I currently name `risk_f3.cpp`, `risk_f4.cpp` and `hedging_w2.cpp` to `hedging_w4.cpp`.
+Stage-letter or wave module names at v0.8.0: C++ `cpp26/src/core/risk_f3.cpp`, `risk_f4.cpp`, `hedging_w2.cpp`, `hedging_w3.cpp`, `hedging_w4.cpp`, with `cpp26/include/quantforge/core/risk_f3.hpp` and `risk_f4.hpp`; Java `cli/OpsHedgeI.java`, `OpsRatesG.java`, `OpsRiskF.java`, `OpsWave2b.java`; Python `quantforge_core/cli/ops_stage_g2.py`. Rust: none. **When you rename one, update** `conformance/mutation/stages.json`. `check_stages.py` (in `repo-gates`) fails on a target that matches no file. Stages F and I currently name `risk_f3.cpp`, `risk_f4.cpp` and `hedging_w2.cpp` to `hedging_w4.cpp`.
 
 ## Coordinator notes
 
