@@ -334,4 +334,129 @@ assert all(cs["correlations"][i][j] == round(1 - 0.1 * abs(i - j), 10) for i in 
 close(mg, 190937.1624383268, 1e-12)
 has("margin 190,937.16 (`sbim_alias_k-0001`")
 
+# Q14.53 to Q14.67: the third pass (added 2026-11-21). Goldens from datasets/golden/stage_k/ and stage_g/.
+GOLD_G = GOLD.parent / "stage_g"
+
+# Q14.53: DRC with a senior short that cannot offset an equity long.
+o = out("drc_k", "drc_k-0007")
+hbr = 50 / (50 + 30)
+close(hbr, o["buckets"][0]["hbr"]); close(0.15 * 50 - hbr * 0.15 * 30, o["drc"], 1e-12)
+assert o["drc"] == 4.6875 and max(50 - 30, 0) * 0.15 == 3.0
+has("`HBR = 50 / (50 + 30) = 0.625`, so `DRC = 7.5 - 0.625 x 4.5 = 4.6875` (`drc_k-0007`)")
+
+# Q14.54: IMCC.
+es = lambda rs, fc, rc: rs * max(1.0, fc / rc)
+o = out("ima_k", "imcc_k-0001")
+assert (es(12, 10, 8), es(6, 5, 4), es(5, 4, 5)) == (15.0, 7.5, 5.0)
+close(0.5 * 15 + 0.5 * (7.5 + 5), o["imcc"], 1e-12); assert o["classes_floored"] == ["EQ"]
+has("`IMCC = 0.5 x 15 + 0.5 x 12.5 = 13.75` (`imcc_k-0001`)")
+
+# Q14.55: IMA capital.
+o = out("ima_k", "cap_k-0002")
+c_a = max(100 + 20, 1.76 * 90 + 15); ima = c_a + 30; k = 0.5 * 100 / 250; sur = k * max(0, 250 - ima)
+acr = min(ima + sur + 40, 300) + max(0, ima - 250)
+for a, b in ((c_a, o["c_a"]), (ima, o["ima_ga"]), (k, o["k"]), (sur, o["surcharge"]), (acr, o["acr_total"])):
+    close(a, b, 1e-12)
+assert o["m_c"] == 1.76
+has("`ACR = min(252.72, 300) + 0 = 252.72` (`cap_k-0002`)")
+
+# Q14.56: BA-CVA reduced, one and two counterparties.
+df5 = (1 - math.exp(-0.25)) / 0.25
+s1 = 0.05 / 1.4 * 5 * 1_000_000 * df5
+close(s1, out("cva_k", "cva_k-0001")["k_reduced"], 1e-12); close(0.65 * s1, out("cva_k", "cva_k-0001")["capital"], 1e-12)
+o = out("cva_k", "cva_k-0002"); sc = [c["scva"] for c in o["counterparties"]]
+kr = math.sqrt((0.5 * sum(sc)) ** 2 + 0.75 * sum(x * x for x in sc))
+close(kr, o["k_reduced"], 1e-12); close(sum(sc), 389806.29, 1e-8); close(math.sqrt(sum(x * x for x in sc)), 280532.06, 1e-8)
+close(o["capital"], 202452.74, 1e-8)
+has("the sum is 389,806.29 and the root sum of squares 280,532.06, and `K_reduced = 311,465.75`")
+
+# Q14.57: large exposures, strict breach.
+o = out("lex_k", "lex_k-0001")
+assert [(g["group"], g["large"], g["breach"]) for g in o["groups"][:4]] == [("A", True, True), ("B", True, False), ("C", True, False), ("D", False, False)]
+has("C 250 is large and does not breach; D 99.99 is not large")
+
+
+def gout(suite: str, case_id: str) -> dict:
+    for c in json.loads((GOLD_G / f"{suite}.json").read_text(encoding="utf-8"))["cases"]:
+        if c["case_id"] == case_id:
+            return c
+    raise KeyError(case_id)
+
+
+# Q14.58 and Q14.59: the identical-V closed form and the bracket.
+c = gout("wwr_g", "wwr_g-0007")
+a = math.log(0.01) - 10
+cva = 0.6 * 10 * (0.97 * (1 - math.exp(-0.01)) + 0.94 * (math.exp(-0.01) - math.exp(-0.02)))
+close(a, c["expected"]["outputs"]["a"][0], 1e-15); close(cva, c["expected"]["outputs"]["cva"], 1e-12)
+has("`a = ln 0.01 - 10 = -14.605170185988092`")
+lo, hi = math.log(0.01) - 11, math.log(0.01) - 9
+assert round(lo, 3) == -15.605 and round(hi, 3) == -13.605 and abs((lo + hi) / 2 - a) < 1e-12
+r11 = gout("wwr_g", "wwr_g-0011")["expected"]["outputs"]["a"][0]
+assert round(math.log(0.01) + 60 - 1, 2) == 54.39 and round(math.log(0.01) + 60 + 1, 2) == 56.39 and round(r11, 2) == 55.39 and r11 > 50
+has("the bracket is `[54.39, 56.39]` and the root is 55.39")
+
+# Q14.60: error order on wwr_g-0023 and -0022.
+assert gout("wwr_g", "wwr_g-0023")["expected"]["error_code"] == "E_INPUT"
+assert gout("wwr_g", "wwr_g-0022")["expected"]["error_code"] == "E_DOMAIN"
+has("`wwr_g-0023` (values `[[10, 1], [10]]`, `b = 70.5`) answers `E_INPUT`")
+
+# Q14.61: pigeonhole.
+for r in range(1, 65):
+    assert (r + 2) - (r + 1) >= 1 and (r + 1) - (r + 1) == 0
+has("Four readers: 6 slots.")
+
+
+# Q14.63: stop-bit integers (restated from adapters.md 3.4).
+def enc_u(v: int) -> bytes:
+    g = []
+    while True:
+        g.append(v & 0x7F); v >>= 7
+        if not v:
+            break
+    g.reverse(); g[-1] |= 0x80
+    return bytes(g)
+
+
+def enc_i(v: int) -> bytes:
+    g = []
+    while True:
+        g.append(v & 0x7F); v >>= 7
+        if (v == 0 and not g[-1] & 0x40) or (v == -1 and g[-1] & 0x40):
+            break
+    g.reverse(); g[-1] |= 0x80
+    return bytes(g)
+
+
+assert enc_u(300).hex() == "02ac" and enc_i(100).hex() == "00e4" and enc_u(100).hex() == "e4" and enc_i(1012500).hex() == "3d6694"
+assert enc_u(2).hex() == "82"
+has("`44 | 0x80 = ac`, so `02 ac`")
+
+# Q14.64: gap detector (restated from adapters.md 3.5).
+exp_, gaps, dups, got = 1, [], 0, []
+for s0, n in ((1, 3), (4, 2), (8, 1), (9, 0), (1, 3)):
+    if s0 > exp_:
+        gaps.append((exp_, s0 - 1)); got += list(range(s0, s0 + n))
+    elif s0 + n <= exp_:
+        dups += 1 if n else 0
+    else:
+        got += list(range(exp_, s0 + n))
+    exp_ = max(exp_, s0 + n)
+assert got == [1, 2, 3, 4, 5, 8] and gaps == [(6, 7)] and dups == 1 and exp_ == 9
+has("Delivered 1 to 5 and 8; one gap `[6, 7]`; one duplicate; `expected = 9`")
+
+# Q14.66: leak visibility.
+close(1_048_576 / (23 * 3600), 12.66, 1e-3); close(23 * 3600 / 100 * 1024 / 1_048_576, 0.81, 2e-3)
+close(23 * 3600 * 1024 / 1_048_576, 81, 3e-3)
+has("`1,048,576 / (23 x 3,600) = 12.66` bytes per case")
+
+# Q14.67: the rehearsal evidence files.
+K6 = GOLD.parents[2] / "benchmarks" / "results" / "k6"
+steps = ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"]
+for i, plant in enumerate(["GAP", "HOLDOUT", "HASH", "EXPLAIN", "DOMAIN", "LABEL", "WIDTH"]):
+    d = json.loads((K6 / f"eod-2026-11-19-synthetic-plant-{plant}.json").read_text(encoding="utf-8"))
+    st = [x["status"] for x in d["steps"]]
+    assert d["failed_step"] == steps[i] and st[:i] == ["pass"] * i and st[i] == "fail" and set(st[i + 1:]) <= {"not run"}
+assert all(x["status"] == "pass" for x in json.loads((K6 / "eod-2026-11-19-forward-log.json").read_text(encoding="utf-8"))["steps"])
+has("the failing step was E1, E2, E3, E4, E5, E6 and E7 respectively")
+
 print(f"v14: {checks} strings checked")

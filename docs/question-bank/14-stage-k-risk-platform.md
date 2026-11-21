@@ -1,6 +1,6 @@
 # Question bank 14: Stage K: data platform, intraday risk, capital and the paper ledger
 
-This set covers the stage K round 1 work, which is **merged to main by 2026-11-20, not tagged, and released with v1.0.0** (stage K as a whole continues toward v1.0.0): the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is in all four builds and on `main` (pull requests #58 and #59; there is no v0.10.1 tag). It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
+This set covers the stage K round 1 work, which is **merged to main by 2026-11-20, not tagged, and released with v1.0.0** (stage K as a whole continues toward v1.0.0): the bitemporal store, incremental curve updates, recalibration triggers, intraday risk with error bounds, the Bermudan ladder convergence fix, SA-CCR and FRTB backtesting, and the daily paper ledger. All of it is in all four builds and on `main` (pull requests #58 and #59; there is no v0.10.1 tag). The third pass (Q14.53 to Q14.67, added 2026-11-21) covers pull requests #60 to #64: wave 2 capital, the wrong-way CVA root fix KR-257, K-5 snapshots, K-3 adapters and feed codecs, and the K-6 soak and rehearsal. It is for a reader who has worked through [Tutorials 51 to 58](../getting-started/README.md#stage-k-in-progress). Every worked-example number is rechecked by `verify/v14_stage_k.py`, which restates the formulas with the standard library and compares them with the goldens' values. All data is synthetic, except the Basel examples, which are the regulator's own sample portfolios.
 
 ## Bitemporal store
 
@@ -621,3 +621,185 @@ Because they are invented by a visible rule, not taken from any calibration: ris
 **Worked example.** Sensitivities `[1,000, -500, 2,500, 4,000, -1,200, 300]` give `WS = [10,000, -10,000, 75,000, 160,000, -60,000, 18,000]` and margin 190,937.16 (`sbim_alias_k-0001`, observed for both the new id and the deprecated alias). The hand-typed weights of v0.7.0 to v0.10.0 gave 452,205.34 on the same sensitivities (`sbim_g-0001` before KR-150), which was no more meaningful.
 
 The pitfall is quoting the margin figure outside the project: it would read as an initial margin, and it is not one.
+
+## Third pass: wave 2 capital, wrong-way CVA, snapshots, adapters and soak (added 2026-11-21)
+
+These questions cover what pull requests #60 to #64 added to main on 2026-11-20. Every worked number is from a golden or was recomputed by `verify/v14_stage_k.py`; the Python build agreed with each golden used here when run on 2026-11-21 (measured, local laptop, not the acceptance machine).
+
+### Q14.53 A long stock of 50 and a short senior bond of 40 on the same BB issuer. Why does the bond not offset the stock in the default risk charge, and what is the DRC?
+
+*Level: practitioner. Evidence: spec (read; KR-53); golden (`drc_k-0007`); computed. Source: `specifications/06-risk/frtb-drc-rrao.md`*
+
+A short can offset a long on the same obligor only if it is no more senior: if the issuer defaults, a senior bond recovers more than the stock, so being short the bond does not pay back the full loss on the stock. The two stay on opposite sides of the bucket, and the hedge benefit ratio decides how much of the short still counts.
+
+Jump-to-default is `LGD x notional + PnL` before netting; the bucket charge is `DRC_b = max(sum RW net_long - HBR sum RW |net_short|, 0)` with `HBR = sum net_long / (sum net_long + sum |net_short|)`.
+
+**Worked example.** Stock JTD 50 (LGD 100%); bond JTD `0.75 x (-40) = -30` (LGD 75% for senior debt). BB risk weight 15%: weighted long 7.5, weighted short 4.5. `HBR = 50 / (50 + 30) = 0.625`, so `DRC = 7.5 - 0.625 x 4.5 = 4.6875` (`drc_k-0007`).
+
+The pitfall is netting by obligor alone: treating the bond as a full offset gives `max(50 - 30, 0) x 0.15 = 3`, which understates the charge.
+
+### Q14.54 Why does the IMCC take half a diversified figure and half an undiversified one, and what is it for the golden `imcc_k-0001`?
+
+*Level: practitioner. Evidence: spec (read; MAR33.15, KR-58); golden (`imcc_k-0001`); computed. Source: `specifications/06-risk/frtb-ima.md`*
+
+Diversification between risk classes is real on average but unreliable in a stress, so the rule gives it half credit: half the all-classes expected shortfall, half the sum of the class-by-class figures. Each figure is a stressed ES scaled from a reduced set of risk factors.
+
+`ES = ES_R,S max(1, ES_F,C / ES_R,C)` for each triple, then `IMCC = 0.5 IMCC(C) + 0.5 sum_i IMCC(C_i)`.
+
+**Worked example.** Portfolio (12, 10, 8): `12 x 1.25 = 15`. IR (6, 5, 4): `6 x 1.25 = 7.5`. EQ (5, 4, 5): the ratio 0.8 is floored at 1, so 5, and EQ appears in `classes_floored`. `IMCC = 0.5 x 15 + 0.5 x 12.5 = 13.75` (`imcc_k-0001`).
+
+The pitfall is letting the ratio fall below 1: the reduced set would then be scaled down because today's full set happens to look calmer, which the floor forbids.
+
+### Q14.55 An IMA bank has six backtesting exceptions and one amber desk. Walk through `risk.frtb.ima.capital` on `cap_k-0002`.
+
+*Level: advanced. Evidence: spec (read; MAR33.41 to 33.45, KR-61); golden (`cap_k-0002`); computed. Source: `specifications/06-risk/frtb-ima.md`*
+
+The model figure is the larger of yesterday's charge and a multiple of the 60-day average; the multiple rises with exceptions. If some desks are amber and the standardised charge is above the model charge, part of the gap is added back as a surcharge, and the total is capped by the standardised charge of all desks.
+
+`C_A = max(imcc_prev + ses_prev, m_c imcc_avg + ses_avg)`; `IMA_G,A = C_A + drc`; `k = 0.5 sum_amber sa / sum sa`; `surcharge = k max(0, SA_G,A - IMA_G,A)`; `ACR = min(IMA_G,A + surcharge + c_u, sa_all) + max(0, IMA_G,A - SA_G,A)`.
+
+**Worked example.** `m_c = 1.76` for six exceptions. `C_A = max(120, 1.76 x 90 + 15) = 173.4`; with DRC 30, `IMA_G,A = 203.4`. Desks GREEN 150 and AMBER 100: `SA_G,A = 250`, `k = 0.2`, `surcharge = 0.2 x 46.6 = 9.32`. With `c_u = 40` and `sa_all = 300`: `ACR = min(252.72, 300) + 0 = 252.72` (`cap_k-0002`).
+
+The pitfall is reading `m_c` from the exception count alone: the qualitative add-on is added to the table value, and a bank-level count and a desk-level zone are different inputs.
+
+### Q14.56 With one counterparty, why does reduced BA-CVA equal the standalone charge, and what does a second counterparty do?
+
+*Level: practitioner. Evidence: spec (read; MAR50.14 to 50.16); golden (`cva_k-0001`, `cva_k-0002`); computed. Source: `specifications/06-risk/cva-capital.md`*
+
+The reduced formula mixes a fully correlated part (weight `0.5^2 = 0.25`) and an independent part (weight 0.75). With one counterparty both parts are the same number, so they add back to it. With two, the independent part is smaller than the sum, so the charge is less than the sum of the standalone charges.
+
+`K_reduced = sqrt((0.5 sum_c SCVA_c)^2 + 0.75 sum_c SCVA_c^2)`, capital `0.65 K_reduced`.
+
+**Worked example.** `cva_k-0001`: `SCVA = 157,999.44`, `K_reduced = sqrt(0.25 S^2 + 0.75 S^2) = S`, capital `0.65 x S = 102,699.64`. `cva_k-0002` adds a high-yield sovereign with `SCVA = 231,806.85`: the sum is 389,806.29 and the root sum of squares 280,532.06, and `K_reduced = 311,465.75`, between the two; capital 202,452.74.
+
+The pitfall is adding standalone CVA charges across counterparties: that is the perfectly correlated case and overstates the charge by about 25% here (389,806.29 against 311,465.75).
+
+### Q14.57 Counterparty A is 26% of Tier 1 and C is exactly 25%. Which is a large exposure, and which is a breach?
+
+*Level: foundation. Evidence: spec (read; LEX10.8, LEX20.1); golden (`lex_k-0001`); computed. Source: `specifications/06-risk/leverage-large-exposures.md`*
+
+Large is at least 10% of Tier 1; a breach is strictly above the limit, which is 25% (15% between two G-SIBs). Both are large; only A breaches.
+
+`large = exposure >= 0.10 tier1`; `breach = exposure > limit`.
+
+**Worked example.** Tier 1 1,000 (`lex_k-0001`): A 260 is large and breaches the 250 limit; B 100 is large (exactly 10%); C 250 is large and does not breach; D 99.99 is not large.
+
+The pitfall is a `>=` on the limit: C would then breach, and the golden would fail in every build.
+
+### Q14.58 In `xva.wwr.cva_hw`, why is the hazard level `a_i = ln h - b V_i` when every path has the same exposure?
+
+*Level: advanced. Evidence: spec (read; KR-257, G-44); golden (`wwr_g-0007`); computed. Source: `specifications/stage-k-rulings-wwr.md`*
+
+If every path is identical, every path has the same survival, so the average over paths is just one path. Matching that survival to the curve `e^(-h t)` forces each bucket's hazard to equal the flat hazard `h`, so `exp(a_i + b V_i) = h`.
+
+Per bucket `mean_p S_p(t_(i-1)) exp(-exp(a_i + b V_i) dt_i) = e^(-h t_i)`; by induction `S(t_(i-1)) = e^(-h t_(i-1))`, so `exp(a_i + b V_i) dt_i = h dt_i`.
+
+**Worked example.** `V = 10`, `b = 1`, `h = 0.01`: `a = ln 0.01 - 10 = -14.605170185988092`, and `CVA = 0.6 x 10 x (0.97 (1 - e^(-0.01)) + 0.94 (e^(-0.01) - e^(-0.02))) = 0.11347051247504984` (`wwr_g-0007`). The builds before KR-257 returned `a = -2.56e33` and `CVA = 0` in Python and Rust on this input.
+
+The pitfall is testing a root finder only where it is easy: the four older goldens had `|b V| <= 2.7`, inside the window where the unbracketed solver worked in every build.
+
+### Q14.59 Why does the KR-257 bracket `[ln h - max bV - 1, ln h - min bV + 1]` always contain the root?
+
+*Level: advanced. Evidence: spec (read; KR-257); inferred (proof restated). Source: `specifications/stage-k-rulings-wwr.md`*
+
+Each path's default probability in the bucket rises with `a`. At `a = ln h - b V_p` path `p` defaults with exactly the target probability `1 - e^(-h dt)`. Below the smallest such `a`, every path is under target; above the largest, every path is over. The weighted average crosses the target in between.
+
+With `x_p = exp(a + b V_p) dt`, `f(a) = sum_p S_p (1 - e^(-x_p)) - (1 - e^(-h dt)) sum_p S_p` is increasing; `f(ln h - max bV) <= 0 <= f(ln h - min bV)`; the margin of 1 keeps the signs after rounding.
+
+**Worked example.** Identical paths with `bV = 10`, `h = 0.01`: the bracket is `[ln 0.01 - 11, ln 0.01 - 9] = [-15.605, -13.605]`, and the root -14.605 is its midpoint. For `bV = -60` (`wwr_g-0011`) the bracket is `[54.39, 56.39]` and the root is 55.39, outside the old C++ fixed bracket `[-800, 50]`.
+
+The pitfall is a fixed bracket chosen from the inputs one has tried: it is right until the first case outside it, and then wrong without an error.
+
+### Q14.60 A request to `xva.wwr.cva_hw` has a path of the wrong length and `|b V| = 705`. Which error comes back, and why?
+
+*Level: practitioner. Evidence: spec (read; HR-66, KR-257); golden (`wwr_g-0023`). Source: `specifications/stage-k-rulings-wwr.md`, [ARCHITECTURE](../../ARCHITECTURE.md#the-four-build-conformance-model-and-why-two-wrong-inputs-give-one-error)*
+
+The structural fault is found first. The repo-wide order is schema, size limit, finite, structural (`E_INPUT`), domain (`E_DOMAIN`); KR-257's limit on `|b V|` is a domain check placed after the G-44 domain checks.
+
+**Worked example.** `wwr_g-0023` (values `[[10, 1], [10]]`, `b = 70.5`) answers `E_INPUT`, "every path and discount_factors need one value per time"; with the lengths fixed (`wwr_g-0022`) the answer is `E_DOMAIN`, "|wwr_b * value| must be at most 700 (KR-257)".
+
+The pitfall is computing `b V` before checking the lengths: a ragged path then gives an index error or a domain error that differs between builds.
+
+### Q14.61 Why does a K-5 snapshot pool with `R` readers need `R + 2` slots and not `R + 1`?
+
+*Level: advanced. Evidence: spec (read; KR-280, KR-282); inferred. Source: `specifications/12-platform/lock-free-snapshots.md`*
+
+The writer must always find a slot that no reader holds and that is not the current snapshot, without waiting. Up to `R` slots can be announced and one is current, so one more is needed for the new snapshot: `R + 2`.
+
+Pigeonhole: of `R + 2` slots at most `R + 1` are excluded at the writer's scan, so at least one is free; with `R + 1`, all could be excluded, and the writer would have to wait, which breaks its wait-free bound.
+
+**Worked example.** Four readers: 6 slots. At a scan, readers hold slots 0, 1, 2 and 3 and slot 4 is current; slot 5 is free. With 5 slots the same moment leaves none.
+
+The pitfall is counting only readers: the current slot can be announced by no reader at all and still must not be overwritten, because a new reader may load it at any moment.
+
+### Q14.62 Why did K-5 not use a seqlock, which is simpler and allocation-free?
+
+*Level: advanced. Evidence: spec (read; KR-281). Source: `specifications/12-platform/lock-free-snapshots.md`*
+
+In a seqlock the reader copies the data while the writer may be writing it and retries if a counter changed. Two problems: a writer stalled half-way blocks every reader, so readers are not lock-free; and the reader's copy reads memory that is being written, which the C++ and Rust memory models and ThreadSanitizer count as a data race unless every field is atomic.
+
+The chosen scheme writes only slots no reader has announced, so no read ever races a write; the 64-bit checksum on each snapshot lets every read test that.
+
+**Worked example.** Local evidence (`program/stage_k_k5/K5_RACE_EVIDENCE.md`, local laptop, not the acceptance machine): C++ under ThreadSanitizer, 20,000 publishes at 1, 4 and 16 readers, 0 races and 0 torn reads in 60,042,044 reads, while both planted ordering faults were reported as races. The CI race jobs have not yet run green.
+
+The pitfall is calling a seqlock lock-free: its writer holds the readers hostage while it writes.
+
+### Q14.63 Encode 300 as a FAST-style stop-bit unsigned integer, and 100 as a signed one.
+
+*Level: foundation. Evidence: spec (read; KR-276); computed. Source: `specifications/12-platform/adapters.md` section 3.4*
+
+Split the number into 7-bit groups, most significant first, and set the high bit on the last byte only. A signed integer uses bit 6 of the first group as its sign, so a positive number whose top group has bit 6 set needs an extra zero group.
+
+Unsigned: minimum groups, last byte `| 0x80`. Signed: two's complement in 7-bit groups, minimum groups with the sign rule.
+
+**Worked example.** `300 = 2 x 128 + 44`: bytes `02` and `44 | 0x80 = ac`, so `02 ac`. 100 is `1100100` in binary, one group with bit 6 set, so as a signed integer it needs `00 e4`; unsigned it is `e4`.
+
+The pitfall is accepting a non-minimal form such as `00 82` for 2 unsigned: the encoding stops being canonical and `encode(decode(b)) = b` fails; the decoder must answer `E_OVERLONG`.
+
+### Q14.64 A multicast receiver sees packets starting at 1 (3 messages), 4 (2), 8 (1), a heartbeat at 9 and the first packet again. What does it deliver?
+
+*Level: practitioner. Evidence: spec (read; KR-278, KR-279); computed. Source: `specifications/12-platform/adapters.md` section 3.5*
+
+It keeps the next expected sequence number. A packet starting above it means messages were lost: record the gap and deliver. A packet that ends at or before it is a duplicate: deliver nothing. A packet that straddles it: deliver only the new part.
+
+`s > expected`: gap `[expected, s - 1]`; `s + n <= expected`: duplicate; otherwise deliver from `expected - s`; then `expected = max(expected, s + n)`.
+
+**Worked example.** Delivered 1 to 5 and 8; one gap `[6, 7]`; one duplicate; `expected = 9`. The heartbeat at 9 carries no messages and matches `expected`, so it records nothing.
+
+The pitfall is treating the repeated first packet as new data because the receiver forgot what it had seen: the book then applies three orders twice.
+
+### Q14.65 Why is the K-3 round-trip hash taken over the canonical form of records sorted by `seq`, not over the bytes the store returns?
+
+*Level: practitioner. Evidence: spec (read; KR-270, KR-271). Source: `specifications/12-platform/adapters.md` sections 1.2 and 1.4*
+
+Stores legitimately change representation: PostgreSQL `jsonb` reorders keys and drops white space, and a consumer may read records in another order. Those changes do not change the data. Hashing a canonical form of records sorted by `seq` makes the test sensitive to the data only.
+
+`H(R) = SHA-256(canon(r_1) LF ... canon(r_N) LF)` over `seq`-sorted records, after a count check that every `seq` from 1 to 10,000 appears once.
+
+**Worked example.** The planted faults show what the rule sees: dropping or duplicating one record gives `COUNT`; changing one byte of a price string, or reading a `value` back as the next binary64 up, gives `HASH`; swapping two records gives `PASS`, on purpose.
+
+The pitfall is hashing the stored text: every PostgreSQL run would fail, and the natural fix, relaxing the check, would also let a changed price through.
+
+### Q14.66 A soak bound is 1 MiB per hour and the process handles 23 cases a second. What is the smallest average leak per case it can see?
+
+*Level: practitioner. Evidence: spec (read; KR-218); measured (the soak's rate); computed. Source: `specifications/12-platform/soak-eod-capacity.md`, [LEARN](../../LEARN.md#does-it-stay-the-same-size-for-hours-soak-capacity-and-an-end-of-day-rehearsal-k-6)*
+
+The bound is per hour; a leak is per request. Divide one by the number of requests in an hour.
+
+`leak per case > 1 MiB / (rate x 3,600 s)`.
+
+**Worked example.** `1,048,576 / (23 x 3,600) = 12.66` bytes per case. The proposed planted leak, 1 KiB every 100 cases (10.24 bytes per case), grows about 0.81 MiB an hour and was not flagged: a recorded miss of the planted-fault rule. 1 KiB per case (about 81 MiB an hour) was caught at 171.9 MiB/h. The spec's text puts the threshold at about 1.2 bytes per case; the division gives 12.7.
+
+The pitfall is writing a soak rule for the throughput of a fast build and applying it to a slow one: the Python soak runs the golden mix at tens of cases a second, not thousands.
+
+### Q14.67 The end-of-day rehearsal has seven planted faults. What must each one show, and why "no earlier step fails"?
+
+*Level: foundation. Evidence: spec (read; KR-220, KR-221); measured (evidence files). Source: `specifications/12-platform/soak-eod-capacity.md` section 3, `benchmarks/results/k6/`*
+
+A planted fault shows that a step can fail for the reason it is meant to catch. Requiring that every earlier step passes shows the fault was caught where intended, not by an unrelated check upstream.
+
+Steps E1 to E8 run in order and stop at the first failure; the planted faults `GAP`, `HOLDOUT`, `HASH`, `EXPLAIN`, `DOMAIN`, `LABEL` and `WIDTH` target E1 to E7 in that order.
+
+**Worked example.** On the recorded date 2026-11-19 every step passed; in the seven planted runs the failing step was E1, E2, E3, E4, E5, E6 and E7 respectively, every earlier step passed and every later step was "not run" (read 2026-11-21 from `eod-2026-11-19-*.json`; local laptop, not the acceptance machine).
+
+The pitfall is a planted fault that fails at E1 every time: the run then proves only that the log check works.
