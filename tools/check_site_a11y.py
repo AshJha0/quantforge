@@ -543,6 +543,24 @@ BROWSER_JS = r"""() => {
     const r = e.getBoundingClientRect(), row = ((r.top + r.height / 2) / G) | 0, col = ((r.left + r.width / 2) / G) | 0;
     if (!grid[row] || !grid[row][col]) out.gridGap.push(`${e.tagName.toLowerCase()}.${e.className || ''} middle in empty cell ${row},${col} of a ${grid === rootGrid ? 'page' : 'scroll box'} grid: "${e.textContent.trim().slice(0, 40)}"`);
   }
+  // Second axe-core 4.2.4 trap (Docs run 44922499739, question bank 14): color-contrast reads the stack under the
+  // middle of the element's bounding box when its own text has at most one line box (color/get-rect-stack.js) and
+  // gives up, with no reason, if the element itself is not in that stack (get-background-stack.js). An inline
+  // element on two lines whose own text is all on the first line (the second holds only a child, such as a long
+  // <code> path) has its middle in the gap between its two line boxes.
+  out.ownMiss = [];
+  for (const e of gridOf.keys()) {
+    if (e === document.documentElement || getComputedStyle(e).display !== 'inline') continue;
+    const own = [...e.childNodes].filter(t => t.nodeType === 3 && t.textContent.trim());
+    if (!own.length) continue;
+    let lines = 0;
+    for (const t of own) { const rg = document.createRange(); rg.selectNodeContents(t);
+      lines += [...rg.getClientRects()].filter(q => q.width >= 1 && q.height >= 1).length; }
+    if (lines > 1) continue;
+    const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    if (![...e.getClientRects()].some(q => x >= q.left && x <= q.right && y >= q.top && y <= q.bottom))
+      out.ownMiss.push(`${e.tagName.toLowerCase()} middle (${x | 0}, ${y | 0}) outside its own line boxes: "${e.textContent.trim().slice(0, 40)}"`);
+  }
   return out;
 }"""
 
@@ -588,6 +606,8 @@ def browser_pass(site, channel="chrome", out=None, only=None):
                         found[(mode, "scrollable-region-focusable")][p] += r["scroll"]
                     if r["gridGap"]:
                         found[(mode, "axe-4.2.4-grid-gap")][p] += r["gridGap"]
+                    if r["ownMiss"]:
+                        found[(mode, "axe-4.2.4-own-stack-miss")][p] += r["ownMiss"]
                 ctx.close()
             b.close()
     finally:

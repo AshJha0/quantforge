@@ -1286,6 +1286,12 @@ class SiteA11y(unittest.TestCase):
         self.assertNotIn("<th></th>", out)
         self.assertIn('<th scope="row">k</th>', out)
         self.assertEqual(out.count("<thead>"), 1)
+        # a paragraph that is one <em> (run 44922499739) is shown as a block; mixed or split emphasis is left alone
+        para = m.a11y_fix("<h1>t</h1><p><em>Level: x. Source: <code>a/b.md</code></em></p><p>a <em>b</em></p>"
+                          "<p><em>c</em> d <em>e</em></p>", "t")
+        self.assertIn('<p><em class="para">Level: x. Source: <code>a/b.md</code></em></p>', para)
+        self.assertIn("<p>a <em>b</em></p><p><em>c</em> d <em>e</em></p>", para)
+        self.assertIn("em.para,strong.para{display:block}", m.CSS)
         svg = ('<svg viewBox="0 0 480 300" role="img" aria-label="betas, synthetic data" '
                'xmlns="http://www.w3.org/2000/svg" style="fill:currentColor"><text>b</text>'
                '<line style="stroke:var(--line)"/></svg>')

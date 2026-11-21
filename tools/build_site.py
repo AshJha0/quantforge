@@ -45,7 +45,7 @@ h1,h2,h3{line-height:1.25}h2{color:var(--link);border-bottom:2px solid var(--lin
 .note{background:var(--panel);border-left:4px solid var(--accent);padding:.7rem 1rem}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem;margin:1rem 0}
 .card{background:var(--panel);border-radius:6px;padding:1rem 1.2rem;box-shadow:0 1px 3px rgba(0,0,0,.12)}.card b{display:block}.card span{display:block;font-size:.92rem;color:var(--ink);background:var(--panel)}
-pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal;display:block}
+pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal;display:block}em.para,strong.para{display:block}
 table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
 .glance th{width:9rem;vertical-align:top}.glance td{background:var(--panel)}
 .chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}main picture img{display:block;max-width:100%;height:auto}.chart img{width:100%}.chart p{font-size:.85rem;margin:.3rem 0 0}
@@ -240,8 +240,14 @@ def a11y_fix(body, title):
       empty-table-header, th-has-data-cells);
     - a page with no <h1> gets one from its title, and a heading never skips a level below the one before it
       (an h4 straight after an h2 is written as h3; axe page-has-heading-one, heading-order). Ids are kept.
+    - a paragraph that is a single <em> or <strong> gets class "para" (shown as a block, so axe-core 4.2.4 can
+      find the element under the middle of its box);
     Worked example: `| | A | B |` renders `<th></th><th>A</th><th>B</th>`, written `<td></td><th>A</th><th>B</th>`."""
     body = body.replace("<pre>", '<pre tabindex="0">')
+    # a paragraph that is one <em> or <strong> keeps the element but shows it as a block (CSS .para): axe-core
+    # 4.2.4 could not place an inline one on two lines whose own text sat on the first line (Docs run 44922499739)
+    body = re.sub(r"<p><(em|strong)>((?:(?!</?\1>|</?p>).)*)</\1></p>", r'<p><\1 class="para">\2</\1></p>', body,
+                  flags=re.S)
 
     def head(m):
         cells = re.findall(r"<th[^>]*>(.*?)</th>", m.group(1), re.S)
