@@ -10,7 +10,7 @@
   "version": "0.10.1",
   "stage_h_outside": "78.0% (160 of 205 value cases, oracle/OUTSIDE_SHARES.md)",
   "stage_h_unchecked": "45 of the 205 stage H value cases",
-  "next_stage": "stage K round 2, platform and release (target v1.0.0); open items in docs/known-issues.md",
+  "next_stage": "the v1.0.0 release, which closes stage K (no date set; the version string is bumped then); open items in docs/known-issues.md",
   "status_glance": [
     [
       "Release",
