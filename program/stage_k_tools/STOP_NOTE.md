@@ -46,7 +46,12 @@ Dispatch: see "Verification".
 
 ## Verification
 
-VERIFY_SECTION
+All on the local laptop, not the acceptance machine, 2026-11-21 [measured]:
+- `cd python && uv run pytest -q`: 4330 passed, 3 skipped (43 min, machine shared with other lanes). `uv run ruff check .`: all passed; `ruff format --check .`: 264 files formatted; `mypy`: no issues in 146 files. (No file under `python/` changed.)
+- `python -m pytest -q tools`: 118 passed, 4 skipped (before the wave 2 mapping commit; after it, the mutation and model-report subset: 21 passed).
+- `python conformance/mutation/test_gates.py`: 0 failures; `check_stages.py`: 0 problems; `python -m pytest -q benchmarks/soak/test_soak.py`: 15 passed; `tools/validation/model_reports.py --check` and `--self-test`: pass.
+- No C++, Rust or Java code changed; no WSL or Maven run. No mutation run locally.
+- Branch dispatch of `mutation-stage.yml` (`paths` = the 16 wave 2 source files plus `python/quantforge_core/daycount.py`, 21 jobs): DISPATCH_LINE
 
 ## Proposed text for rows the docs lane owns (not edited here)
 
