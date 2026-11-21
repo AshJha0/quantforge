@@ -752,6 +752,7 @@ HAND_PAGES = [
     ("joint-solve.md", "Multi-curve joint solve and its Jacobian", "`rates.curve.joint_solve`, `rates.curve.joint_bootstrap`"),
     ("curve-risk.md", "Curve risk: par buckets, key rates and the Jacobian", "`risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian`"),
     ("incremental-update.md", "Incremental curve update (stage K)", "`curve.bootstrap.par_annual`, `curve.incremental.update`"),
+    ("cross-gamma.md", "Cross gamma on a curve", "`risk.curve.cross_gamma`"),
 ]
 
 
