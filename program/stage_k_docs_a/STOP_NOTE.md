@@ -7,6 +7,7 @@ Branch `k-v1-docs-a` (cut from main 11ba1b40). Files owned: COOKBOOK.md, docs/ge
 
 - COOKBOOK section "Stage K wave 2 capital and xVA recipes": RRAO, securitisation DRC, CTP DRC, SA-CVA with hedges, large exposures, wrong-way CVA (all outputs observed 2026-11-21, Python build).
 - Tutorial 60, reading a soak run (`docs/getting-started/tutorial-60-read-a-soak-run.md`): K-6 rule on the committed CSVs, MISS and planted-leak miss stated; check passes (3 lines).
+- Tutorial 61, K-5 snapshots and the hedge (`docs/getting-started/tutorial-61-snapshots-and-hedge.md`); check passes (6 lines).
 
 ## Next, in order
 1. K-6 end-of-day rehearsal and capacity tools; K-5 snapshots; K-3 adapters and simulated feed codecs (developer guides).
