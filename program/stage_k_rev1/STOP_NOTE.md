@@ -28,7 +28,7 @@ Verification at the merged head (local laptop, not the acceptance machine; measu
 | Rust (WSL) | release build + conformance | 16,609 of 16,609 |
 | C++ (WSL) | plain Release build (`-DQF_WERROR=ON`), ctest | 6 of 6 ctest targets pass |
 | C++ (WSL) | conformance (plain build) | 16,609 of 16,609 |
-| C++ (WSL) | ASan/UBSan build + ctest | running (first attempt hit the 10-minute part cap during the fresh build; rerun in progress) |
+| C++ (WSL) | ASan/UBSan build + ctest | build pass (needed three 10-minute parts: fresh build); ctest: the five snapshot/K-5 targets pass, `quantforge_core_tests` under ctest hit the 10-minute part cap, so the binary was run in four Catch2 shards (`--shard-count 4`, each under the WSL lock): all pass, 706 test cases, 2,068,360 assertions, 0 failed (`_h4ci/kv1/k-v1-rev1/summary_asan_shards`) |
 | Repo | `python -m pytest -q tools` | 109 passed, 4 skipped, 1 failed (gallery page stale), fixed in d52d01a2 and the failing test rerun green; full tools suite not rerun |
 | Repo | `check_case_total.py`, `case_figures.py --check`, `research/test_preregs.py`, every `repo-gates.yml` step run locally (incl. `check_scheduled_runs.py` live) | pass |
 
