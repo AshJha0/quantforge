@@ -19,3 +19,8 @@ Branch `k-v1-int1`, cut from main `11ba1b40`. Merges two docs branches one at a 
 
 ## Done
 Lane work is complete; nothing pending on this branch.
+
+## Follow-on (coordinator, 2026-11-21)
+1. CI: Repo gates runs `tools/check_case_total.py`; Docs runs `tools/test_check_cookbook.py && tools/check_cookbook.py` after `uv sync` (paths filter extended). No setup-java step touched.
+2. K-2 measured: one ledger row (2026-11-20), anchors at Bitcoin heights 976796 and 976809; `verify_ledger.py verify --no-cli` ok, `recorded_trading_days` null (headers not fetched: an outside download). Written as "not met: at most 1 of 20" in README status block, site_facts and ROADMAP. Note: on Windows extract the anchors with `git -c core.autocrlf=false archive`, or the OpenTimestamps proof fails ("proof is for a different file").
+3. `origin/k-v1-docs-b` (cb1fdf26) merged, no conflicts. Fixes: ARCHITECTURE line 5 no longer cites ISDA; README 63 tutorials (was 50) and 500 questions (was 470); LEARN set 14 is 82 questions (said 32); Q14.32 no longer says the ledger never ran.
