@@ -6,7 +6,7 @@ The plain idea: a pricing or risk service that runs all day must not grow. A soa
 
 You will apply the frozen K-6 rule by hand to the three Python soak runs recorded on 2026-11-20, see why the main run is a recorded miss, why one planted leak was missed and the other caught, and get the same lines from the project's analyser. Budget 10 minutes. Nothing is run against a build: the inputs are the committed CSV files.
 
-<p class="note">Stage K, item K-6, merged to <code>main</code> 2026-11-20 (merge 62d77666; not in a tag). Spec <code>specifications/12-platform/soak-eod-capacity.md</code> 0.2.0, rulings KR-217 to KR-221 (<code>specifications/stage-k-rulings-k6.md</code>, confirmed 2026-11-20). The rule was committed before the runs it judges (1ce167bf, per <a href="../capacity.md">Capacity and operations</a>). The runs are on the local laptop, not the acceptance machine. <strong>The Python soak is a recorded MISS on slope, and the first planted leak is a recorded miss</strong> (<code>docs/known-issues.md</code>, read 2026-11-21); this page explains the misses and changes nothing. Step 1 uses the standard library; Step 2 calls <code>benchmarks/soak/analyse.py</code>, and CI checks that it prints the lines shown under Step 1.</p>
+<p class="note">Stage K, item K-6, merged to <code>main</code> 2026-11-20 (merge 62d77666; not in a tag). Spec <code>specifications/12-platform/soak-eod-capacity.md</code> 0.2.0, rulings KR-217 to KR-221 (<code>specifications/stage-k-rulings-k6.md</code>, confirmed 2026-11-20). The rule was committed before the runs it judges (1ce167bf, per <code>docs/capacity.md</code>). The runs are on the local laptop, not the acceptance machine. <strong>The Python soak is a recorded MISS on slope, and the first planted leak is a recorded miss</strong> (<code>docs/known-issues.md</code>, read 2026-11-21); this page explains the misses and changes nothing. Step 1 uses the standard library; Step 2 calls <code>benchmarks/soak/analyse.py</code>, and CI checks that it prints the lines shown under Step 1.</p>
 
 Terms, defined here. The **judged series** is, for Python, the smallest committed-private-bytes reading in each 10 s window (Windows). **Warm-up** is discarded: samples before 600 s or the end of the first full pass over the golden set, whichever is later. The **slope** is the least-squares slope of the judged series against time, in MiB per hour. The **range** is maximum minus minimum. A **planted leak** is a fault switched on deliberately (`QF_SOAK_LEAK=1`) to show that the rule can see one.
 
@@ -68,15 +68,18 @@ def judge(name, planted):
           f"range {100 * rng / med:.1f}% of median {med:.1f} MiB, reasons {reasons or 'none'}: {verdict}")
 
 
+print("rule: warm-up at least 600 s, slope at most 1.0 MiB/h, range at most 5% of median, "
+      "at least 660 samples and 7200 s")
 judge("soak-python-2026-11-20", planted=False)
 judge("soak-python-2026-11-20-planted-leak", planted=True)
 judge("soak-python-2026-11-20-planted-leak-every-1", planted=True)
 ```
 
-Output (CI checks that Step 2 prints these lines; measured 2026-11-21 on branch `k-v1-docs-a` from the committed files):
+Output (the first line is the frozen rule, from `analyse.RULES` in Step 2; CI checks that Step 2 prints these lines; measured 2026-11-21 on branch `k-v1-docs-a` from the committed files):
 
 <!-- tutorial:expect -->
 ```text
+rule: warm-up at least 600 s, slope at most 1.0 MiB/h, range at most 5% of median, at least 660 samples and 7200 s
 soak-python-2026-11-20: warm-up 2037 s, 671 samples, slope 2.32 MiB/h, 95% CI [1.70, 3.80], range 3.0% of median 432.6 MiB, reasons ['SLOPE']: MISS
 soak-python-2026-11-20-planted-leak: warm-up 826 s, 43 samples, slope -46.97 MiB/h, 95% CI n/a, range 1.5% of median 429.4 MiB, reasons none: LEAK MISSED
 soak-python-2026-11-20-planted-leak-every-1: warm-up 600 s, 61 samples, slope 171.90 MiB/h, 95% CI n/a, range 6.0% of median 475.6 MiB, reasons ['SLOPE', 'RANGE']: LEAK CAUGHT
@@ -112,6 +115,10 @@ sys.path.insert(0, "benchmarks/soak")
 import analyse  # noqa: E402
 
 K6 = "benchmarks/results/k6/"
+R = analyse.RULES
+print(f"rule: warm-up at least {R['warmup_s']} s, slope at most {R['slope_max_mib_per_h']} MiB/h, "
+      f"range at most {100 * R['range_max_fraction_of_median']:.0f}% of median, "
+      f"at least {R['min_samples']} samples and {R['min_duration_s']} s")
 for name, planted in (("soak-python-2026-11-20", False), ("soak-python-2026-11-20-planted-leak", True),
                       ("soak-python-2026-11-20-planted-leak-every-1", True)):
     rows = list(csv.DictReader(open(K6 + name + ".csv", encoding="utf-8")))
