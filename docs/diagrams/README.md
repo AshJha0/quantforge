@@ -673,7 +673,7 @@ Plain idea: a latency figure is a claim about one machine, one workload and one 
 
 ## Stage K: risk platform and capital (in progress)
 
-Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), and the parts toward v1.0.0 followed the same day (pull requests #60 to #64: the wrong-way-risk root fix KR-257, release evidence, K-3 adapters, wave 2 capital and K-5 snapshots, K-6 soak and rehearsal); none is tagged, all are released with v1.0.0. The last tag is v0.10.0. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`). The three diagrams added on 2026-11-20 (platform pieces, daily curve run, error order) follow the same syntax and the site build passes with 0 broken links. On 2026-11-20 `tools/check_site_view.py` opened this page in headless Chrome at 1280 px and at 375 px in light and dark mode: all 57 diagrams on the page, the three new ones included, drew an SVG with no Mermaid syntax error, and the page was no wider than the window (measured on the owner's laptop, not the acceptance machine; `benchmarks/results/k7/site-view-local-2026-11-20.md`). The check reads whether a diagram rendered, not whether it reads well; that still needs a person's eye. The same check runs in CI as `docs-site-view` (not yet run there). Seven diagrams were added on 2026-11-21 by the docs lane `k-v1-docs-b` (K-5 snapshot, K-3 boundary, round trip and gap detector, K-6 judging, wave 2 capital map, wrong-way CVA root); on 2026-11-21 `tools/check_site_view.py --page docs/diagrams/README.html` on a site built from that branch drew all 64 diagrams on the page as SVG with no Mermaid syntax error at 1280 px light, 375 px light and 375 px dark, with the page no wider than the window (measured, local laptop, not the acceptance machine).
+Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59), and the parts toward v1.0.0 followed the same day (pull requests #60 to #64: the wrong-way-risk root fix KR-257, release evidence, K-3 adapters, wave 2 capital and K-5 snapshots, K-6 soak and rehearsal); none is tagged, all are released with v1.0.0. The last tag is v0.10.0. Each diagram names the spec it was drawn from (read 2026-11-19). All four rendered in the locally built site of the docs lane with every node drawn and no parse error (checked in the built-in browser, 2026-11-19); the site is rebuilt on `k-r1` (`program/STAGE_K_DOCS_PENDING.md`). The three diagrams added on 2026-11-20 (platform pieces, daily curve run, error order) follow the same syntax and the site build passes with 0 broken links. On 2026-11-20 `tools/check_site_view.py` opened this page in headless Chrome at 1280 px and at 375 px in light and dark mode: all 57 diagrams on the page, the three new ones included, drew an SVG with no Mermaid syntax error, and the page was no wider than the window (measured on the owner's laptop, not the acceptance machine; `benchmarks/results/k7/site-view-local-2026-11-20.md`). The check reads whether a diagram rendered, not whether it reads well; that still needs a person's eye. The same check runs in CI as `docs-site-view` (not yet run there). Seven diagrams were added on 2026-11-21 by the docs lane `k-v1-docs-b` (K-5 snapshot, K-3 boundary, round trip and gap detector, K-6 judging, wave 2 capital map, wrong-way CVA root); on 2026-11-21 `tools/check_site_view.py --page docs/diagrams/README.html` on a site built from that branch drew all 64 diagrams on the page as SVG with no Mermaid syntax error at 1280 px light, 375 px light and 375 px dark, with the page no wider than the window (measured, local laptop, not the acceptance machine). Three more were added later that day (curve build, error-order decision table, K-7 release evidence chain); the same check then drew all 67 (measured).
 
 ### SA-CCR: from trades to EAD
 
@@ -990,6 +990,72 @@ flowchart TB
 ```
 
 Ruling KR-257 (`specifications/stage-k-rulings-wwr.md`, confirmed 2026-11-20; read 2026-11-21). The old solver started Newton at `ln h` with no finite bracket and returned an unconverged root without an error; the reported case (two paths, `V = 10`, `b = 1`, `h = 0.01`) gave `a = -2.56e33` and `cva = 0`. After the fix the Python build returns `a = -14.605170185988092` in both buckets and `cva = 0.11347051247504979`, against the closed form `ln 0.01 - 10` and 0.11347051247504984 (golden `wwr_g-0007`, measured 2026-11-21 in this worktree; the two CVA figures differ by 4e-16 relative, inside the 1e-12 tolerance). Worked through in [LEARN](../../LEARN.md#wrong-way-risk-cva-and-a-root-that-must-be-bracketed-kr-257).
+
+### Curve build: from quotes to solved curves, Jacobian and risk
+
+```mermaid
+flowchart TB
+  accTitle: Data flow of a curve build from quotes to curves, Jacobian and risk
+  accDescr: Market quotes, a curve set in dependency order and the interpolation choice enter one request. The request is checked in the repo-wide error order. A single OIS curve can be bootstrapped directly; a set of curves goes to the joint solve, which solves block by block because each curve depends only on earlier ones, with meeting steps and year-end turns as extra unknowns. The solve stops when every instrument reprices to 1e-13 or fails with E_NO_CONVERGENCE. It returns the curves and the Jacobian of every curve unknown to every quote. Pricers read the curves. Par risk bumps quotes and rebuilds; key-rate risk shifts zero rates on the fixed curve; the Jacobian links the two by the chain rule. When one quote ticks, the incremental update copies pillars before the change and solves the rest, and must equal a full rebuild bit for bit.
+  Q["quotes: OIS, futures, deposits,<br/>FRAs, swaps, basis swaps"] --> RQ["one request: as_of, curves in<br/>dependency order, interpolation,<br/>step dates, turns"]
+  RQ --> EO{"error order:<br/>schema, limit, finite,<br/>structure, domain"}
+  EO -->|"fault"| ERR["E_SCHEMA, E_LIMIT,<br/>E_DOMAIN or E_INPUT"]
+  EO -->|"one OIS curve"| BOOT["rates.ois.bootstrap"]
+  EO -->|"curve set"| JS["rates.curve.joint_solve<br/>block lower triangular,<br/>solve curve by curve"]
+  ST["meeting steps and turns<br/>rates.ois.step_curve, fit_steps"] -.->|"OIS_STEPS, turn unknowns"| JS
+  JS --> CONV{"every residual<br/>at most 1e-13?"}
+  CONV -->|"no"| NC["E_NO_CONVERGENCE"]
+  CONV -->|"yes"| OUT["curves: pillars or base and steps,<br/>turn factors"]
+  CONV -->|"yes"| JAC["Jacobian d unknown / d quote<br/>implicit function theorem"]
+  BOOT --> OUT
+  OUT --> PR["pricers: OIS, bonds, FRAs, swaps"]
+  OUT --> KR["risk.curve.key_rate<br/>zero shifts, no rebuild"]
+  Q --> PAR["risk.curve.par<br/>bump quote, rebuild"]
+  KR & JAC -->|"chain rule, PILLAR keys"| PAR
+  TICK["one quote ticks"] --> INC["curve.incremental.update<br/>copy pillars before the change,<br/>stale cache: E_INPUT"]
+  OUT -.->|"cached curve, held by the caller"| INC
+```
+
+From `specifications/02-curves/joint-solve-and-funding.md`, `meeting-steps.md`, `incremental-update.md` and `specifications/06-risk/par-and-key-rate.md` (read 2026-11-21). Worked numbers for each box are on the Curves method pages: [joint solve](../curves/joint-solve.md), [meeting steps](../curves/meeting-steps.md), [curve risk](../curves/curve-risk.md) and [incremental update](../curves/incremental-update.md). `curve.incremental.update` works on the stage K annual par bootstrap, not on the joint solve; the dotted arrow says only that the caller keeps the cached curve between calls.
+
+### Error order (HR-66) as a decision table, with two-fault goldens
+
+```mermaid
+flowchart TB
+  accTitle: Which error a request with two faults gets, by the repo-wide order
+  accDescr: For a request with two faults, compare the steps at which each fault is found, in the order schema, size limit, finite rule, structure, domain. The earlier step wins. A schema fault beats a domain fault, as in cap_ke-0008, where an unlisted zone and a negative exception count give E_SCHEMA. A structural fault beats a domain fault, as in e2_k-0008, imcc_ke-0005 and wwr_g-0023, which give E_INPUT. A non-finite input beats a structural fault, as in e2_k-0011, which gives E_DOMAIN for the NaN shift although the position list is empty. Two faults at the same step give that step's code. A limit that can only be known after validation, such as the wrong-way limit on the absolute value of b times V, is a domain check placed after the earlier domain checks.
+  A{"fault 1 at step s1,<br/>fault 2 at step s2"} --> B{"s1 = s2?"}
+  B -->|"yes"| SAME["that step's code"]
+  B -->|"no"| C["the earlier step wins:<br/>schema, limit, finite, structure, domain"]
+  C --> X1["schema and domain:<br/>E_SCHEMA, cap_ke-0008"]
+  C --> X2["structure and domain:<br/>E_INPUT, e2_k-0008, imcc_ke-0005, wwr_g-0023"]
+  C --> X3["finite and structure:<br/>E_DOMAIN, e2_k-0011"]
+  C --> X4["schema and domain in leverage:<br/>E_SCHEMA, lev_ke-0003"]
+```
+
+The rule is HR-66 (`specifications/stage-h-rulings-w2-exec.md`), applied to stage H by HR-122 and to stage K by KR-230; the one-request flow is drawn in [Error order: one request, two faults](#error-order-one-request-two-faults). The codes of the six goldens named were read from `datasets/golden/` on 2026-11-21, and the Python build returned the same codes for `cap_ke-0008`, `imcc_ke-0005` and `wwr_g-0023` that day (measured). A step that needs a computed quantity (the KR-257 limit `|b V| <= 700`) is a domain check that runs after the operation's other domain checks.
+
+### Release evidence chain (K-7): what a v1.0.0 claim rests on
+
+```mermaid
+flowchart LR
+  accTitle: The K-7 release evidence checks and what each leaves behind
+  accDescr: A release tag starts release.yml, which builds the assets, writes SHA256SUMS before the attest step, attests every asset with build provenance and ships an SBOM. The release-verify job downloads every asset and runs gh attestation verify on each. Beside the tag, separate checks each leave a file or a run: every example and tutorial on clean Windows, macOS and Linux runners; runbook commands that name scripts and workflows that exist; a known-issues register that holds every recorded miss; one validation report per model; a public results page with misses first and an evidence path for every verdict; every site page at desktop and phone width in light and dark mode plus pa11y accessibility. The ruleset's strict setting is the owner's and was off when read; registry publishing is not done by owner decision. Each check is first shown failing on a planted fault.
+  TAG["tag v1.0.0"] --> REL["release.yml<br/>assets, SHA256SUMS, SBOM,<br/>attestations"]
+  REL --> RV["RE2 release-verify<br/>gh attestation verify per asset"]
+  RE1["RE1 examples and tutorials<br/>clean runners, three OSes"] --> CLAIM{"v1.0.0 evidence"}
+  RV --> CLAIM
+  RE3["RE3 runbooks<br/>check_runbooks.py"] --> CLAIM
+  RE4["RE4 known-issues register<br/>check_known_issues.py"] --> CLAIM
+  RE5["RE5 model validation reports<br/>model_reports.py, 120 reports"] --> CLAIM
+  RE6["RE6 results page<br/>results_page.py, misses first"] --> CLAIM
+  RE9["RE9 site view and pa11y<br/>check_site_view.py, check_site_a11y.py"] --> CLAIM
+  RE7["RE7 ruleset strict on<br/>owner setting; off when read"] -.-> CLAIM
+  RE8["RE8 registries<br/>not done, owner decision"] -.-> CLAIM
+  PF["planted fault per check"] -.->|"must fail first"| RE3 & RE4 & RE5 & RE6
+```
+
+From `specifications/12-platform/release-evidence.md` 0.3.0 (rulings KR-222 to KR-227, confirmed 2026-11-20; read 2026-11-21). State at that read: the checks are built and pass locally with their planted faults failing; none has run on a tag; RE7 fails because the ruleset's strict setting was off when read on 2026-11-20 (`benchmarks/results/k7/ruleset-2026-11-20.json`); RE8 is not done by owner decision (no registry accounts). The dashed arrows are items that do not support the claim today.
 
 ## Per-domain flows
 
