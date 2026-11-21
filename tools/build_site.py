@@ -28,6 +28,9 @@ LINK = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)\s]+)\)")
 FENCE = re.compile(r"^(```|~~~).*?^\1\s*$", re.M | re.S)
 # Colours meet WCAG 2.2 AA (plan 13.2 E6): white on --accent 5.1:1, white on --brand 6.3:1, --link on --bg 5.9:1,
 # --c2 on --bg 5.4:1, dark --link on dark --bg 9.2:1.
+# pre code is one block as wide as its longest line (KR-227, CI run 44805977858): as an inline element a multi-line
+# <code> in a <pre> that scrolls sideways has a bounding box whose middle can lie in a 200 px cell that none of its
+# line boxes touch, and axe-core 4.2.4 color-contrast then throws (tools/check_site_a11y.py BROWSER_JS, grid gap).
 CSS = """:root{--bg:#f7f8fa;--ink:#1a1a2e;--brand:#16697a;--accent:#0e7c66;--line:#d9dee3;--panel:#fff;--code:#eef1f4;--link:#16697a;--c1:#16697a;--c2:#a84a12;--focus:#c2571a}
 @media(prefers-color-scheme:dark){:root{--bg:#14181d;--ink:#e3e6ea;--brand:#16697a;--accent:#0e7c66;--line:#333b44;--panel:#1d232a;--code:#232a32;--link:#6fc7d6;--c1:#6fc7d6;--c2:#e8935a;--focus:#f0b27a}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Segoe UI",Arial,sans-serif}
@@ -40,7 +43,7 @@ h1,h2,h3{line-height:1.25}h2{color:var(--link);border-bottom:2px solid var(--lin
 .note{background:var(--panel);border-left:4px solid var(--accent);padding:.7rem 1rem}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem;margin:1rem 0}
 .card{background:var(--panel);border-radius:6px;padding:1rem 1.2rem;box-shadow:0 1px 3px rgba(0,0,0,.12)}.card b{display:block}.card span{display:block;font-size:.92rem;color:var(--ink);background:var(--panel)}
-pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal}
+pre{background:var(--code);padding:.8rem;overflow-x:auto;border-radius:4px}code{font-size:.92em;overflow-wrap:anywhere}pre code{overflow-wrap:normal;display:block;width:max-content;min-width:100%}
 table{border-collapse:collapse;width:100%;font-size:.9rem;margin:1rem 0}th,td{border:1px solid var(--line);padding:.45rem .7rem;text-align:left}th{background:var(--code)}
 .glance th{width:9rem;vertical-align:top}.glance td{background:var(--panel)}
 .chart{max-width:42rem;margin:1.2rem 0}.chart svg{display:block;width:100%;height:auto}main picture img{display:block;max-width:100%;height:auto}.chart img{width:100%}.chart p{font-size:.85rem;margin:.3rem 0 0}

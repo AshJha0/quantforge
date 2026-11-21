@@ -970,6 +970,11 @@ class SiteHome(unittest.TestCase):
         for needle in ('class="skip"', '<main id="main"', "search.js"):
             self.assertIn(needle, bs.PAGE)
         self.assertIn(":focus-visible", bs.CSS)
+        # KR-227, run 44805977858: a multi-line inline <code> in a <pre> that scrolls made axe-core 4.2.4 color-contrast
+        # throw; the block must cover every line so the middle of its box is on its own grid cells
+        rule = bs.CSS.split("pre code{", 1)[1].split("}", 1)[0]
+        for decl in ("display:block", "width:max-content", "min-width:100%"):
+            self.assertIn(decl, rule)
 
 
 class DoctorAndQuickstart(unittest.TestCase):

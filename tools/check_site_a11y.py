@@ -512,6 +512,37 @@ BROWSER_JS = r"""() => {
     if (e.tabIndex >= 0 || e.querySelector('a[href],button,input,select,textarea,[tabindex]')) return;
     out.scroll.push(`${e.tagName.toLowerCase()}.${e.className || ''} ${e.scrollWidth}x${e.scrollHeight} in ${e.clientWidth}x${e.clientHeight}`);
   });
+  // axe-core 4.2.4 (the copy pa11y 6.2.3 runs) puts every element into a grid of 200 px cells, with one sub-grid
+  // per box that scrolls (lib/commons/dom/get-rect-stack.js createGrid). color-contrast then looks up the cell
+  // under the middle of each element's bounding box (getElementStack) and reads .filter of it. A sub-grid holds
+  // only the client rects of the elements inside that box, so the middle of a multi-line inline element there
+  // (a <code> block in a <pre> that scrolls sideways) can fall in an empty cell: the rule throws "Cannot read
+  // property 'filter' of undefined" and pa11y reports color-contrast on the page with no element (CI run
+  // 44805977858, tutorials 36 and 39). This replays that lookup; display:none and visibility:hidden stand in for
+  // axe's isVisible.
+  const G = 200, scrolls = e => { const ox = e.scrollWidth > e.clientWidth, oy = e.scrollHeight > e.clientHeight;
+    if (!(ox || oy)) return false; const s = getComputedStyle(e);
+    return (ox && !['visible', 'hidden'].includes(s.overflowX)) || (oy && !['visible', 'hidden'].includes(s.overflowY)); };
+  const gridOf = new Map(), subOf = new Map();
+  const put = (grid, e) => { gridOf.set(e, grid); for (const q of e.getClientRects()) {
+    const r0 = (q.top / G) | 0, r1 = ((q.top + q.height) / G) | 0, c0 = (q.left / G) | 0, c1 = ((q.left + q.width) / G) | 0;
+    for (let a = r0; a <= r1; a++) { grid[a] = grid[a] || []; for (let b = c0; b <= c1; b++) grid[a][b] = true; } } };
+  const rootGrid = [];
+  put(rootGrid, document.documentElement);
+  const g = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+  for (let e = g.currentNode; e; e = g.nextNode()) {
+    let q = e.parentElement; while (q && !scrolls(q)) q = q.parentElement;
+    const grid = q ? subOf.get(q) : rootGrid;
+    if (scrolls(e)) subOf.set(e, []);
+    const r = e.getBoundingClientRect(), s = getComputedStyle(e);
+    if (r.width && r.height && s.display !== 'none' && s.visibility !== 'hidden' && grid) put(grid, e);
+  }
+  out.gridGap = [];
+  for (const [e, grid] of gridOf) {
+    if (e === document.documentElement || ![...e.childNodes].some(t => t.nodeType === 3 && t.textContent.trim())) continue;
+    const r = e.getBoundingClientRect(), row = ((r.top + r.height / 2) / G) | 0, col = ((r.left + r.width / 2) / G) | 0;
+    if (!grid[row] || !grid[row][col]) out.gridGap.push(`${e.tagName.toLowerCase()}.${e.className || ''} middle in empty cell ${row},${col} of a ${grid === rootGrid ? 'page' : 'scroll box'} grid: "${e.textContent.trim().slice(0, 40)}"`);
+  }
   return out;
 }"""
 
@@ -555,6 +586,8 @@ def browser_pass(site, channel="chrome", out=None, only=None):
                         found[(mode, "color-contrast")][p] += r["contrast"]
                     if r["scroll"]:
                         found[(mode, "scrollable-region-focusable")][p] += r["scroll"]
+                    if r["gridGap"]:
+                        found[(mode, "axe-4.2.4-grid-gap")][p] += r["gridGap"]
                 ctx.close()
             b.close()
     finally:
