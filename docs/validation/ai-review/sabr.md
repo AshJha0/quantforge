@@ -9,7 +9,7 @@ Rules for your answer:
 - After the table, list the questions you answered "cannot check", and why.
 - Your review is filed under a labelled "AI review" section of the curve's evidence checklist and checked against the repository before anything is acted on.
 
-Stage: C. Evidence line from the project's curve table: 32 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by`.
+Stage: C. Evidence line from the project's curve table: 64 golden cases for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`, 26 with an outside library in `verified_by`.
 
 ## Questions
 
@@ -62,6 +62,20 @@ Checks for both, in order, all `E_DOMAIN`: `expiry_years < 0`; `vol < 0`; `disco
 
 Further checks for `vol.option.implied`, `E_DOMAIN`: `expiry_years = 0`; `price < I`, where `I = D max(phi (F-K), 0)`; lognormal `price >= U`, with `U = D F` for a call and `D K` for a put. `price = I` exactly gives `vol = 0`. A solve that fails is `E_NO_CONVERGENCE`, but a correct build meets none on valid inputs. Any solver: the result is judged, not the path. Stop on `|V(v) - price| <= 1e-13 max(1, price)` or better.
 
+**Acceptance by the vol error (ruling KR-341, PROPOSED).** Plain idea: far out of the money the price is tiny, so a price residual of `1e-13 max(1, price)` says nothing about the vol; a build could stop anywhere. A returned `v` must also pass an estimate of its own relative error. With `M` the sum of the magnitudes of the two terms of `V` (lognormal `D (F N(phi d1) + K N(phi d2))`, normal `D (|F - K| N(phi d) + v sqrt T n(d))`), which bounds how much the rounding of their difference can be:
+
+`e = (|V(v) - price| + 2^-52 M + 2^-1070 (1 + D (|F| + |K| + v sqrt T))) / (v vega(v))`
+
+The last term covers subnormal intermediate values. If `v vega(v)` is not above 0, or `e > 1e-10`, the result is `E_NO_CONVERGENCE` (field `price`): the price does not identify the vol in binary64. Builds solve by Newton on `ln V(v) - ln price` inside the bracket (the same step as on `V - price` near the root), which keeps its size where `V` spans hundreds of decades.
+
+Worked example (measured 2026-11-20, mpmath at 60 digits): Black-76 call, `F = 100`, `K = 300`, `T = 0.1`, `v = 0.1` has price `1.48e-265`; before this ruling Python returned 0.1234 and Java 0.1196 (both passed the price check, the residual being below `1e-12`); now every build returns 0.1. A Bachelier put at `K = 86.84`, `T = 2.91`, `v = 0.2027` has the subnormal price `1.58e-319`: `e = 3.4e-7`, so `E_NO_CONVERGENCE`. On 4,794 random deep cases (Black-76 and Bachelier, up to 40 standard deviations out) the largest error of an accepted vol was 404 times `e` (the `d^2` growth of the rounding of `N(d)`), so an accepted vol is good to about `4e-8` relative at worst; no accepted vol erred by more than `1e-8`. Goldens `ivdeep_c`.
+
+## Convergence and limit cases
+
+| Method | Asserted order | Measured on | Limit case | Reference |
+|---|---|---|---|---|
+| Implied vol: Newton on `ln V - ln price` inside a bisection bracket (KR-341) | quadratic near the root, as Newton on `V - price`; the bracket halves on any rejected step | goldens `black`, `black_deep`, `e1_vol_1`, `ivdeep_c`; 4,794 random deep cases up to 40 standard deviations out (2026-11-20) | `price = I` gives `vol = 0` exactly; a price whose vol is not identified in binary64 (estimate `e > 1e-10`, for example a subnormal price) is `E_NO_CONVERGENCE` | mpmath at 60 digits (`oracle/python/gen_stage_k_rev1.py`) |
+
 ## Limits of this stage
 
 No American exercise. Implied vol is ill-conditioned when vega is tiny: goldens stop at `vega >= 1e-3 max(price, 1)`.
@@ -99,6 +113,15 @@ Common checks, in order, `E_DOMAIN`: `expiry_years <= 0`; `alpha <= 0`; `beta` o
 - `z = (nu/alpha) sqrt(A) L`
 - `chi = ln((sqrt(1 - 2 rho z + z^2) + z - rho)/(1 - rho))`
 - `m = z/chi`, or for `|z| < 1e-7`, `m = 1 - rho z/2 - (3 rho^2 - 2) z^2/12`
+
+**Evaluating `chi` (ruling KR-340, PROPOSED).** Plain idea: written as above, `chi` is the log of a number close to 1 when `z` is small, so it keeps only about `16 + log10|z|` digits, and for `z` far below 0 the sum `sqrt(...) + z - rho` cancels. Every build evaluates the same value from terms of one sign. With `d = z - rho`, `q = (1 - rho)(1 + rho)`:
+
+- `s = hypot(d, sqrt(q))` (equal to `sqrt(1 - 2 rho z + z^2)`)
+- `w = s + d` if `d >= 0`, else `w = q/(s - d)` (equal to `s + z - rho`)
+- `u = (z/(s + 1)) (w/(1 - rho) + 1)` (equal to `w/(1 - rho) - 1`, the argument of the log less 1)
+- `chi = log1p(u)` if `|u| < 1/2`; else `chi = ln(s + d) - log1p(-rho)` if `d >= 0`; else `chi = log1p(rho) - ln(s - d)`
+
+Worked example (measured, mpmath at 50 digits plus two per decade of `|z|`, 2026-11-20): at `z = 1.01e-7`, `rho = 0.3` the direct form gives `m` with relative error 2.7e-9; the form above gives 3 ulp or less over `1e-7 <= |z| <= 1e307` and `|rho| <= 1 - 2^-53` (about 18,000 sampled points). The series below `1e-7` has a truncation error of order `z^3`, below `1e-20`. Goldens `sabrz_c` check `|z|` from `1e-8` to `1e5`, both signs of `rho`, at relative limit `1e-12`.
 - `den = sqrt(A) (1 + c/24 + c^2/1920)`
 - `h = 1 + T ((1-beta)^2 alpha^2/(24 A) + rho beta nu alpha/(4 sqrt A) + (2 - 3 rho^2) nu^2/24)`
 - `vol = alpha m h/den`
@@ -152,14 +175,11 @@ Targets in `stage-c-targets.md`. Suites `sabr`, `sabr_deep`, `strata_vol`.
 
 ## Sources
 
-Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfill, not re-read; section numbers are given only where known.
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfil
 
-- [S1] Hagan, P. S., Kumar, D., Lesniewski, A. S. and Woodward, D. E., "Managing smile risk", *Wilmott Magazine*, September 2002, 84-108 (not opened)
-- [S2] Hagan, P. S., Kumar, D., Lesniewski, A. S. and Woodward, D. E., "Arbitrage-free SABR", *Wilmott Magazine*, January 2014, 60-75 (not opened)
-- [S3] Breeden, D. T. and Litzenberger, R. H., "Prices of state-contingent claims implicit in option prices", *Journal of Business* 51(4), 1978, 621-651 (density check) (not opened)
+[... truncated to fit one chat; the rest of this file is not included, so answer "cannot check" for anything that depends on it]
 
-
-## Golden cases (32 of 33 value cases of this curve's operations shown, chosen in file order and skipping cases too large to fit; one JSON object per line; `verified_by` lists the sources that agreed)
+## Golden cases (19 of 65 value cases of this curve's operations shown, chosen in file order and skipping cases too large to fit; one JSON object per line; `verified_by` lists the sources that agreed)
 
 ```json
 {"case_id":"sabr-0001","operation":"vol.sabr.hagan","inputs":{"forward":0.03,"strikes":[0.018,0.024,0.028499999999999998,0.03,0.0315,0.0375,0.048],"expiry_years":2.0,"alpha":0.04,"beta":0.5,"rho":-0.3,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.3132312101373863,0.2658807994902696,0.24132005765247522,0.23492372627921312,0.22935760129447622,0.21449644252696756,0.20823170937759167]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["quantlib-1.44"]}
@@ -176,31 +196,18 @@ Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: th
 {"case_id":"sabr_deep-0004","operation":"vol.sabr.arbfree","inputs":{"forward":0.02,"expiry_years":20.0,"alpha":0.03,"beta":0.5,"rho":-0.3,"nu":0.5,"shift":0.0,"cells":800,"cells_below":40,"steps":400,"strikes":[0.002,0.004,0.008,0.012,0.02,0.03,0.05]},"expected":{"status":"ok","outputs":{"call_prices":[0.018676807228749457,0.017366152667486878,0.0148015733172678,0.012357860340082879,0.008227201086342745,0.005476228784603462,0.00380199130941394],"vols":[0.47860943188974747,0.41436963229750756,0.3421096448268052,0.2960328226080087,0.24185667877946926,0.22928169485695002,0.2516845437579852],"mass":0.9999999999999972,"mean":0.019999999999999924,"absorbed":0.33597563775876427,"min_density":3.87093171497667e-06}},"tolerance_class":"numerical_scheme","tolerance_limit":null,"verified_by":["mass-and-mean"]}
 {"case_id":"sabr_deep-0005","operation":"vol.sabr.arbfree","inputs":{"forward":0.01,"expiry_years":20.0,"alpha":0.03,"beta":0.5,"rho":-0.3,"nu":0.5,"shift":0.01,"cells":800,"cells_below":40,"steps":400,"strikes":[-0.008,-0.006,-0.002,0.002,0.01,0.019999999999999997,0.04]},"expected":{"status":"ok","outputs":{"call_prices":[0.018676807228749457,0.017366152667486878,0.0148015733172678,0.012357860340082879,0.008227201086342745,0.005476228784603462,0.00380199130941394],"vols":[0.47860943188974747,0.41436963229750756,0.3421096448268052,0.2960328226080087,0.24185667877946926,0.22928169485695002,0.2516845437579852],"mass":0.9999999999999972,"mean":0.019999999999999924,"absorbed":0.33597563775876427,"min_density":3.87093171497667e-06}},"tolerance_class":"numerical_scheme","tolerance_limit":null,"verified_by":["mass-and-mean"]}
 {"case_id":"sabr_deep-0013","operation":"vol.sabr.arbfree","inputs":{"forward":1.0,"expiry_years":1.0,"alpha":0.3,"beta":0.5,"rho":-0.4,"nu":0.5,"shift":0.0,"cells":100,"cells_below":25,"steps":50,"strikes":[1e-20,1.0]},"expected":{"status":"ok","outputs":{"call_prices":[1.0000000000000009,0.1199666077089992],"vols":[null,0.3018537698912655],"mass":1.0000000000000007,"mean":1.0000000000000009,"absorbed":0.0016164658349306204,"min_density":2.8669657257164814e-07}},"tolerance_class":"numerical_scheme","tolerance_limit":null,"verified_by":["mass-and-mean"]}
-{"case_id":"strata_vol-0015","operation":"vol.sabr.hagan","inputs":{"forward":0.03,"strikes":[0.018],"expiry_years":2.0,"alpha":0.04,"beta":0.5,"rho":-0.3,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.3132312101373863]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0016","operation":"vol.sabr.hagan","inputs":{"forward":0.03,"strikes":[0.024],"expiry_years":2.0,"alpha":0.04,"beta":0.5,"rho":-0.3,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.2658807994902696]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0017","operation":"vol.sabr.hagan","inputs":{"forward":0.03,"strikes":[0.028499999999999998],"expiry_years":2.0,"alpha":0.04,"beta":0.5,"rho":-0.3,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.24132005765247522]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0018","operation":"vol.sabr.hagan","inputs":{"forward":0.03,"strikes":[0.0315],"expiry_years":2.0,"alpha":0.04,"beta":0.5,"rho":-0.3,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.22935760129447622]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0019","operation":"vol.sabr.hagan","inputs":{"forward":0.03,"strikes":[0.0375],"expiry_years":2.0,"alpha":0.04,"beta":0.5,"rho":-0.3,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.21449644252696756]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0020","operation":"vol.sabr.hagan","inputs":{"forward":0.03,"strikes":[0.048],"expiry_years":2.0,"alpha":0.04,"beta":0.5,"rho":-0.3,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.20823170937759167]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0021","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[60.0],"expiry_years":1.0,"alpha":3.0,"beta":0.5,"rho":-0.4,"nu":0.6},"expected":{"status":"ok","outputs":{"vols":[0.4277311493595516]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0022","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[80.0],"expiry_years":1.0,"alpha":3.0,"beta":0.5,"rho":-0.4,"nu":0.6},"expected":{"status":"ok","outputs":{"vols":[0.354442247779285]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0023","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[95.0],"expiry_years":1.0,"alpha":3.0,"beta":0.5,"rho":-0.4,"nu":0.6},"expected":{"status":"ok","outputs":{"vols":[0.31493795645311107]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0024","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[105.0],"expiry_years":1.0,"alpha":3.0,"beta":0.5,"rho":-0.4,"nu":0.6},"expected":{"status":"ok","outputs":{"vols":[0.29519840099340056]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0025","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[125.0],"expiry_years":1.0,"alpha":3.0,"beta":0.5,"rho":-0.4,"nu":0.6},"expected":{"status":"ok","outputs":{"vols":[0.27059495038968]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0026","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[160.0],"expiry_years":1.0,"alpha":3.0,"beta":0.5,"rho":-0.4,"nu":0.6},"expected":{"status":"ok","outputs":{"vols":[0.2620746513880662]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0027","operation":"vol.sabr.hagan","inputs":{"forward":1.0,"strikes":[0.6],"expiry_years":10.0,"alpha":0.25,"beta":0.25,"rho":0.1,"nu":0.3},"expected":{"status":"ok","outputs":{"vols":[0.33678949501794603]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0028","operation":"vol.sabr.hagan","inputs":{"forward":1.0,"strikes":[0.8],"expiry_years":10.0,"alpha":0.25,"beta":0.25,"rho":0.1,"nu":0.3},"expected":{"status":"ok","outputs":{"vols":[0.2969850427971178]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0029","operation":"vol.sabr.hagan","inputs":{"forward":1.0,"strikes":[0.95],"expiry_years":10.0,"alpha":0.25,"beta":0.25,"rho":0.1,"nu":0.3},"expected":{"status":"ok","outputs":{"vols":[0.27808937972605113]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0030","operation":"vol.sabr.hagan","inputs":{"forward":1.0,"strikes":[1.05],"expiry_years":10.0,"alpha":0.25,"beta":0.25,"rho":0.1,"nu":0.3},"expected":{"status":"ok","outputs":{"vols":[0.26913755182380533]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0031","operation":"vol.sabr.hagan","inputs":{"forward":1.0,"strikes":[1.25],"expiry_years":10.0,"alpha":0.25,"beta":0.25,"rho":0.1,"nu":0.3},"expected":{"status":"ok","outputs":{"vols":[0.25740124975847484]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
-{"case_id":"strata_vol-0032","operation":"vol.sabr.hagan","inputs":{"forward":1.0,"strikes":[1.6],"expiry_years":10.0,"alpha":0.25,"beta":0.25,"rho":0.1,"nu":0.3},"expected":{"status":"ok","outputs":{"vols":[0.24860352897487104]}},"tolerance_class":"interpolation","tolerance_limit":null,"verified_by":["strata-2.12.78","quantlib-1.44"]}
+{"case_id":"sabrz_c-0001","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[99.9999995],"expiry_years":1.5,"alpha":0.2,"beta":1.0,"rho":-0.4,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.20064000040128002]}},"tolerance_class":"interpolation","tolerance_limit":{"absolute":0.0,"relative":1e-12,"reason":"KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"},"verified_by":["mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)","scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"]}
+{"case_id":"sabrz_c-0002","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[99.99999495000013],"expiry_years":1.5,"alpha":0.2,"beta":1.0,"rho":-0.4,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.20064000405292826]}},"tolerance_class":"interpolation","tolerance_limit":{"absolute":0.0,"relative":1e-12,"reason":"KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"},"verified_by":["mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)","scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"]}
+{"case_id":"sabrz_c-0003","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[99.9999500000125],"expiry_years":1.5,"alpha":0.2,"beta":1.0,"rho":-0.4,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.20064004012802542]}},"tolerance_class":"interpolation","tolerance_limit":{"absolute":0.0,"relative":1e-12,"reason":"KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"},"verified_by":["mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)","scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"]}
+{"case_id":"sabrz_c-0004","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[99.99500012499792],"expiry_years":1.5,"alpha":0.2,"beta":1.0,"rho":-0.4,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.20064401305413052]}},"tolerance_class":"interpolation","tolerance_limit":{"absolute":0.0,"relative":1e-12,"reason":"KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"},"verified_by":["mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)","scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"]}
+{"case_id":"sabrz_c-0005","operation":"vol.sabr.hagan","inputs":{"forward":100.0,"strikes":[100.0000005],"expiry_years":1.5,"alpha":0.2,"beta":1.0,"rho":-0.4,"nu":0.4},"expected":{"status":"ok","outputs":{"vols":[0.20063999959872]}},"tolerance_class":"interpolation","tolerance_limit":{"absolute":0.0,"relative":1e-12,"reason":"KR-340: chi(z) evaluated without cancellation; the direct form misses by 2.7e-9 at z = 1.01e-7"},"verified_by":["mpmath 50 digits (independent oracle, gen_stage_k_rev1.py)","scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14"]}
 ```
 
 ## Outside-library evidence and limits (from the project's own page)
 
 Hagan volatilities are compared with QuantLib 1.44, and with Strata 2.12.78 on 18 of the golden cases. The density has replay cases only. The arbitrage-free form is compared with QuantLib's CEV engine at `nu = 0` and, coarsely, with `NoArbSabrSmileSection`, a different model of the floor. Targets and measured gaps are in `specifications/05-volatility/stage-c-targets.md`.
 
-Golden cases with an `ok` result for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`: 32, counted from `verified_by` in `datasets/golden/stage_c/`. All four builds passed them locally, which is self-assessment.
+Golden cases with an `ok` result for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`: 64, counted from `verified_by` in `datasets/golden/stage_c/`. All four builds passed them locally, which is self-assessment.
 
 | Verified by | Operation | Cases |
 |---|---|---|
@@ -208,6 +215,7 @@ Golden cases with an `ok` result for `vol.sabr.hagan`, `vol.sabr.density`, `vol.
 | mass-and-mean | vol.sabr.arbfree | 3 |
 | quantlib-1.44-cev | vol.sabr.arbfree | 2 |
 | analytic-replay | vol.sabr.density | 3 |
+| mpmath 50 digits (independent oracle, gen_stage_k_rev1.py), scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14 | vol.sabr.hagan | 32 |
 | quantlib-1.44 | vol.sabr.hagan | 5 |
 | strata-2.12.78, quantlib-1.44 | vol.sabr.hagan | 18 |
 

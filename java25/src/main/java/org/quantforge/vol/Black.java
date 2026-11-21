@@ -137,9 +137,10 @@ public final class Black {
         }
         double v = (lo + hi) / 2.0;
         for (int i = 0; i < 400; i++) {
-            double diff = value(normal, phi, f, x, t, d, v) - price;
+            double val = value(normal, phi, f, x, t, d, v);
+            double diff = val - price;
             if (diff == 0.0) {
-                return v;
+                return identified(normal, phi, f, x, t, d, v, price);
             }
             if (diff > 0.0) {
                 hi = v;
@@ -147,7 +148,9 @@ public final class Black {
                 lo = v;
             }
             double vega = vega(normal, f, x, t, d, v);
-            double next = vega > 0.0 ? v - diff / vega : Double.NaN;
+            // Newton on ln V - ln price (ruling KR-341): the same step near the root, and it keeps its size far
+            // out of the money, where V spans hundreds of decades over the bracket.
+            double next = vega > 0.0 && val > 0.0 ? v - Math.log(val / price) * val / vega : Double.NaN;
             if (!(next > lo && next < hi)) {
                 next = (lo + hi) / 2.0;
             }
@@ -163,6 +166,30 @@ public final class Black {
         boolean collapsed = hi - lo <= 1e-14 * hi && Math.abs(value(normal, phi, f, x, t, d, v) - price) <= 1e-10 * Math.max(1.0, price);
         if (!priced && !collapsed) {
             throw new QfError("E_NO_CONVERGENCE", "implied vol did not converge: f=" + f + " x=" + x + " t=" + t + " d=" + d + " price=" + price + " v=" + v + " value=" + value(normal, phi, f, x, t, d, v));
+        }
+        return identified(normal, phi, f, x, t, d, v, price);
+    }
+
+    /**
+     * Returns v if the price identifies the vol in binary64, else E_NO_CONVERGENCE (ruling KR-341). Estimated vol
+     * error: (|V(v) - price| + 2^-52 M + 2^-1070 (1 + D (|F| + |K| + v sqrt T)))/(v vega), M the sum of the
+     * magnitudes of the two terms of V (they cancel far from the money); above 1e-10 the vol is refused.
+     */
+    static double identified(boolean normal, double phi, double f, double x, double t, double d, double v, double price) {
+        double root = v * Math.sqrt(t);
+        double mag;
+        if (normal) {
+            double z = (f - x) / root;
+            mag = d * (Math.abs(f - x) * Normal.cdf(phi * z) + root * Normal.pdf(z));
+        } else {
+            double d1 = (Math.log(f / x) + v * v * t / 2.0) / root;
+            mag = d * (f * Normal.cdf(phi * d1) + x * Normal.cdf(phi * (d1 - root)));
+        }
+        double scale = v * vega(normal, f, x, t, d, v);
+        double error = Math.abs(value(normal, phi, f, x, t, d, v) - price) + 0x1p-52 * mag
+                + 0x1p-1070 * (1.0 + d * (Math.abs(f) + Math.abs(x) + root));
+        if (!(scale > 0.0) || error > 1e-10 * scale) {
+            throw new QfError("E_NO_CONVERGENCE", "the price does not identify the vol in binary64");
         }
         return v;
     }

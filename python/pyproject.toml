@@ -21,7 +21,8 @@ include = ["quantforge_core*", "quantforge_research*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra"
+addopts = "-ra -p skip_guard"
+pythonpath = ["tests"]  # skip_guard: unexpected skips fail the run (K-9 finding 21, KR-343)
 
 [tool.ruff]
 line-length = 100

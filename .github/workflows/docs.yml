@@ -8,13 +8,12 @@ name: Docs
 # pa11y AA a second time on a copy of the site with the dark colours forced on. docs-site-view-summary writes the
 # table the release notes quote (artifact site-view, file site-view.md). Added 2026-11-20 on branch k-v1-k7b; not
 # yet run in CI.
-# Split 2026-11-20: the docs-site-a11y and docs-site-a11y-summary jobs described below are held on branch k-v1-a11y-ci
-# until every page passes; they are not in this file yet. KR-227 stays not met.
 # KR-227 read strictly (coordinator, 2026-11-20): docs-site-a11y runs pa11y AA (pa11y-ci 3.1.0, as in docs-site) on
 # every page of the built site, light and dark, in 12 shards (tools/check_site_a11y.py), after a planted contrast
 # failure is reported; docs-site-a11y-summary fails if any shard failed or any page was not reported on, and writes
-# the counts for the release notes (artifact site-a11y, a11y-summary.md). Added 2026-11-20 on branch k-v1-a11y; not
-# yet run in CI.
+# the counts for the release notes (artifact site-a11y, a11y-summary.md). Added 2026-11-20 on branch k-v1-a11y, held
+# out of pull request #63 while tutorials 36 and 39 failed, restored 2026-11-21 on branch k-v1-a11y2 with the fix
+# (pre code as one block: axe-core 4.2.4 color-contrast threw on those two pages, run 44805977858).
 on:
   push:
     branches: [main]
@@ -130,6 +129,91 @@ jobs:
   # tools/check_site_a11y.py writes each shard's URL list from the built site; 2 modes x 6 shards of about 137 pages,
   # pa11y-ci at concurrency 1 in batches of 10 (tools/check_site_a11y.py --run), expected about 8 to 15 minutes a job against 45.
   # Each job first runs pa11y-ci on a planted contrast failure, which must be reported (--check-plant).
+  site-a11y:
+    name: docs-site-a11y
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [light, dark]
+        shard: ['1/6', '2/6', '3/6', '4/6', '5/6', '6/6']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - run: python3 tools/check_site_a11y.py --self-test
+      - run: uv run --no-project --with markdown==3.11.2 python tools/build_site.py --out site
+      # pa11y-ci runs through check_site_a11y.py --run: batches of 10 pages with a fresh browser each, and a page
+      # whose result is a browser or protocol failure (not a WCAG error) is run again on its own, at most twice
+      # (run 44791215797: one Chromium crash failed every later page of its pa11y-ci run)
+      - name: planted contrast failure must be reported by pa11y-ci
+        run: |
+          mkdir -p a11y
+          python3 tools/check_site_a11y.py --plant "$RUNNER_TEMP/plant" --base http://127.0.0.1:8002
+          python3 -m http.server 8002 --bind 127.0.0.1 --directory "$RUNNER_TEMP/plant" >/dev/null 2>&1 &
+          sleep 1
+          rc=0
+          python3 tools/check_site_a11y.py --run "$RUNNER_TEMP/plant/pa11y-plant.json" --results a11y/plant-results.json --raw a11y/raw-plant || rc=$?
+          test "$rc" -ne 0 || { echo "pa11y-ci found nothing on the planted contrast failure"; exit 1; }
+          python3 tools/check_site_a11y.py --check-plant a11y/plant-results.json --base http://127.0.0.1:8002
+      - name: pa11y AA on every page of the shard (${{ matrix.mode }} ${{ matrix.shard }})
+        env:
+          MODE: ${{ matrix.mode }}
+          SHARD: ${{ matrix.shard }}
+        run: |
+          dir=site
+          if [ "$MODE" = dark ]; then
+            python3 tools/check_site_view.py --dark-copy site "$RUNNER_TEMP/site-dark"
+            dir="$RUNNER_TEMP/site-dark"
+          fi
+          python3 -m http.server 8000 --bind 127.0.0.1 --directory "$dir" >/dev/null 2>&1 &
+          sleep 1
+          python3 tools/check_site_a11y.py --urls --site site --shard "$SHARD" --mode "$MODE" --base http://127.0.0.1:8000 --out a11y
+          tag="$MODE-${SHARD%/*}of${SHARD#*/}"
+          python3 tools/check_site_a11y.py --run "a11y/pa11y-$tag.json" --results "a11y/a11y-$tag.results.json"             --raw "a11y/raw-$tag" --out "a11y/a11y-$tag.rc" || true
+          test "$(cat "a11y/a11y-$tag.rc")" = 0
+      # Diagnostic only: axe-core's own colour figures for up to four pages with a contrast error (those with no element named first)
+      - name: contrast details on failure (diagnostic, not a verdict)
+        if: failure()
+        run: |
+          nm=$(dirname "$(dirname "$(find ~/.npm/_npx -path '*/node_modules/pa11y-ci/package.json' | head -1)")")
+          urls=$(python3 -c "import glob,json; r={}; [r.update(json.load(open(f))['results']) for f in glob.glob('a11y/a11y-*.results.json')]; c=[(not any(x.get('code')=='color-contrast' and not x.get('selector') for x in v),u) for u,v in r.items() if any(x.get('code')=='color-contrast' for x in v)]; print(' '.join(u for _,u in sorted(c)[:4]))" || true)
+          if [ -n "$urls" ]; then node tools/a11y_detail.js "$nm" $urls | tee a11y/contrast-detail.txt || true; fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: site-a11y-${{ matrix.mode }}-${{ strategy.job-index }}
+          path: a11y/
+          retention-days: 30
+  site-a11y-summary:
+    name: docs-site-a11y-summary
+    needs: site-a11y
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: site-a11y-*
+          merge-multiple: true
+          path: a11y
+      # Fails if any shard failed or is missing, or any page of the site was not reported on; writes the counts the
+      # release notes quote (artifact site-a11y, a11y-summary.md and a11y-summary.json)
+      - name: merge the shard results
+        run: |
+          set -o pipefail
+          python3 tools/check_site_a11y.py --merge a11y --shards 6 | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: site-a11y
+          path: a11y/
+          retention-days: 90
   deploy:
     name: docs-deploy
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && !github.event.repository.private

@@ -5037,7 +5037,7 @@
     "counted_with_rederivation": 171,
     "share_with_rederivation": 0.74026,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 349
+    "error_and_invariance_cases": 351
    },
    "with_sweeps": {
     "cases": 231,
@@ -5052,7 +5052,7 @@
     "counted_with_rederivation": 171,
     "share_with_rederivation": 0.74026,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 349
+    "error_and_invariance_cases": 351
    },
    "sweeps": null,
    "libraries": {},
@@ -5207,6 +5207,21 @@
      "share_with_rederivation": 1.0,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 5
+    },
+    "rates.shortrate.zcb_option": {
+     "cases": 0,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 0,
+     "share": null,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": null,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "rates.swaption.price": {
      "cases": 0,
@@ -5597,6 +5612,21 @@
      "share_with_rederivation": 0.631579,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 23
+    },
+    "vol.garch.estimate": {
+     "cases": 0,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 0,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 0,
+     "share": null,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 0,
+     "share_with_rederivation": null,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 1
     },
     "xva.sbim.ir_delta": {
      "cases": 0,

@@ -124,7 +124,7 @@ Each CLI built these numbers on its own, from the same input files. Agreement sh
 
 Hagan volatilities are compared with QuantLib 1.44, and with Strata 2.12.78 on 18 of the golden cases. The density has replay cases only. The arbitrage-free form is compared with QuantLib's CEV engine at `nu = 0` and, coarsely, with `NoArbSabrSmileSection`, a different model of the floor. Targets and measured gaps are in `specifications/05-volatility/stage-c-targets.md`.
 
-Golden cases with an `ok` result for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`: 32, counted from `verified_by` in `datasets/golden/stage_c/`. All four builds passed them locally, which is self-assessment.
+Golden cases with an `ok` result for `vol.sabr.hagan`, `vol.sabr.density`, `vol.sabr.arbfree`: 64, counted from `verified_by` in `datasets/golden/stage_c/`. All four builds passed them locally, which is self-assessment.
 
 | Verified by | Operation | Cases |
 |---|---|---|
@@ -132,6 +132,7 @@ Golden cases with an `ok` result for `vol.sabr.hagan`, `vol.sabr.density`, `vol.
 | mass-and-mean | vol.sabr.arbfree | 3 |
 | quantlib-1.44-cev | vol.sabr.arbfree | 2 |
 | analytic-replay | vol.sabr.density | 3 |
+| mpmath 50 digits (independent oracle, gen_stage_k_rev1.py), scipy quad of chi = int_0^z dt/sqrt(1 - 2 rho t + t^2), a different formulation (library-primitive), within 1e-14 | vol.sabr.hagan | 32 |
 | quantlib-1.44 | vol.sabr.hagan | 5 |
 | strata-2.12.78, quantlib-1.44 | vol.sabr.hagan | 18 |
 

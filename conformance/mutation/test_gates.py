@@ -7,13 +7,15 @@ Each check shows the gate failing on a planted fault and passing on the real con
   1. every stage in stages.json plans a non-empty matrix; a planted empty stage F makes plan_matrix exit 1;
   2. check_stages.py passes on the committed file and fails on an empty stage and on a target naming no file;
   3. stage_report --gate fails a 17/20 module (85%, Wilson lower bound 64%) and passes a 39/40 module;
-  4. a countersigned reason clears a listed module; an unsigned one does not;
+  4. a countersigned reason clears a listed module; an unsigned one does not; a Rust module with a shard
+     file missing fails the gate however well the shards present scored (K9-1c);
   5. semantic_changes drops formatting/comment-only edits and keeps real, new and unknown changes;
   6. the pull-request sample in mutation-stage.yml is large enough to pass a good module: at least 3
      survivors allowed per module and a pass probability of at least 0.9 at a true 90% kill rate (a
      12-mutant sample allowed none and passed a 90% module 28% of the time);
   7. a mutmut timeout (its own per-mutant CPU limit, as for an endless loop) counts as caught, as a C++
-     hang does; a survivor and a segfault do not.
+     hang does; a survivor and a segfault do not;
+  8. a failed unmutated baseline command prints the tail of its output (K9-1c); mutant runs stay silent.
 """
 import contextlib
 import io
@@ -217,6 +219,31 @@ def timeout_checks():
     check("planted endless-loop mutant counts as caught (1 of 3)", s["sample_either_killed"] == 1)
 
 
+def baseline_tail_checks():
+    """K9-1c: a failed baseline command prints the tail of its output; a mutant run (keep=False) prints nothing."""
+    script = "import sys\nfor i in range(200): print('line', i)\nprint('FAILED test_x', file=sys.stderr)\nsys.exit(3)"
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = golden_mutants.run([sys.executable, "-c", script], keep=True)
+    text = err.getvalue()
+    check("failed baseline: exit code returned", code == 3)
+    check("failed baseline: stderr line and last stdout line in the tail", "FAILED test_x" in text and "line 199" in text)
+    check(f"failed baseline: only the last {golden_mutants.TAIL_LINES} lines", "line 100\n" not in text and "line 130" in text)
+    check("failed baseline: header names the command and exit", "exit 3" in text and "of 201 output lines" in text)
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = golden_mutants.run([sys.executable, "-c", script])
+    check("mutant run: output still discarded", code == 3 and err.getvalue() == "")
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = golden_mutants.run([sys.executable, "-c", "print('ok')"], keep=True)
+    check("passing baseline: nothing printed", code == 0 and err.getvalue() == "")
+    err = io.StringIO()
+    with contextlib.redirect_stderr(err):
+        code = golden_mutants.run([sys.executable, "-c", "import time; print('slow', flush=True); time.sleep(30)"], keep=True, timeout=2)
+    check("timed-out baseline: None and the tail so far", code is None and "timed out" in err.getvalue() and "slow" in err.getvalue())
+
+
 def main():
     cfg = json.loads((HERE / "stages.json").read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory() as d:
@@ -256,12 +283,23 @@ def main():
         empty = tmp / "empty"
         empty.mkdir()
         check("no results at all: gate fails", quiet(stage_report.main, ["--stage", "T", "--stages", str(sp), "--results", str(empty), "--gate"]) == 1)
+        rs = tmp / "rs.json"
+        rs.write_text(json.dumps({"target": {"T": 0.8}, "stages": {"T": [{"module": "m", "suite": "x", "rust": "**/m.rs"}]}}),
+                      encoding="utf-8")
+        rres = tmp / "rres"
+        rres.mkdir()
+        result(rres, "rust", "m--s1", 40, 0)
+        rbase = ["--stage", "T", "--stages", str(rs), "--results", str(rres), "--gate", "--reasons", str(tmp / "none.json")]
+        check("planted missing Rust shard s0 (s1 scores 40/40): gate fails", quiet(stage_report.main, rbase) == 1)
+        result(rres, "rust", "m--s0", 40, 0)
+        check("both Rust shards present: gate passes", quiet(stage_report.main, rbase) == 0)
     semantic_checks()
     pr_sample_checks()
     cpp_site_checks()
     skip_and_seed_checks()
     joint_pass_checks()
     timeout_checks()
+    baseline_tail_checks()
     lo, hi = stage_report.wilson(17, 20)
     check("Wilson 17/20 is 64% to 95%", round(lo, 2) == 0.64 and round(hi, 2) == 0.95)
     print(f"{len(FAILS)} failure(s)")
