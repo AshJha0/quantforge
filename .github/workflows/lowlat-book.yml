@@ -31,6 +31,12 @@ jobs:
       - name: Rust run (5 repeats, unpinned runner)
         working-directory: rust
         run: cargo run --release -p quantforge-bench --bin lowlat_book -- ../S.bin 5 ../rust_S.json
+      # Maven repository cache (three HTTP 429 failures from Central on 2026-11-20); no setup-java here
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: lowlat-maven-${{ hashFiles('java25/pom.xml') }}
+          restore-keys: lowlat-maven-
       - name: Java run (5 repeats, unpinned runner)
         working-directory: java25
         run: |
