@@ -5,11 +5,14 @@ Everything financial is a CLI call. This module fetches public data, sends cases
 decimal), curve time (date - as_of) / 365, and differences between numbers.
 """
 import datetime as dt
+import http.client
 import json
 import math
 import os
 import subprocess
 import sys
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -31,10 +34,64 @@ LEGACY_ARGS = ["batch"]
 USED = {}
 
 
-def fetch(url, timeout=60):
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read()
+# K9-1b: HTTP statuses worth another attempt. Any other 4xx fails at once (a wrong URL does not heal by waiting).
+RETRY_STATUS = (429, 500, 502, 503, 504)
+FETCH_ATTEMPTS = 3
+FETCH_BACKOFF = 30.0  # seconds; attempt k waits k * FETCH_BACKOFF before the next one (30 s, then 60 s)
+SNIPPET = 200  # bytes of the body quoted in a failure message
+
+
+class FetchError(RuntimeError):
+    """A download that failed every attempt. The message names the URL, status, content type and first bytes."""
+
+
+def _describe(url, status, ctype, body, why):
+    return f"{why}: {url} (HTTP {status}, Content-Type {ctype!r}, first {SNIPPET} bytes {bytes(body[:SNIPPET])!r})"
+
+
+def fetch(url, timeout=60, expect_json=False, attempts=FETCH_ATTEMPTS, backoff=FETCH_BACKOFF, opener=None, sleep=time.sleep):
+    """GET url and return the body bytes.
+
+    Retries a network error, HTTP 429 or 5xx, an empty body, and (expect_json) a body that does not parse as JSON,
+    up to `attempts` tries with linear backoff. What is returned is the server's body, unchanged. After the last
+    try, FetchError names the URL, the HTTP status, the content type and the first 200 bytes, so a failed run
+    explains itself (K9-1b: run 44630395673 logged only `JSONDecodeError ... char 0`). `opener` and `sleep` are
+    for tests; the default opener is urllib.request.urlopen.
+    """
+    opener = opener or urllib.request.urlopen
+    last = "no attempt made"
+    for attempt in range(1, attempts + 1):
+        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+        try:
+            with opener(req, timeout=timeout) as r:
+                body, status, ctype = r.read(), getattr(r, "status", None), r.headers.get("Content-Type", "")
+        except urllib.error.HTTPError as e:
+            body = e.read() if e.fp is not None else b""
+            msg = _describe(url, e.code, e.headers.get("Content-Type", "") if e.headers else "", body, f"HTTP error {e.code}")
+            if e.code not in RETRY_STATUS:
+                raise FetchError(f"download failed on attempt {attempt} of {attempts}, not retried: {msg}") from e
+            last = msg
+        except (OSError, http.client.HTTPException) as e:  # URLError, timeouts, resets, truncated bodies
+            last = f"network error {type(e).__name__}: {e}: {url} (no HTTP status, no body)"
+        else:
+            if not body.strip():
+                last = _describe(url, status, ctype, body, "empty body")
+            elif expect_json and not _is_json(body):
+                last = _describe(url, status, ctype, body, "body is not JSON")
+            else:
+                return body
+        if attempt < attempts:
+            print(f"fetch attempt {attempt} of {attempts} failed, retrying in {backoff * attempt:.0f} s: {last}", file=sys.stderr)
+            sleep(backoff * attempt)
+    raise FetchError(f"download failed after {attempts} attempts; last: {last}")
+
+
+def _is_json(body):
+    try:
+        json.loads(body)
+    except ValueError:
+        return False
+    return True
 
 
 def source_url(source_id, year):

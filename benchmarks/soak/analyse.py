@@ -7,9 +7,10 @@ wander, and every answer should stay the same as the first time the case was run
 Formal rule (frozen before any judged run; `RULES` below is the single source, and the docs quote it):
   * Warm-up: samples before max(600 s, the end of the first full pass over the golden set) are discarded, so every
     case has been run once (caches, JIT and allocator pools filled) before memory is judged.
-  * Judged series: `judged_bytes`, one value per 10 s sample. For Python, C++ and Rust it is the smallest memory
-    reading taken once a second inside that 10 s window (committed private bytes on Windows, VmRSS on Linux; see
-    procstat.py). For Java it is the heap used after the most recent full collection, which the soak requests with
+  * Judged series: `judged_bytes`, one value per 10 s sample. For Python, C++ and Rust it is one memory reading
+    taken at the idle point of each sample: soak.py stops sending, waits until every case in flight is answered
+    (`quiesce()`), then reads once (committed private bytes on Windows, VmRSS on Linux; see procstat.py). A sample
+    whose quiesce did not finish has no judged value. For Java it is the heap used after the most recent full collection, which the soak requests with
     `jcmd <pid> GC.run` every 30 s; Java RSS is reported, not judged.
   * SLOPE: the least-squares slope of the judged series against time is at most 1 MiB per hour.
   * RANGE: max minus min of the judged series is at most 5 % of its median.

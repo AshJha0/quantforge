@@ -10,7 +10,7 @@ Reads one result file per (language, module) from a folder, as written by the pe
 Score = killed / (killed + survived). Unviable, non-building and not-sampled mutants are left out,
 and timeouts count as killed, matching golden_mutants.py. Python and Rust count a sampled mutant killed if the
 unit tests or the golden cases catch it. A module scores its own languages separately; the stage figure
-pools every mutant. --gate exits 1 if a mapped result is missing, or if the pooled score, or any module-language score with at least 10
+pools every mutant. --gate exits 1 if a mapped result or one of its shards is missing, or if the pooled score, or any module-language score with at least 10
 mutants, is below the stage target in stages.json.
 """
 import argparse
@@ -20,6 +20,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from plan_matrix import RUST_SHARDS  # noqa: E402  (same directory: a Rust module is scored in this many shard files)
 LANGS = ("java", "cpp", "python", "rust")
 MIN_FOR_GATE = 10
 # R6-14 acceptance: no module-language with a lower 95% Wilson bound under 65% or a point estimate under 80%,
@@ -59,6 +61,15 @@ def shard_files(path):
     """<lang>--<module>.json, or its shards <lang>--<module>--s<K>.json (Rust, see plan_matrix.py)."""
     path = Path(path)
     return [path] if path.is_file() else sorted(path.parent.glob(path.stem + "--s*" + path.suffix))
+
+
+def missing_shards(path, want):
+    """Shard numbers K in 0..want-1 with no <lang>--<module>--s<K> file. An unsharded module file counts as complete
+    (a local 0/1 run). K9-1c: run 43716417939 scored rust surfaces_local_vol from shard s1 alone as 100 %."""
+    path = Path(path)
+    if path.is_file() or want <= 1:
+        return []
+    return [k for k in range(want) if not (path.parent / f"{path.stem}--s{k}{path.suffix}").is_file()]
 
 
 def merged_summary(path):
@@ -137,6 +148,13 @@ def main(argv=None):
             if not shard_files(f):
                 missing.append(f.name)
                 rows.append([m["module"], lang, "no result", "", "", "", f"`{m[lang]}`"])
+                continue
+            gone = missing_shards(f, RUST_SHARDS if lang == "rust" else 1)
+            if gone:
+                # Scored on fewer shards than configured: no percentage, and the gate counts it as missing.
+                missing += [f"{f.stem}--s{k}{f.suffix}" for k in gone]
+                rows.append([m["module"], lang, "incomplete: " + ", ".join(f"shard s{k} missing" for k in gone),
+                             "", "", "", f"`{m[lang]}`; not scored, {RUST_SHARDS - len(gone)} of {RUST_SHARDS} shards present"])
                 continue
             k, s, note = score_file(lang, f)
             tk, ts = tk + k, ts + s
