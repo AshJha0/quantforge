@@ -23,6 +23,10 @@ The sections below follow the order in which stages were built. To find recipes 
 | 11 Research | [Stage J](#stage-j-recipes) |
 | 12 Platform | [Stage K](#stage-k-recipes) (bitemporal store, daily paper ledger, scheduled on main since 2026-11-20), [platform recipes](#stage-k-platform-recipes-simulated-feeds-end-of-day-rehearsal-soak-and-snapshots) (simulated feed fixtures, end-of-day rehearsal, soak verdict) |
 
+## Check the recipes
+
+A recipe whose bash block is marked `<!-- cookbook:run -->` carries a hidden `<!-- cookbook:expect -->` list of strings its output must contain. `python tools/check_cookbook.py` runs every marked block from the repository root and fails if a string is missing or a command fails; `--list` names them and `--only TEXT` runs the recipes whose heading contains `TEXT`. It sends `quantforge` lines to `python -m quantforge_core.cli.main`, the same entry point. Its tests: `python tools/test_check_cookbook.py`. Not run by any workflow yet.
+
 ## Run a tutorial script
 
 Tutorials 2 to 16 each have a script in `examples/tutorials/` that sends its operations to any build: Python in process with no argument, or another build's CLI. Tutorial 1's script, `examples/tutorial_swap.py`, takes a build's CLI command, and so do the hedging tutorials' scripts, `examples/tutorial_hedge_17.py` to `tutorial_hedge_21.py`, which send cases built from the `examples/hedge_*_i.json` inputs.
@@ -1361,7 +1365,7 @@ python tools/paper_daily/verify_ledger.py verify --ledger ledger.jsonl --anchors
 
 ### Stage K desk recipes
 
-Tasks a desk user would do with the stage K operations and the jobs around them, each worked by hand and then run. Commands run from the repository root in Git Bash or a Unix shell and send the lines between `<<'EOF'` and `EOF` to the Python build in one batch. The outputs shown were observed on 2026-11-20 on branch `k-v1-docs2` with the Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine; the other three builds return the same values within each golden's tolerance in conformance. Every input below is synthetic or comes from a named golden; dates in requests are moved to 2027 so that this page carries no date inside a preregistered holdout window (`research/test_preregs.py`). No checker runs these blocks; they were run once by hand for this page.
+Tasks a desk user would do with the stage K operations and the jobs around them, each worked by hand and then run. Commands run from the repository root in Git Bash or a Unix shell and send the lines between `<<'EOF'` and `EOF` to the Python build in one batch. The outputs shown were observed on 2026-11-20 on branch `k-v1-docs2` with the Python build (`uv run --locked --project python quantforge batch`), local laptop, not the acceptance machine; the other three builds return the same values within each golden's tolerance in conformance. Every input below is synthetic or comes from a named golden; dates in requests are moved to 2027 so that this page carries no date inside a preregistered holdout window (`research/test_preregs.py`). They were run once by hand for this page; the blocks marked `cookbook:run` (the incremental update, the SA-CCR netting sets and the two-fault errors) are rerun by `python tools/check_cookbook.py`, which no workflow runs yet.
 
 #### Correct a past value and prove that earlier as-of answers do not change
 
@@ -1385,6 +1389,7 @@ Plain idea: when the 2-year quote ticks, the 1-year pillar cannot move, so copy 
 
 Formal statement (`specifications/02-curves/incremental-update.md`, KR-5): `P_k = (1 - S_k sum_{i<k} P_i) / (1 + S_k)`. By hand for quotes 2%, 2.6%, 3%: `P_1 = 1/1.02 = 0.980392`, `P_2 = (1 - 0.026 x 0.980392) / 1.026 = 0.949815`, `P_3 = (1 - 0.03 x (0.980392 + 0.949815)) / 1.03 = 0.914654`.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"incremental","operation":"curve.incremental.update","inputs":{"previous_quotes":[0.02,0.025,0.03],"previous_discount_factors":[0.9803921568627451,0.9516977522716404,0.9145993230349208],"new_quotes":[0.02,0.026,0.03]}}
@@ -1392,6 +1397,10 @@ uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"stale_cache","operation":"curve.incremental.update","inputs":{"previous_quotes":[0.02,0.025,0.03],"previous_discount_factors":[0.9803921568627451,0.9516977522716404,0.9145993230349209],"new_quotes":[0.02,0.026,0.03]}}
 EOF
 ```
+<!-- cookbook:expect
+"case_id":"full_rebuild","status":"ok","outputs":{"discount_factors":[0.9803921568627451,0.9498146237052325,0.9146541714397676]}
+"code":"E_INPUT"
+-->
 
 ```json
 {"schema_version":"1.0","case_id":"incremental","status":"ok","outputs":{"discount_factors":[0.9803921568627451,0.9498146237052325,0.9146541714397676],"first_changed_index":1,"recomputed":2},"diagnostics":{}}
@@ -1409,12 +1418,18 @@ Formal statement (`specifications/06-risk/sa-ccr.md`, CRE52 read 2026-11-19 by t
 
 By hand, a 10-year USD swap received on 10,000 (market value +30) and a 10-year USD swap paid on 5,000 (market value -10), no collateral: `SD = (1 - exp(-0.5)) / 0.05 = 7.869387`; `D_A = 78,693.87`, `D_B = -39,346.93`, both in bucket 3, so `D_3 = 39,346.93` and the effective notional is 39,346.93; add-on `0.005 x 39,346.93 = 196.73`; `V = 20`, `RC = 20`, `m = 1`; `EAD = 1.4 x (20 + 196.73) = 303.43`. If the set were worth -310 to us instead (the long swap at -300), `RC = 0` and `m = 0.05 + 0.95 exp(-310 / 373.80) = 0.4645`, so `EAD = 1.4 x 0.4645 x 196.73 = 127.94`.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"set_plus","operation":"risk.saccr.ead","inputs":{"trades":[{"id":"A","asset_class":"IR","notional":10000,"market_value":30,"maturity":10,"position":"LONG","start":0,"end":10,"hedging_set":"USD"},{"id":"B","asset_class":"IR","notional":5000,"market_value":-10,"maturity":10,"position":"SHORT","start":0,"end":10,"hedging_set":"USD"}]}}
 {"schema_version":"1.0","case_id":"set_minus","operation":"risk.saccr.ead","inputs":{"trades":[{"id":"A","asset_class":"IR","notional":10000,"market_value":-300,"maturity":10,"position":"LONG","start":0,"end":10,"hedging_set":"USD"},{"id":"B","asset_class":"IR","notional":5000,"market_value":-10,"maturity":10,"position":"SHORT","start":0,"end":10,"hedging_set":"USD"}]}}
 EOF
 ```
+<!-- cookbook:expect
+"ead":303.4285382011566
+"ead":127.94333326981402
+"multiplier":0.4645246062932369
+-->
 
 Output, key fields: `set_plus` `ead` 303.4285382011566, `rc` 20.0, `pfe` 196.7346701436833, `multiplier` 1.0, trade A `supervisory_duration` 7.8693868057473315 and `effective_notional` 78693.86805747332, trade B `effective_notional` -39346.93402873666; `set_minus` `ead` 127.94333326981402, `rc` 0.0, `multiplier` 0.4645246062932369. Both agree with the hand figures. These two netting sets are not goldens; for a published check, run golden `saccr_k-0001` (Basel CRE99 Example 1, EAD 569.47, worked in [Tutorial 56](docs/getting-started/tutorial-56-sa-ccr-example-1.md)). Limits: no margin agreement here; scope limits KR-39.
 
@@ -1535,12 +1550,17 @@ Both lines return `weighted_sensitivities` `[10000.0, -10000.0, 75000.0, 160000.
 
 Plain idea: every build checks in one fixed order, so two faults give one code everywhere (see [ARCHITECTURE](ARCHITECTURE.md#the-four-build-conformance-model-and-why-two-wrong-inputs-give-one-error)).
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"e2_k-0008","operation":"calib.trigger.check","inputs":{"changes":[1.0],"x_ref":100.0,"x_now":105.0,"days_since":1.0,"k":0.0}}
 {"schema_version":"1.0","case_id":"e2_k-0011","operation":"risk.intraday.delta_gamma_bound","inputs":{"positions":[],"shift":"NaN"}}
 EOF
 ```
+<!-- cookbook:expect
+"case_id":"e2_k-0008","status":"error","error":{"code":"E_INPUT"
+"case_id":"e2_k-0011","status":"error","error":{"code":"E_DOMAIN"
+-->
 
 ```json
 {"schema_version":"1.0","case_id":"e2_k-0008","status":"error","error":{"code":"E_INPUT","message":"changes must hold at least two one-day changes","field":"changes"},"diagnostics":{}}
@@ -1557,11 +1577,16 @@ Formal statement (`specifications/06-risk/frtb-drc-rrao.md`, MAR22 read 2026-11-
 
 By hand: stock `JTD = 1.00 x 50 = 50`, bond `JTD = 0.75 x (-40) = -30`; `HBR = 50 / 80 = 0.625`; weighted long `0.15 x 50 = 7.5`, weighted short `0.15 x 30 = 4.5`; `DRC = 7.5 - 0.625 x 4.5 = 4.6875`.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"drc_k-0007","operation":"risk.frtb.drc_nonsec","inputs":{"positions":[{"id":"stock","obligor":"Z","bucket":"CORPORATE","seniority":"EQUITY","notional":50,"market_value":50,"maturity_years":2,"cash_equity":true},{"id":"bond","obligor":"Z","bucket":"CORPORATE","seniority":"SENIOR","notional":-40,"market_value":-40,"maturity_years":2}],"ratings":{"Z":"BB"}}}
 EOF
 ```
+<!-- cookbook:expect
+"drc":4.6875
+"hbr":0.625
+-->
 
 Output, key fields (Python build, read 2026-11-20): bond `gross_jtd` -30.0, stock `gross_jtd` 50.0, bucket `hbr` 0.625, `wtd_long` 7.5, `wtd_short` 4.5, `drc` 4.6875, with the label "regulatory formula on caller inputs; not a regulatory return". The golden records the same values, a fractions-and-mpmath oracle and a blind MATCH (`program/STAGE_K_BLIND_W2.md`). Limits: one bucket, and a maturity of at least one year, so no maturity scaling (the spec's Limits section).
 
@@ -1573,11 +1598,16 @@ Formal statement (`specifications/06-risk/cva-capital.md`, MAR50 read 2026-11-19
 
 By hand: financials, investment grade, RW 5%; EAD 1,000,000, M 5. `DF = (1 - e^-0.25) / 0.25 = 0.884797`; `SCVA = 0.05 x 5 x 1,000,000 x 0.884797 / 1.4 = 157,999.44`; with one counterparty `K_reduced = SCVA`; capital `0.65 x 157,999.44 = 102,699.64`.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"cva_k-0001","operation":"risk.cva.ba","inputs":{"version":"REDUCED","counterparties":[{"id":"C1","sector":"financials","quality":"IG","netting_sets":[{"ead":1000000,"m":5,"imm":false}]}]}}
 EOF
 ```
+<!-- cookbook:expect
+"df":0.8847968677143805
+"rwa":1283745.4553891683
+-->
 
 Output, key fields (Python build, read 2026-11-20): `df` 0.8847968677143805, `scva` and `k_reduced` 157999.44066328224, `capital` 102699.63643113346, `rwa` 1283745.4553891683. The golden's `capital` is 102699.63643113345: the last digit differs, and the case passes inside its stated tolerance. Limits: no hedges (`REDUCED`); the `FULL` version and SA-CVA are in the same spec.
 
@@ -1589,17 +1619,23 @@ Formal statement (`specifications/06-risk/leverage-large-exposures.md`, LEV20 an
 
 By hand, with the netting set of Basel CRE99 Example 1 (V 60, PFE 347): `1.4 x (60 + 347) = 569.8`; `ratio = 100 / 569.8 = 17.55%`, above 3%.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"lev_k-0001","operation":"risk.capital.leverage","inputs":{"tier1":100,"on_balance":[],"derivatives":[{"v":60,"cvm_received":0,"cvm_provided":0,"pfe":347}],"written_credit_derivatives":[],"sfts":[],"off_balance":[]}}
 EOF
 ```
+<!-- cookbook:expect
+"exposure":569.8
+"ratio":0.17550017550017552
+"meets_minimum":true
+-->
 
 Output, key fields (Python build, read 2026-11-20): `derivatives` 569.8, `exposure` 569.8, `ratio` 0.17550017550017552, `meets_minimum` true, label "simplified leverage ratio (LEV30 subset); not a regulatory return". The golden records the Basel printed EAD 569 (CRE99.40) within its stated tolerance of 1.0 and a blind MATCH (`program/STAGE_K_BLIND_K8I.md`). Limits: a simplified subset of LEV30, not a regulatory return.
 
 ### Stage K wave 2 capital and xVA recipes
 
-The wave 2 operations (merged to main 2026-11-20, merge 37292e4f; not in a tag) not covered by a recipe above, and the wrong-way-risk CVA of stage G with its KR-257 root fix. The IMA pieces (PLA, ES with liquidity horizons, stress calibration, SES, capital) are worked in [Tutorial 59](docs/getting-started/tutorial-59-frtb-ima-pla-to-capital.md). Every output shown was observed on 2026-11-21 on branch `k-v1-docs-a` with the Python build, local laptop, not the acceptance machine. On that laptop Windows Smart App Control blocks the `quantforge` launcher that `uv` installs, so the lines were sent to `uv run --locked --project python python -m quantforge_core.cli.main batch`, the same entry point; on Linux or macOS use `uv run --locked --project python quantforge batch` as below. Every capital output carries a label such as "regulatory formula on caller inputs; not a regulatory return". No checker runs these blocks.
+The wave 2 operations (merged to main 2026-11-20, merge 37292e4f; not in a tag) not covered by a recipe above, and the wrong-way-risk CVA of stage G with its KR-257 root fix. The IMA pieces (PLA, ES with liquidity horizons, stress calibration, SES, capital) are worked in [Tutorial 59](docs/getting-started/tutorial-59-frtb-ima-pla-to-capital.md). Every output shown was observed on 2026-11-21 on branch `k-v1-docs-a` with the Python build, local laptop, not the acceptance machine. On that laptop Windows Smart App Control blocks the `quantforge` launcher that `uv` installs, so the lines were sent to `uv run --locked --project python python -m quantforge_core.cli.main batch`, the same entry point; on Linux or macOS use `uv run --locked --project python quantforge batch` as below. Every capital output carries a label such as "regulatory formula on caller inputs; not a regulatory return". Every block in this section and the next is marked `cookbook:run` and rerun by `python tools/check_cookbook.py`, which checks the numbers named in the output lines below (no workflow runs it yet).
 
 #### Residual risk add-on: what counts and what is excluded (golden rrao_k-0002)
 
@@ -1609,11 +1645,16 @@ Formal statement (`specifications/06-risk/frtb-drc-rrao.md`, MAR23.7 and MAR23.8
 
 By hand: the listed OTHER of 5,000,000 is excluded; the listed EXOTIC of 1,000,000 is not (listing excludes only OTHER), so it adds 10,000; the back-to-back EXOTIC of 3,000,000 is excluded. RRAO 10,000.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"rrao","operation":"risk.frtb.rrao","inputs":{"instruments":[{"id":"o","gross_notional":5000000,"kind":"OTHER","listed_or_clearable":true,"back_to_back":false},{"id":"e1","gross_notional":1000000,"kind":"EXOTIC","listed_or_clearable":true,"back_to_back":false},{"id":"e2","gross_notional":3000000,"kind":"EXOTIC","listed_or_clearable":false,"back_to_back":true}]}}
 EOF
 ```
+<!-- cookbook:expect
+"rrao":10000.0
+"id":"e2","weight":0.01,"excluded":true
+-->
 
 Output, key fields: instruments `o` weight 0.001 `excluded` true, `e1` weight 0.01 `excluded` false `addon` 10000.0, `e2` `excluded` true; `rrao` 10000.0, as worked and as the golden.
 
@@ -1625,12 +1666,18 @@ Formal statement (`specifications/06-risk/frtb-drc-rrao.md`, MAR22.27 to 22.35, 
 
 By hand, long 50 of tranche T1 and short 20 of tranche T2, RW 20%: `HBR = 50 / 70 = 0.7143`; weighted long 10, weighted short 4; `DRC = 10 - 0.7143 x 4 = 7.1429`. If the short were the same tranche T1, the two would net to a long of 30 and `DRC = 0.2 x 30 = 6`.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"sec","operation":"risk.frtb.drc_sec_nonctp","inputs":{"positions":[{"id":"l","bucket":"RMBS-EU","pool":"P1","tranche":"T1","market_value":50,"maturity_years":5,"rw":0.2},{"id":"s","bucket":"RMBS-EU","pool":"P1","tranche":"T2","market_value":-20,"maturity_years":5,"rw":0.2}]}}
 {"schema_version":"1.0","case_id":"sec_same","operation":"risk.frtb.drc_sec_nonctp","inputs":{"positions":[{"id":"l","bucket":"RMBS-EU","pool":"P1","tranche":"T1","market_value":50,"maturity_years":5,"rw":0.2},{"id":"s","bucket":"RMBS-EU","pool":"P1","tranche":"T1","market_value":-20,"maturity_years":5,"rw":0.2}]}}
 EOF
 ```
+<!-- cookbook:expect
+"case_id":"sec","status":"ok"
+"drc":7.142857142857142
+"hbr":1.0,"wtd_long":6.0,"wtd_short":0.0,"drc":6.0
+-->
 
 Output, key fields: `sec` bucket `hbr` 0.7142857142857143, `wtd_long` 10.0, `wtd_short` 4.0, `drc` 7.142857142857142; `sec_same` `hbr` 1.0, `wtd_long` 6.0, `drc` 6.0. The golden `sec_k-0001` states `drc` 7.142857142857143, one unit in the last place from the output, inside its tolerance. The second line is not a golden; it is the same input with one tranche label changed.
 
@@ -1642,11 +1689,17 @@ Formal statement (`specifications/06-risk/frtb-drc-rrao.md`, MAR22.39 to 22.45):
 
 By hand, long 1,000 of index A and short 1,000 of index B, RW 10%: `HBR_ctp = 1000 / 2000 = 0.5`; `DRC_A = 100`, `DRC_B = -0.5 x 100 = -50`; total `100 + 0.5 x (-50) = 75`.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"ctp","operation":"risk.frtb.drc_ctp","inputs":{"positions":[{"id":"a","index":"A","series":"S1","tranche":"T1","market_value":1000,"maturity_years":5,"rw":0.1},{"id":"b","index":"B","series":"S1","tranche":"T1","market_value":-1000,"maturity_years":5,"rw":0.1}]}}
 EOF
 ```
+<!-- cookbook:expect
+"hbr_ctp":0.5
+"bucket":"B","wtd_long":0.0,"wtd_short":100.0,"drc":-50.0
+"drc":75.0
+-->
 
 Output, key fields: `hbr_ctp` 0.5, bucket A `drc` 100.0, bucket B `drc` -50.0, `drc` 75.0, as worked and as the golden. To check the aggregation alone, send `{"bucket_drc": [100, -100]}` (golden `ctp_k-0001`, the MAR22.45 printed example): 50.
 
@@ -1658,6 +1711,7 @@ Formal statement (`specifications/06-risk/cva-capital.md`, MAR50.51 to 50.53, KR
 
 By hand without a hedge: `WS_1Y = 11,100`, `WS_5Y = -14,800`; `K_b^2 = 11,100^2 + 14,800^2 - 2 x 0.72 x 11,100 x 14,800 = 105,686,800`, `K_b = 10,280.41`. With a 5Y hedge sensitivity of -1,500,000: `WS_5Y = -3,700`, hedge term `0.01 x 11,100^2`, `K_b = 8,887.70`. With hedges equal to both CVA sensitivities, every `WS_k` is 0 and `K_b = 0.1 sqrt(11,100^2 + 14,800^2) = 1,850`.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"sacva_nohedge","operation":"risk.cva.sa","inputs":{"m_cva":1,"reporting_currency":"USD","classes":{"IR.DELTA":[{"bucket":"USD","factor":"1Y","s_cva":1000000,"s_hdg":0},{"bucket":"USD","factor":"5Y","s_cva":-2000000,"s_hdg":0}]}}}
@@ -1665,6 +1719,12 @@ uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"sacva_perfect","operation":"risk.cva.sa","inputs":{"m_cva":1,"reporting_currency":"USD","classes":{"IR.DELTA":[{"bucket":"USD","factor":"1Y","s_cva":1000000,"s_hdg":1000000},{"bucket":"USD","factor":"5Y","s_cva":-2000000,"s_hdg":-2000000}]}}}
 EOF
 ```
+<!-- cookbook:expect
+"k_b":10280.408552192855
+"k_b":8887.704990603592
+"k_b":1850.0
+"rwa":23125.0
+-->
 
 Output, key fields: `sacva_nohedge` `k_b` 10280.408552192855, `total` 10280.408552192855, `rwa` 128505.1069024107; `sacva_hedge` `k_b` 8887.704990603592, `rwa` 111096.3123825449; `sacva_perfect` `k_b` 1850.0, `rwa` 23125.0. The first two equal their goldens; the third is not a golden and shows the floor term. Limits: every sensitivity is an input; there is no CVA model behind it (spec, Limits).
 
@@ -1676,11 +1736,16 @@ Formal statement (`specifications/06-risk/leverage-large-exposures.md`, LEX10, L
 
 By hand, Tier 1 1,000: a loan of 200 to issuer G; a long senior bond of G, face 100, market value 90: JTD `100 + (90 - 100) = 90`; a short of G stock, -30. The stock is junior to the bond, so it offsets: net long 60. Exposure `200 + 60 = 260`, 26% of Tier 1: large and in breach.
 
+<!-- cookbook:run -->
 ```bash
 uv run --locked --project python quantforge batch <<'EOF'
 {"schema_version":"1.0","case_id":"lex","operation":"risk.capital.large_exposures","inputs":{"tier1":1000,"bank_gsib":false,"counterparties":[{"id":"G"}],"banking_book":[{"counterparty":"G","value":200}],"off_balance":[],"crm":[],"trading_book":[{"id":"bond","counterparty":"G","seniority":"SENIOR","notional":100,"market_value":90,"maturity_years":5},{"id":"stock","counterparty":"G","seniority":"EQUITY","notional":-30,"market_value":-30,"maturity_years":1,"cash_equity":true}]}}
 EOF
 ```
+<!-- cookbook:expect
+"trading_book_net_long":60.0
+"exposure":260.0,"share":0.26,"large":true,"limit":250.0,"breach":true
+-->
 
 Output, key fields: counterparty G `banking_book` 200.0, `trading_book_net_long` 60.0, `exposure` 260.0; group G `share` 0.26, `large` true, `limit` 250.0, `breach` true; `report` `["G"]`; label "simplified large exposures (LEX subset); not a regulatory return". Under MAR22 the same bond would have LGD 75% and JTD 65 (spec worked example); the large exposures rule assumes no recovery.
 
@@ -1692,12 +1757,21 @@ Formal statement (`specifications/06-risk/xva-framework.md`, ruling G-44; J. Hul
 
 By hand at `b = 0`: every path has hazard `h = 0.03`, so `a_i = ln 0.03 = -3.506558` and the CVA is the independent one on the path-mean positive exposure `EE = (1.125, 2.75, 3.375, 2.75)`: `0.6 x sum D_i EE_i (e^(-0.03 t_(i-1)) - e^(-0.03 t_i)) = 0.0436277` (standard-library line, 0.043627733225243444). For identical exposure on every path (KR-257 closed form) `a_i = ln h - b V`: with `h = 0.01`, `b = 1`, `V = 10`, `a = ln 0.01 - 10 = -14.605170` and `CVA = 0.6 x 10 x (0.97 (1 - e^-0.01) + 0.94 (e^-0.01 - e^-0.02)) = 0.113471`.
 
+<!-- cookbook:run -->
 ```bash
 { for b in 0.0 0.1 0.3 -0.2; do echo "{\"schema_version\":\"1.0\",\"case_id\":\"b=$b\",\"operation\":\"xva.wwr.cva_hw\",\"inputs\":{\"times\":[0.25,0.5,0.75,1.0],\"values\":[[3.0,5.0,2.0,-1.0],[-2.0,-4.0,-6.0,-3.0],[1.0,6.0,9.0,4.0],[0.5,-1.0,2.5,7.0]],\"discount_factors\":[0.995,0.99,0.985,0.98],\"hazard_rate\":0.03,\"recovery\":0.4,\"wwr_b\":$b}}"; done
   echo '{"schema_version":"1.0","case_id":"flat","operation":"xva.wwr.cva_hw","inputs":{"times":[1.0,2.0],"values":[[10.0,10.0],[10.0,10.0]],"discount_factors":[0.97,0.94],"hazard_rate":0.01,"recovery":0.4,"wwr_b":1.0}}'
   echo '{"schema_version":"1.0","case_id":"too_big","operation":"xva.wwr.cva_hw","inputs":{"times":[1.0,2.0],"values":[[10.0,10.0],[800.0,10.0]],"discount_factors":[0.97,0.94],"hazard_rate":0.01,"recovery":0.4,"wwr_b":1.0}}'
 } | uv run --locked --project python quantforge batch
 ```
+<!-- cookbook:expect
+"cva":0.04362773322524349
+"cva":0.06114835388862783
+"cva":0.08648730471425058
+"cva":0.015569211034720719
+"cva":0.11347051247504979,"a":[-14.605170185988092,-14.605170185988092]
+"code":"E_DOMAIN"
+-->
 
 | Case | `wwr_b` | `cva` | `a` first bucket | Golden |
 |---|---|---|---|---|
@@ -1715,6 +1789,7 @@ Plain idea: under the internal models approach a risk factor may stay in the ES 
 
 Formal statement (`specifications/06-risk/frtb-ima.md`, MAR31.12 to 31.16 read 2026-11-19 by the spec lane; ruling KR-59): count distinct calendar days in the 12 months ending at `as_of`; criterion 1 is at least 24 days and at least 4 in every 90-day window lying wholly inside the 12 months; criterion 2 is at least 100 days; pass is either. The goldens use dates in 2025 and 2026, so this recipe builds its own lists for the 12 months to 2028-06-30 (synthetic dates; none is a golden). By hand: every 14 days gives 26 days and at least `floor(90 / 14) = 6` in any 90-day window, so criterion 1 holds; 30 consecutive days give 30 days but leave most windows empty; 100 consecutive days fail criterion 1 for the same reason and pass criterion 2.
 
+<!-- cookbook:run -->
 ```bash
 python -c "
 import datetime as dt, json
@@ -1728,6 +1803,14 @@ for t in (0.75, 0.7499):
     print(json.dumps({'schema_version': '1.0', 'case_id': f'bucket_{t}', 'operation': 'risk.frtb.rfet.bucket', 'inputs': {'row': 'A', 't': t}}))
 " | uv run --locked --project python quantforge batch
 ```
+<!-- cookbook:expect
+"distinct_days":26,"min_window_count":6
+"first_failing_window_start":"2027-08-01","first_failing_window_count":3,"crit1":false,"crit2":false,"pass":false
+"distinct_days":100
+"crit1":false,"crit2":true,"pass":true
+"bucket":2,"lower":0.75
+"bucket":1,"lower":0.0
+-->
 
 | Case | `distinct_days` | `min_window_count` | First failing window | `crit1` | `crit2` | `pass` |
 |---|---|---|---|---|---|---|
@@ -1747,6 +1830,7 @@ Plain idea: the five feed formats (QF-FIX-S, QF-ITCH-S, QF-OUCH-S, QF-MOLD-S, QF
 
 Formal statement (`specifications/12-platform/adapters.md` 0.2.0 section 3, rulings KR-270 to KR-283 confirmed 2026-11-20; KR-276: every encoding is canonical, so anything that decodes re-encodes to the same bytes). The adapter package lives outside the library trees (`platform/python`), so it is put on `PYTHONPATH`.
 
+<!-- cookbook:run -->
 ```bash
 export PYTHONUTF8=1 PYTHONPATH=platform/python
 uv run --locked --project python python - <<'EOF'
@@ -1777,6 +1861,9 @@ print(f"{good} of {len(list(pathlib.Path('datasets/feeds').glob('*/*.json')))} f
       f"{right} of {len(cases)} malformed inputs give their expected code")
 EOF
 ```
+<!-- cookbook:expect
+17 of 17 fixtures round-trip; 39 of 39 malformed inputs give their expected code
+-->
 
 Output: `17 of 17 fixtures round-trip; 39 of 39 malformed inputs give their expected code`. The OUCH fixture `stream_two` and the malformed cases whose names start with "stream" are length-prefixed streams, so they go to `ouch.decode_stream`. A byte-level worked example (the 36-byte ITCH Add Order, offset by offset) is in the [adapters developer guide](docs/developer-guides/adapters.md#decoding-a-fixture-a-worked-example). Label: "simulated; not a certified implementation; not connected to any venue". Limits: the container round trips (Kafka, PostgreSQL and the others) run only in the `adapters` workflow and need Docker; this recipe does not start any service.
 
@@ -1786,20 +1873,33 @@ Plain idea: before trusting the daily jobs with a date, run the whole chain for 
 
 Formal statement (`specifications/12-platform/soak-eod-capacity.md` 0.2.0 section 3, rulings KR-217 to KR-221 confirmed 2026-11-20; `tools/eod/rehearse.py`, read): eight steps E1 to E8; `--plant` injects exactly one fault: `GAP` (E1), `HOLDOUT` (E2), `HASH` (E3), `EXPLAIN` (E4), `DOMAIN` (E5), `LABEL` (E6), `WIDTH` (E7). It writes only to a temporary folder and to the `--out` file; it never writes to `forward-log`, `curve-daily` or `paper-ledger` and starts no workflow.
 
+<!-- cookbook:run -->
 ```bash
 export PYTHONUTF8=1
-uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --out eod.json
-uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --plant EXPLAIN --out eod-explain.json
-uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --plant HOLDOUT --out eod-holdout.json
+uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --out "${TMPDIR:-/tmp}/eod.json"
+uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --plant EXPLAIN --out "${TMPDIR:-/tmp}/eod-explain.json" || echo "exit $?"
+uv run --locked --project python python tools/eod/rehearse.py --date 2026-11-19 --source synthetic --plant HOLDOUT --out "${TMPDIR:-/tmp}/eod-holdout.json" || echo "exit $?"
 ```
+<!-- cookbook:expect
+result: pass
+result: fail (failed at E4)
+result: fail (failed at E2)
+exit 1
+-->
 
-Output: the clean run prints `pass` for E1 to E8 and `result: pass` (about 1 s in all). With `EXPLAIN`, E1 to E3 pass, E4 prints `fail    EXPLAIN`, E5 to E8 print `not run`, and the result is `fail (failed at E4)`; the E4 evidence in the JSON reads `"planted": "roll_down of the date's row plus one cent, chain rebuilt"`, `"verify_ok": false`, `"verify_reason": "EXPLAIN"`: one cent in one explain term, with the hash chain recomputed as a forger would, and the verifier's exact replay still refuses it. With `HOLDOUT` the run stops at E2. The JSON holds hashes, counts and aggregates only, never a recorded row. On 2026-11-20 the same date from the forward log (`--source forward-log`) passed all eight steps (`benchmarks/results/k6/eod-2026-11-19-forward-log.json`, measured by the K-6 lane); not rerun here. Limits: a dry run has no anchors to check; E3 fits the five recorded Treasury tenors, not the thirteen of the scheduled run (`rehearse.py`, deviation 3). How to act on a failed step: [runbook](docs/runbooks/soak-and-eod.md#rehearse-an-end-of-day).
+Output: the clean run prints `pass` for E1 to E8 and `result: pass` (about 1 s in all). With `EXPLAIN`, E1 to E3 pass, E4 prints `fail    EXPLAIN`, E5 to E8 print `not run`, and the result is `fail (failed at E4)`; the E4 evidence in the JSON reads `"planted": "roll_down of the date's row plus one cent, chain rebuilt"`, `"verify_ok": false`, `"verify_reason": "EXPLAIN"`: one cent in one explain term, with the hash chain recomputed as a forger would, and the verifier's exact replay still refuses it. With `HOLDOUT` the run stops at E2. A failed run exits 1, which the `|| echo` lines print so the block runs on; the JSON files go to the temporary folder. The JSON holds hashes, counts and aggregates only, never a recorded row. On 2026-11-20 the same date from the forward log (`--source forward-log`) passed all eight steps (`benchmarks/results/k6/eod-2026-11-19-forward-log.json`, measured by the K-6 lane); not rerun here. Limits: a dry run has no anchors to check; E3 fits the five recorded Treasury tenors, not the thirteen of the scheduled run (`rehearse.py`, deviation 3). How to act on a failed step: [runbook](docs/runbooks/soak-and-eod.md#rehearse-an-end-of-day).
 
 #### Reread a soak verdict from the committed files (K-6)
 
+<!-- cookbook:run -->
 ```bash
 export PYTHONUTF8=1
-python benchmarks/soak/analyse.py benchmarks/results/k6/soak-python-2026-11-20.csv benchmarks/results/k6/soak-python-2026-11-20.summary.json --out soak-verdict.json
+python benchmarks/soak/analyse.py benchmarks/results/k6/soak-python-2026-11-20.csv benchmarks/results/k6/soak-python-2026-11-20.summary.json --out "${TMPDIR:-/tmp}/soak-verdict.json" || echo "exit $?"
 ```
+<!-- cookbook:expect
+python: MISS slope 2.3243 MiB/h (95% CI [1.696, 3.7996])
+reasons ['SLOPE']
+exit 1
+-->
 
 Output: `python: MISS slope 2.3243 MiB/h (95% CI [1.696, 3.7996]), range 13.035 MiB of median 432.59 MiB, reasons ['SLOPE']`. **This is the recorded MISS of the Python soak**: the memory climbs 2.32 MiB an hour against a bound of 1 MiB an hour fixed before the run, and the cause has not been found (`docs/known-issues.md`). `--out` writes the full verdict JSON; without it the analyser prints the line only, and it exits 1 on a MISS (`analyse.py`, read). Worked by hand in [Tutorial 60](docs/getting-started/tutorial-60-read-a-soak-run.md). Running a new soak takes 130 minutes and must be detached on a shared machine ([runbook](docs/runbooks/soak-and-eod.md#run-a-soak)).
