@@ -10,8 +10,22 @@ Branch `k-v1-docs-b`, cut from main 11ba1b40. Files owned: LEARN.md, ARCHITECTUR
 5. docs/question-bank: new questions with worked answers.
 6. docs/curves: gaps.
 
-## Done
-(updated per commit)
+## Done (all pushed)
+- docs/diagrams/README.md: 7 new Mermaid diagrams with accTitle/accDescr (K-5 snapshot sequence, K-3 boundary, K-3 round trip, K-3 gap detector, K-6 judging, wave 2 capital map, KR-257 root); stage K intro updated. check_site_view on the page: 64 of 64 render, 3 views, no overflow (measured 2026-11-21).
+- LEARN.md: 4 sections (capital worked by hand, KR-257 wrong-way root, K-3 adapters and codecs, K-6 soak/capacity/rehearsal); stale wave 2 "merge pending" lines fixed; status line names #60-#64; question count 485.
+- ARCHITECTURE.md: status names #60-#64; table rows K-3, K-6, KR-257; sections K-5 threading model, K-6 where each runs, wave 2 data flow, KR-257 change; wave 2 and codec error order; K-3 heading no longer says branch/proposed.
+- architecture/system-overview.md (what exists on main), performance-standards.md (soak rule note).
+- GLOSSARY.md: 26 terms.
+- docs/question-bank set 14: Q14.53 to Q14.67 with worked answers; verify/v14_stage_k.py 55 strings pass; index regenerated (485).
+- Numbers: Python CLI in this worktree (uv run --locked quantforge batch) and quantforge_adapters feeds (Windows Python), 2026-11-21.
+
+## Not done
+- docs/curves gap review (planned last; see below if started).
 
 ## Stale statements found in files this lane may not edit
-(updated as found)
+- README.md:157 "470 knowledge-check questions in 14 sets": now 485 (question bank index regenerated on this branch).
+- README.md:100, CHANGELOG.md:5, docs/known-issues.md:5: name only pull requests #58 and #59; #60 to #64 (2026-11-20) are also on main.
+- CHANGELOG.md:13: K-5 "not yet merged to k-v1": merged, on main via #63.
+- CHANGELOG.md:21, docs/known-issues.md:48, docs/results.md:19: wave 2 "branch k-r3-w2 ... merge into k-v1 pending": on main via #63.
+- specifications/12-platform/soak-eod-capacity.md:39 (spec, not this lane's): "can only see a leak of more than about 1.2 bytes per case on average (1 MiB/h at 23 cases a second)": 1,048,576 / (23 x 3,600) = 12.7 bytes per case; the same paragraph's own 1 KiB per 100 cases (10.24 B/case) escaping the bound agrees with 12.7. Arithmetic slip, factor 10.
+- ARCHITECTURE.md:5 (own file, left unchanged): lists "ISDA" among cited standards; owner rule says no ISDA material; coordinator to decide whether that legacy mention goes.
