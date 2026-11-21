@@ -62,7 +62,7 @@ uv run --locked --project python pytest python/tests/test_conformance.py -q
 python conformance/runner/runner.py --impl python
 ```
 
-Then the runner for each other build (`--impl java`, `--impl cpp`, `--impl rust`; commands in `conformance/runner/implementations.json`), after building each CLI (`docs/developer-guides/test-infrastructure.md`, "Build the CLIs"). On this laptop the C++ and Rust builds run in WSL, one heavy job at a time, and Java on Windows (lane rules). `python tools/check_case_total.py` compares the golden totals with the last line stated in `program/R6_HANDOVER.md`; on 2026-11-21 it exited 1 on main (16,547 cases against a stated 16,545; measured), so a change of totals needs that line updated by whoever owns it.
+Then the runner for each other build (`--impl java`, `--impl cpp`, `--impl rust`; commands in `conformance/runner/implementations.json`), after building each CLI (`docs/developer-guides/test-infrastructure.md`, "Build the CLIs"). On this laptop the C++ and Rust builds run in WSL, one heavy job at a time, and Java on Windows (lane rules). `python tools/check_case_total.py` compares the golden totals with the last line stated in `program/R6_HANDOVER.md`; on 2026-11-21 it exited 1 on main (16,547 cases against a stated 16,545; measured), because pull requests #60 to #64 added cases without a new line; branch `k-v1-int1` adds the line (16,547). No workflow runs this check (`grep -r check_case_total .github/workflows`: none, read 2026-11-21), so a change of totals needs a new `TOTALS:` line in that file in the same change.
 
 ## 7. Docs
 
