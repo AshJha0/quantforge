@@ -1135,7 +1135,7 @@
     "two_errors",
     "synthetic"
    ],
-   "description": "two errors: node expiry 2^53 (structural E_INPUT) and a negative alpha (E_DOMAIN); E_INPUT first"
+   "description": "two errors: node expiry 2^53 [structural] and a negative alpha [domain]; E_INPUT first"
   },
   {
    "case_id": "fuzzfix_k-0006",
@@ -2136,7 +2136,7 @@
     "two_errors",
     "synthetic"
    ],
-   "description": "two errors: a row of the wrong length (structural E_INPUT) then a row that is a number (E_SCHEMA); E_SCHEMA first"
+   "description": "two errors: a row of the wrong length [structural] then a row that is a number [schema]; E_SCHEMA first"
   }
  ]
 }

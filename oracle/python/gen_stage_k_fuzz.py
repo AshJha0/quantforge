@@ -89,7 +89,7 @@ CASES = [
          "trade expiry 1201 months, one above the range (was E_DATE_RANGE in Python and Rust)"),
     case(5, CUBE, both(setter("cube", "expiries_months", 3, BIG), setter("cube", "alpha", 0, 0, -0.05)),
          "E_INPUT", ["ratesvol", "months", "two_errors"],
-         "two errors: node expiry 2^53 (structural E_INPUT) and a negative alpha (E_DOMAIN); E_INPUT first"),
+         "two errors: node expiry 2^53 [structural] and a negative alpha [domain]; E_INPUT first"),
     case(6, SWPT, setter("trade", "expiry_months", 1201), "E_INPUT", ["swaption", "months"],
          "swaption expiry 1201 months, one above the range (was E_DATE_RANGE in Python and Rust)"),
     case(7, SWPT, setter("trade", "expiry_months", BIG), "E_INPUT", ["swaption", "months"],
@@ -112,7 +112,7 @@ CASES = [
     case(15, SOR_DARK, setter("venues", 1, "tail", 1), "E_SCHEMA", ["sor", "mistyped"],
          "a DARK venue's tail that is a number (Python crashed)"),
     case(16, SOR, setter("lit_samples", [["0", "1"], 1]), "E_SCHEMA", ["sor", "mistyped", "two_errors"],
-         "two errors: a row of the wrong length (structural E_INPUT) then a row that is a number (E_SCHEMA); "
+         "two errors: a row of the wrong length [structural] then a row that is a number [schema]; "
          "E_SCHEMA first"),
 ]
 
