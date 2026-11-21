@@ -394,6 +394,38 @@
         "module": "bermudan_k8",
         "suite": "k8_k,e2_k",
         "python": "quantforge_core.bermudan_k8.*"
+      },
+      {
+        "module": "frtb_drc",
+        "suite": "drc_k",
+        "java": "org.quantforge.risk.FrtbDrc",
+        "cpp": "cpp26/src/core/frtb_drc.cpp",
+        "python": "quantforge_core.frtb_drc.*",
+        "rust": "**/frtb_drc.rs"
+      },
+      {
+        "module": "frtb_ima",
+        "suite": "ima_k",
+        "java": "org.quantforge.risk.FrtbIma",
+        "cpp": "cpp26/src/core/frtb_ima.cpp",
+        "python": "quantforge_core.frtb_ima.*",
+        "rust": "**/frtb_ima.rs"
+      },
+      {
+        "module": "cva_capital",
+        "suite": "cva_k,cva_ke,df_k,sacva_k,sacva_ke",
+        "java": "org.quantforge.risk.Cva",
+        "cpp": "cpp26/src/core/cva.cpp",
+        "python": "quantforge_core.cva.*",
+        "rust": "**/cva.rs"
+      },
+      {
+        "module": "leverage",
+        "suite": "lev_k,lev_ke,lex_k,lex_ke",
+        "java": "org.quantforge.risk.Leverage",
+        "cpp": "cpp26/src/core/leverage.cpp",
+        "python": "quantforge_core.leverage.*",
+        "rust": "**/leverage.rs"
       }
     ]
   }

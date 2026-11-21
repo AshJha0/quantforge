@@ -27,6 +27,23 @@ Result [measured, local laptop, not the acceptance machine, Python 3.15.2 on Win
 Not shown: that the job now finishes inside 120 minutes on the runner. That needs a branch dispatch of `mutation-stage.yml` (paths `python/quantforge_core/daycount.py`) or the weekly run after merge.
 
 
+## Wave 2 modules mapped for mutation (coordinator addition, owner request, 2026-11-21)
+
+Plain idea: the wave 2 capital files were in no mutation cell, so a change to them planned no mutation sample (known-issues row "K-8a, K-8f, K-8g, K-8i (mutation)"). They are now four stage K modules, mapped like `frtb_backtest` (one module, all four languages, the module's own golden suites, 80 % target of stage K, no `reasons.json` entry, no change to MAX 40 or the Wilson bound).
+
+| Module | Suite (all languages) | Java | C++ | Python | Rust |
+|---|---|---|---|---|---|
+| `frtb_drc` (DRC and RRAO) | `drc_k` | `org.quantforge.risk.FrtbDrc` | `cpp26/src/core/frtb_drc.cpp` | `quantforge_core.frtb_drc.*` | `**/frtb_drc.rs` |
+| `frtb_ima` | `ima_k` | `org.quantforge.risk.FrtbIma` | `cpp26/src/core/frtb_ima.cpp` | `quantforge_core.frtb_ima.*` | `**/frtb_ima.rs` |
+| `cva_capital` (BA-CVA, SA-CVA) | `cva_k,cva_ke,df_k,sacva_k,sacva_ke` | `org.quantforge.risk.Cva` | `cpp26/src/core/cva.cpp` | `quantforge_core.cva.*` | `**/cva.rs` |
+| `leverage` (leverage ratio, large exposures) | `lev_k,lev_ke,lex_k,lex_ke` | `org.quantforge.risk.Leverage` | `cpp26/src/core/leverage.cpp` | `quantforge_core.leverage.*` | `**/leverage.rs` |
+
+The suites are the proposal in the known-issues row, and the trace confirms them for Python [measured, `trace_suites.py`, local laptop]: of 264 golden files, exactly these call each module (frtb_drc 1, frtb_ima 1, cva 5, leverage 4); no other file calls them. Python functions never started by any golden case: `frtb_ima.fx_pair_specified.<locals>.<genexpr>`, `cva._schema`, `leverage._schema` and an annotation stub; mutants there can be caught only by unit tests. The Java `*Tables` classes (`FrtbDrcTables`, `FrtbImaTables`) are left out, as the proposal did.
+
+Not done, stated plainly: no Python kill tests were added to the mutmut `tests_dir`. The wave 2 unit tests (`tests/test_stage_k_w2a.py`, `test_stage_k_w2b.py`) read `specifications/` and `datasets/` outside the copy of `python/` that mutmut tests, the reason `test_conformance.py` is left out (`pyproject.toml` comment), so they cannot be listed as they are. Python cells therefore score on the golden verdict, with unit verdict "mutmut code 33" (the report says "NO unit tests mapped ... golden only"). Kill rates were not measured before mapping: the known-issues row warned that the next pull request touching these files runs the 32-of-40 gate. Checks: `check_stages.py` 0 problems; `test_gates.py` 0 failures; `plan_matrix.py --changed` on the 16 wave 2 files plans 4 Java, 4 C++, 4 Python and 8 Rust shard jobs; `tools/validation/model_reports.py` regenerated (4 model pages now name the module; `--check` current) [measured].
+
+Dispatch: see "Verification".
+
 ## Verification
 
 VERIFY_SECTION
@@ -41,9 +58,13 @@ VERIFY_SECTION
 
 > The scheduled run of 2026-11-15 failed: seven mutation jobs did not finish, not four: Java `rates_vol` and `roots` (Maven Central refused the pitest plugin, HTTP 429 named in the roots log), Rust `surfaces_local_vol` shard s0 (the unmutated `cargo test` failed once; shard s1 passed it on the same commit), Python `interp` (target without `*`, no mutants), and Python `daycount`, `compounding` and `roots` (cancelled at the 120-minute job limit). The report also scored Rust `surfaces_local_vol` 100.0 % from shard s1 alone. The report gate found modules below the 80 % target on the 40-mutant sample (for example C++ `hedge_solvers` 28 of 40, 70.0 %, Wilson 95 % interval 55 % to 82 %). Read from the run log of 43716417939 (2026-11-20, re-read 2026-11-21). | open; the mutation shortfall is the README known issue "Mutation gate". Fixed since the run: Maven retries, fallback mirror and cache (1e816fc5, e443e3b5, 47072365); Python `interp` target and the narrower suites for `compounding` and `roots` (H-0, green in 44373491612). Branch `k-v1-tools`: a missing shard is now reported `incomplete` and fails the gate; a failed baseline prints its output tail; Python `daycount` now runs only the 31 golden files that call it (traced, none left out). Not yet shown: the next weekly run (2026-11-22 05:41 UTC) must finish every job
 
+`docs/known-issues.md`, row "K-8a, K-8f, K-8g, K-8i (mutation)", replace "Proposed mapping, not yet applied" onward with:
+
+> Mapped 2026-11-21 (branch `k-v1-tools`): stage K modules `frtb_drc` on `drc_k`, `frtb_ima` on `ima_k`, `cva_capital` on `cva_k,cva_ke,df_k,sacva_k,sacva_ke`, `leverage` on `lev_k,lev_ke,lex_k,lex_ke`, all four languages, 80 % target, no exception; the Python trace (`conformance/mutation/trace_suites.py`) finds no other golden file calling them. Python has no kill tests in the mutmut `tests_dir` for them (the wave 2 test files read files outside `python/`), so Python scores on golden cases only. Kill rates not yet measured: DISPATCH_RESULT. | open until a run scores all 20 cells; a cell below the gate is a recorded miss, not a reason to unmap
+
 `CHANGELOG.md`, under "Fixed":
 
-> - **Tooling (lane `k-v1-tools`, 2026-11-21; known issues K9-1b, K9-1c).** `tools/workflows/common.py` `fetch` retries a transient bad download (network error, HTTP 429/5xx, empty or non-JSON body; 3 attempts, 30 s and 60 s apart) and its final error names the URL, status, content type and first 200 bytes. `conformance/mutation/stage_report.py` reports a module with a missing shard as `incomplete: shard sN missing` and the gate counts it as missing (run 43716417939 had scored one shard as 100 %). `golden_mutants.py` prints the last 80 lines of a failed unmutated baseline command. Python `daycount` mutation scoring uses the 31 golden files that call the module (traced with the new `conformance/mutation/trace_suites.py`; none left out), instead of all 264, which hit the 120-minute job limit. K-6 soak harness: `analyse.py` docstring now matches the code (one reading at the idle point; rule unchanged, new file hash recorded) and `soak.py` records `GITHUB_SHA` when git refuses the container checkout (empty C++ commit in run 44824197236). No gate, target, threshold, sample size or soak bound changed.
+> - **Tooling (lane `k-v1-tools`, 2026-11-21; known issues K9-1b, K9-1c).** `tools/workflows/common.py` `fetch` retries a transient bad download (network error, HTTP 429/5xx, empty or non-JSON body; 3 attempts, 30 s and 60 s apart) and its final error names the URL, status, content type and first 200 bytes. `conformance/mutation/stage_report.py` reports a module with a missing shard as `incomplete: shard sN missing` and the gate counts it as missing (run 43716417939 had scored one shard as 100 %). `golden_mutants.py` prints the last 80 lines of a failed unmutated baseline command. Python `daycount` mutation scoring uses the 31 golden files that call the module (traced with the new `conformance/mutation/trace_suites.py`; none left out), instead of all 264, which hit the 120-minute job limit. K-6 soak harness: `analyse.py` docstring now matches the code (one reading at the idle point; rule unchanged, new file hash recorded) and `soak.py` records `GITHUB_SHA` when git refuses the container checkout (empty C++ commit in run 44824197236). Wave 2 capital modules `frtb_drc`, `frtb_ima`, `cva_capital` and `leverage` mapped in `conformance/mutation/stages.json` (stage K, all four languages; Python golden-only). No gate, target, threshold, sample size or soak bound changed.
 
 ## Open
 
