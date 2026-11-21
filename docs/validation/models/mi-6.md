@@ -42,9 +42,10 @@ Operations (1; listed for this entry in tools/inventory_counts.py): `hedge.selec
 
 | Operation | Value-checked | Error | Invariance | Invariance base | Suites | Outside-checked value cases | Unit-test files (Python, Java, C++, Rust) |
 |---|---:|---:|---:|---:|---|---|---|
-| `hedge.select.solve` | 10 | 15 | 0 | 0 | `e1_r6`, `fuzzfix_j`, `hedgeaudit_r6`, `hedgeselect_i`, `selectcost_j` | 0 of 0 (stage J) | 3, 0, 0, 2 |
+| `hedge.select.solve` | 10 | 15 | 0 | 0 | `e1_r6`, `fuzzfix_j`, `hedgeaudit_r6`, `hedgeselect_i`, `selectcost_j` | 10 of 10 (stage I) | 3, 0, 0, 2 |
 
 Totals: 10 value-checked, 15 error, 0 invariance cases (measured from `datasets/golden` at generation).
+Outside-checked: 10 of 10 value cases (100.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: modules `I/hedge_credit_corr`, `I/hedge_cross`, `I/hedge_dynamic`, `I/hedge_select_slip`, `I/hedge_solvers` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.
 

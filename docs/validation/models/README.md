@@ -22,7 +22,7 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [M12](m12.md) | Equity | Implemented | 10 | 28 | 0 of 15 (0.0%) |
 | [M13](m13.md) | Inflation | Implemented | 4 | 11 | 0 of 11 (0.0%) |
 | [M14](m14.md) | Black-76 and Bachelier | Implemented | 2 | 218 | 5 of 5 (100.0%) |
-| [M15](m15.md) | Caps, floors, swaptions | Implemented | 2 | 22 | not in the share table |
+| [M15](m15.md) | Caps, floors, swaptions | Implemented | 2 | 22 | 22 of 22 (100.0%) |
 | [M16](m16.md) | Smile, SVI, SSVI, surface | Implemented | 9 | 35 | not in the share table |
 | [M17](m17.md) | SABR | Implemented | 4 | 35 | not in the share table |
 | [M18](m18.md) | Commodities | Implemented | 2 | 4 | 0 of 4 (0.0%) |
@@ -32,34 +32,34 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [M22](m22.md) | Least-squares calibration | Implemented | 3 | 21 | not in the share table |
 | [M23](m23.md) | Hedge solver | Implemented | 2 | 20 | not in the share table |
 | [M24](m24.md) | Coupon schedule generation | Implemented | 1 | 54 | not in the share table |
-| [ME-A1](me-a1.md) | SVI surface checks and fit | Implemented | 3 | 18 | 0 of 14 (0.0%) |
+| [ME-A1](me-a1.md) | SVI surface checks and fit | Implemented | 3 | 18 | 0 of 16 (0.0%) |
 | [ME-A2](me-a2.md) | Dupire local vol | Implemented | 4 | 30 | 17 of 28 (60.7%) |
 | [ME-A3](me-a3.md) | Forward vol, smile dynamics, vol of vol | Implemented | 4 | 30 | 17 of 28 (60.7%) |
 | [ME-A4](me-a4.md) | FX smile and Garman-Kohlhagen | Implemented | 5 | 114 | 114 of 114 (100.0%) |
 | [ME-A5](me-a5.md) | Heston, Bates, Merton | Implemented | 5 | 51 | 27 of 41 (65.9%) |
 | [ME-A6](me-a6.md) | SLV leverage | Implemented | 5 | 51 | 27 of 41 (65.9%) |
-| [ME-A7](me-a7.md) | Exotics | Implemented | 11 | 172 | 76 of 104 (73.1%) |
-| [ME-A8](me-a8.md) | American options | Implemented | 11 | 172 | 76 of 104 (73.1%) |
-| [EB1](eb1.md) | GARCH(1,1) | Implemented | 4 | 28 | 5 of 7 (71.4%) |
+| [ME-A7](me-a7.md) | Exotics | Implemented | 11 | 172 | 76 of 107 (71.0%) |
+| [ME-A8](me-a8.md) | American options | Implemented | 11 | 172 | 76 of 107 (71.0%) |
+| [EB1](eb1.md) | GARCH(1,1) | Implemented | 4 | 28 | 8 of 17 (47.1%) |
 | [EB2](eb2.md) | Variance swap | Implemented | 2 | 23 | 18 of 22 (81.8%) |
 | [EB3](eb3.md) | VIX-style index | Implemented | 2 | 23 | 0 of 8 (0.0%) |
-| [EB4](eb4.md) | SABR swaption cube | Implemented | 6 | 74 | 16 of 22 (72.7%) |
-| [EB5](eb5.md) | Caplet stripping | Implemented | 6 | 74 | 16 of 22 (72.7%) |
-| [EB6](eb6.md) | Bond futures options | Implemented | 6 | 74 | 16 of 22 (72.7%) |
-| [EB7](eb7.md) | Inflation caps | Implemented | 6 | 74 | 16 of 22 (72.7%) |
-| [EB8](eb8.md) | Correlation repair | Implemented | 4 | 41 | 0 of 9 (0.0%) |
-| [EB9](eb9.md) | Implied correlation and dispersion | Implemented | 4 | 41 | 0 of 9 (0.0%) |
+| [EB4](eb4.md) | SABR swaption cube | Implemented | 6 | 74 | 66 of 72 (91.7%) |
+| [EB5](eb5.md) | Caplet stripping | Implemented | 6 | 74 | 66 of 72 (91.7%) |
+| [EB6](eb6.md) | Bond futures options | Implemented | 6 | 74 | 66 of 72 (91.7%) |
+| [EB7](eb7.md) | Inflation caps | Implemented | 6 | 74 | 66 of 72 (91.7%) |
+| [EB8](eb8.md) | Correlation repair | Implemented | 4 | 41 | 25 of 39 (64.1%) |
+| [EB9](eb9.md) | Implied correlation and dispersion | Implemented | 4 | 41 | 25 of 39 (64.1%) |
 | [EB10](eb10.md) | CDS options | Implemented | 6 | 254 | 222 of 253 (87.7%) |
 | [EB11](eb11.md) | Default copulas | Implemented | 6 | 254 | 222 of 253 (87.7%) |
 | [EB12](eb12.md) | Large homogeneous pool | Implemented | 6 | 254 | 222 of 253 (87.7%) |
 | [MF-1](mf-1.md) | CDS index option (Pedersen) | Implemented | 6 | 254 | 222 of 253 (87.7%) |
-| [MF-2](mf-2.md) | GARCH estimate | Implemented | 4 | 28 | 5 of 7 (71.4%) |
+| [MF-2](mf-2.md) | GARCH estimate | Implemented | 4 | 28 | 8 of 17 (47.1%) |
 | [MF-3](mf-3.md) | VIX null quotes and local-vol continuity | Implemented | 6 | 53 | 17 of 36 (47.2%) |
 | [MF-4](mf-4.md) | Curve interpolation (Q1) | Implemented | 4 | 139 | 70 of 83 (84.3%) |
 | [MF-5](mf-5.md) | Joint multi-curve solve (Q4) | Implemented | 2 | 7 | 5 of 7 (71.4%) |
 | [MF-6](mf-6.md) | Funding curve | Implemented | 2 | 7 | 5 of 7 (71.4%) |
-| [MF-7](mf-7.md) | Book sensitivities (Q3a, F3) | Implemented | 4 | 40 | 6 of 16 (37.5%) |
-| [MF-8](mf-8.md) | VaR, ES and backtests (Q2) | Implemented | 6 | 79 | 73 of 73 (100.0%) |
+| [MF-7](mf-7.md) | Book sensitivities (Q3a, F3) | Implemented | 4 | 40 | 30 of 40 (75.0%) |
+| [MF-8](mf-8.md) | VaR, ES and backtests (Q2) | Implemented | 6 | 79 | 73 of 77 (94.8%) |
 | [MF-9](mf-9.md) | FRTB-SA GIRR delta (Q2) | Implemented | 2 | 18 | 13 of 13 (100.0%) |
 | [MF-10](mf-10.md) | Book lifecycle and marks (F5) | Implemented | 2 | 23 | 23 of 23 (100.0%) |
 | [MF-11](mf-11.md) | Factor attribution (use case 4) | Implemented | 3 | 6 | not in the share table |
@@ -70,19 +70,19 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [MG-5](mg-5.md) | LIBOR market model, closed-form layer and simulation (G4a, waves 3b and 3c) | Implemented | 2 | 56 | 53 of 53 (100.0%) |
 | [MG-6](mg-6.md) | AAD ladder of the Bermudan scheme (Q3b) | Implemented | 1 | 8 | 4 of 4 (100.0%) |
 | [MG-7](mg-7.md) | Model-reserve dispersion (Q9 part 2) | Implemented | 1 | 6 | 0 of 6 (0.0%) |
-| [MG-8](mg-8.md) | Deterministic xVA layer (G5b) | Implemented | 2 | 6 | not in the share table |
+| [MG-8](mg-8.md) | Deterministic xVA layer (G5b) | Implemented | 2 | 6 | 0 of 4 (0.0%) |
 | [MG-9](mg-9.md) | Portfolio exposure under Hull-White, ORE-checked (G5c) | Implemented | 1 | 97 | 80 of 96 (83.3%) |
 | [MG-10](mg-10.md) | F3 sensitivities (inflation01, dividend and borrow, correlation) | Implemented | 3 | 12 | 9 of 12 (75.0%) |
 | [MG-11](mg-11.md) | FRTB-SA delta for FX, equity, CSR and commodity | Implemented | 4 | 17 | 17 of 17 (100.0%) |
 | [MG-12](mg-12.md) | FRTB-SA vega and curvature | Implemented | 2 | 13 | 13 of 13 (100.0%) |
-| [MG-13](mg-13.md) | F4 portfolio-risk tools | Implemented | 5 | 16 | 4 of 12 (33.3%) |
+| [MG-13](mg-13.md) | F4 portfolio-risk tools | Implemented | 5 | 16 | 8 of 16 (50.0%) |
 | [MG-14](mg-14.md) | Heston and SABR calibration surrogate (A5, challenger) | Specified | 0 | 0 | not in the share table |
-| [MI-1](mi-1.md) | Hedge solvers (stage I wave 1) | Implemented | 6 | 212 | 10 of 24 (41.7%) |
+| [MI-1](mi-1.md) | Hedge solvers (stage I wave 1) | Implemented | 6 | 212 | 19 of 53 (35.8%) |
 | [MI-2](mi-2.md) | Credit and correlation hedges (stage I wave 2) | Implemented | 2 | 54 | 19 of 19 (100.0%) |
 | [MI-3](mi-3.md) | Cross-asset hedge, equity and rates (stage I wave 3) | Implemented | 1 | 9 | 9 of 9 (100.0%) |
-| [MI-4](mi-4.md) | Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a) | Implemented | 1 | 4 | not in the share table |
+| [MI-4](mi-4.md) | Hedge costs, impact, margin and the risk-against-cost frontier (stage I wave 4a) | Implemented | 1 | 4 | 2 of 4 (50.0%) |
 | [MI-5](mi-5.md) | Dynamic delta-hedge backtest and hedge effectiveness (stage I wave 4b) | Implemented | 2 | 37 | 5 of 17 (29.4%) |
-| [MI-6](mi-6.md) | Instrument selection (stage I wave 4c) | Implemented | 1 | 10 | not in the share table |
+| [MI-6](mi-6.md) | Instrument selection (stage I wave 4c) | Implemented | 1 | 10 | 10 of 10 (100.0%) |
 | [MI-7](mi-7.md) | Hedge slippage report (stage I wave 4d) | Implemented | 1 | 6 | 0 of 6 (0.0%) |
 | [MJ-1](mj-1.md) | Backtester (stage J wave 1) | Implemented | 1 | 14 | 14 of 14 (100.0%) |
 | [MJ-2](mj-2.md) | Purged cross-validation (stage J wave 1) | Implemented | 2 | 15 | 12 of 15 (80.0%) |
@@ -101,7 +101,7 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [MH-2](mh-2.md) | Low-latency order book (stage H wave 1b) | Implemented | 1 | 10 | 8 of 10 (80.0%) |
 | [MH-3](mh-3.md) | Simulated lit matching engine (stage H wave 1b) | Implemented | 1 | 16 | 10 of 16 (62.5%) |
 | [MH-4](mh-4.md) | Simulated dark pool (stage H wave 1b) | Implemented | 1 | 5 | 3 of 5 (60.0%) |
-| [MH-5](mh-5.md) | Smart order router (stage H wave 1b) | Implemented | 1 | 8 | not in the share table |
+| [MH-5](mh-5.md) | Smart order router (stage H wave 1b) | Implemented | 1 | 8 | 3 of 8 (37.5%) |
 | [MH-6](mh-6.md) | Almgren-Chriss trajectory and frontier (stage H wave 1) | Implemented | 2 | 6 | 4 of 6 (66.7%) |
 | [MH-7](mh-7.md) | Market impact (stage H wave 1) | Implemented | 2 | 4 | 4 of 4 (100.0%) |
 | [MH-8](mh-8.md) | Execution schedules (stage H wave 1) | Implemented | 4 | 12 | 9 of 12 (75.0%) |

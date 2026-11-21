@@ -45,10 +45,10 @@ Operations (4; every operation whose name-map spec is the model's spec (shared s
 | `risk.book.ois_sensitivity` | 5 | 15 | 3 | 3 | `e1_risk`, `risk_f3` | 0 of 5 (stage F) | 0, 0, 0, 0 |
 | `risk.credit.jtd` | 5 | 13 | 3 | 3 | `e1_risk`, `risk_f3` | 0 of 5 (stage F) | 1, 0, 0, 0 |
 | `risk.curve.cross_gamma` | 6 | 16 | 5 | 5 | `e1_risk`, `risk_f3` | 6 of 6 (stage F) | 0, 0, 0, 0 |
-| `risk.curve.pca` | 24 | 19 | 4 | 4 | `e1_risk`, `fuzzfix_j`, `risk_f3` | 0 of 0 (stage J) | 0, 0, 1, 0 |
+| `risk.curve.pca` | 24 | 19 | 4 | 4 | `e1_risk`, `fuzzfix_j`, `risk_f3` | 24 of 24 (stage F) | 0, 0, 1, 0 |
 
 Totals: 40 value-checked, 63 error, 30 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 6 of 16 value cases (37.5%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Outside-checked: 30 of 40 value cases (75.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: modules `F/var_backtest` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.
 
