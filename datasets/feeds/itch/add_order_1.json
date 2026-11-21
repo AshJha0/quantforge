@@ -1,0 +1,19 @@
+{
+ "format": "QF-ITCH-S",
+ "label": "simulated; not a certified implementation; not connected to any venue",
+ "fields": {
+  "type": "A",
+  "locate": 1,
+  "tracking": 0,
+  "timestamp": 34200000000000,
+  "order_ref": 1,
+  "side": "B",
+  "shares": 100,
+  "stock": "QFSIM   ",
+  "price": 1012500
+ },
+ "hex": "41000100001f1aced9f00000000000000000014200000064514653494d202020000f7314",
+ "length": 36,
+ "sha256": "e6b2df55aa2cb8bc1901e2a90e67ab97d7b44f4547a2f52792dd0c2df3a0166a",
+ "derivation": "specifications/12-platform/adapters.md section 3.2"
+}

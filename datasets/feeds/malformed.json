@@ -1,0 +1,240 @@
+{
+ "label": "simulated; not a certified implementation; not connected to any venue",
+ "source": "specifications/12-platform/adapters.md section 3",
+ "cases": [
+  {
+   "format": "QF-FIX-S",
+   "name": "truncated: last byte removed",
+   "hex": "383d514653494d2e3101393d32340133353d300133343d310134393d5146410135363d5146420131303d323237",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-FIX-S",
+   "name": "empty",
+   "hex": "",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-FIX-S",
+   "name": "bad checksum 228",
+   "hex": "383d514653494d2e3101393d32340133353d300133343d310134393d5146410135363d5146420131303d32323801",
+   "code": "E_CHECKSUM"
+  },
+  {
+   "format": "QF-FIX-S",
+   "name": "BodyLength 25 for 24 bytes",
+   "hex": "383d514653494d2e3101393d32350133353d300133343d310134393d5146410135363d5146420131303d32323701",
+   "code": "E_LENGTH"
+  },
+  {
+   "format": "QF-FIX-S",
+   "name": "unknown MsgType Z",
+   "hex": "383d514653494d2e3101393d32340133353d5a0133343d310134393d5146410135363d5146420131303d30313301",
+   "code": "E_TYPE"
+  },
+  {
+   "format": "QF-FIX-S",
+   "name": "BeginString FIX.4.4",
+   "hex": "383d4649582e342e3401393d32340133353d300133343d310134393d5146410135363d5146420131303d32323701",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-FIX-S",
+   "name": "side 3",
+   "hex": "383d514653494d2e3101393d36370133353d440133343d320134393d5146410135363d5146420131313d5146310135353d514653494d0135343d330133383d3130300134303d320134343d3130312e32350131303d30363801",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-FIX-S",
+   "name": "quantity with leading zero",
+   "hex": "383d514653494d2e3101393d36380133353d440133343d320134393d5146410135363d5146420131313d5146310135353d514653494d0135343d310133383d303130300134303d320134343d3130312e32350131303d31313501",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-ITCH-S",
+   "name": "empty",
+   "hex": "",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-ITCH-S",
+   "name": "unknown type Z",
+   "hex": "5a000100001f1aced9f00000000000000000014200000064514653494d202020000f7314",
+   "code": "E_TYPE"
+  },
+  {
+   "format": "QF-ITCH-S",
+   "name": "add order cut to 35 bytes",
+   "hex": "41000100001f1aced9f00000000000000000014200000064514653494d202020000f73",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-ITCH-S",
+   "name": "add order with one extra byte",
+   "hex": "41000100001f1aced9f00000000000000000014200000064514653494d202020000f731400",
+   "code": "E_LENGTH"
+  },
+  {
+   "format": "QF-ITCH-S",
+   "name": "side Q",
+   "hex": "41000100001f1aced9f00000000000000000015100000064514653494d202020000f7314",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-ITCH-S",
+   "name": "zero shares",
+   "hex": "41000100001f1aced9f00000000000000000014200000000514653494d202020000f7314",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-ITCH-S",
+   "name": "stock with a 0x00 byte",
+   "hex": "41000100001f1aced9f00000000000000000014200000064004653494d202020000f7314",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-ITCH-S",
+   "name": "system event code Z",
+   "hex": "53000000000d18c2e280005a",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-OUCH-S",
+   "name": "stream: one byte",
+   "hex": "00",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-OUCH-S",
+   "name": "stream: frame cut short",
+   "hex": "00314f51463030303030303030303120204200000064514653494d202020000f7314000000002020202059504e000000004e",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-OUCH-S",
+   "name": "stream: zero length",
+   "hex": "0000",
+   "code": "E_LENGTH"
+  },
+  {
+   "format": "QF-OUCH-S",
+   "name": "stream: length 48 for an enter order",
+   "hex": "00304f51463030303030303030303120204200000064514653494d202020000f7314000000002020202059504e000000004e",
+   "code": "E_LENGTH"
+  },
+  {
+   "format": "QF-OUCH-S",
+   "name": "stream: unknown type Z",
+   "hex": "00315a51463030303030303030303120204200000064514653494d202020000f7314000000002020202059504e000000004e20",
+   "code": "E_TYPE"
+  },
+  {
+   "format": "QF-OUCH-S",
+   "name": "stream: display Q",
+   "hex": "00314f51463030303030303030303120204200000064514653494d202020000f7314000000002020202051504e000000004e20",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "first message cut after 10 bytes",
+   "hex": "fc818151465349cd3d66",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "template id 2",
+   "hex": "fc828151465349cd3d6694e43d66f801c8",
+   "code": "E_TYPE"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "overlong seq 00 81",
+   "hex": "fc81008151465349cd3d6694e43d66f801c8",
+   "code": "E_OVERLONG"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "overlong presence map 7c 80",
+   "hex": "7c80818151465349cd3d6694e43d66f801c8",
+   "code": "E_OVERLONG"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "u32 seq 2^32 in 5 bytes",
+   "hex": "fc81100000008051465349cd3d6694e43d66f801c8",
+   "code": "E_OVERFLOW"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "u32 seq with 6 bytes and no stop bit",
+   "hex": "fc81017f7f7f7f7f51465349cd3d6694e43d66f801c8",
+   "code": "E_OVERFLOW"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "second message first: empty dictionary",
+   "hex": "8400e400e402ac",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "redundant symbol in message 2",
+   "hex": "fc818151465349cd3d6694e43d66f801c89451465349cd00e400e402ac",
+   "code": "E_OVERLONG"
+  },
+  {
+   "format": "QF-FAST-S",
+   "name": "unused presence bit 5 set",
+   "hex": "fe818151465349cd3d6694e43d66f801c8",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-MOLD-S",
+   "name": "19-byte header",
+   "hex": "514653494d3030303031000000000000000100",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-MOLD-S",
+   "name": "count 2, one block",
+   "hex": "514653494d303030303100000000000000010002002441000100001f1aced9f00000000000000000014200000064514653494d202020000f7314",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-MOLD-S",
+   "name": "block length past the end",
+   "hex": "514653494d303030303100000000000000010001002541000100001f1aced9f00000000000000000014200000064514653494d202020000f7314",
+   "code": "E_TRUNCATED"
+  },
+  {
+   "format": "QF-MOLD-S",
+   "name": "trailing byte",
+   "hex": "514653494d303030303100000000000000010001002441000100001f1aced9f00000000000000000014200000064514653494d202020000f731400",
+   "code": "E_LENGTH"
+  },
+  {
+   "format": "QF-MOLD-S",
+   "name": "zero block length",
+   "hex": "514653494d3030303031000000000000000100010000",
+   "code": "E_LENGTH"
+  },
+  {
+   "format": "QF-MOLD-S",
+   "name": "end of session followed by a byte",
+   "hex": "514653494d30303030310000000000000005ffff00",
+   "code": "E_LENGTH"
+  },
+  {
+   "format": "QF-MOLD-S",
+   "name": "session byte 0x01",
+   "hex": "014653494d303030303100000000000000050000",
+   "code": "E_FIELD"
+  },
+  {
+   "format": "QF-MOLD-S",
+   "name": "session all spaces",
+   "hex": "2020202020202020202000000000000000050000",
+   "code": "E_FIELD"
+  }
+ ]
+}

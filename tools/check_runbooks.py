@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Every command in a runbook names something that exists (plan 14.8 K-7, check RE3, ruling KR-224, PROPOSED).
+"""Every command in a runbook names something that exists (plan 14.8 K-7, check RE3, ruling KR-224, confirmed 2026-11-20).
 
     python tools/check_runbooks.py              check docs/runbooks/*.md
     python tools/check_runbooks.py --self-test  planted faults must fail

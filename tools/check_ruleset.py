@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""G1k check (plan 12.7, ruling KR-225, PROPOSED): the main-branch ruleset requires branches to be up to date.
+"""G1k check (plan 12.7, ruling KR-225, confirmed 2026-11-20; not met: strict is off): the main-branch ruleset requires branches to be up to date.
 
     python tools/check_ruleset.py --file benchmarks/results/k7/ruleset-2026-11-20.json
     gh api repos/AshJha0/quantforge/rulesets/26732064 > ruleset.json && python tools/check_ruleset.py --file ruleset.json

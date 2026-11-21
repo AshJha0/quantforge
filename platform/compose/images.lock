@@ -1,0 +1,9 @@
+# K-3 image lock (KR-272): every compose image reference, pinned to the multi-platform index digest read from
+# the Docker Hub tag API (https://hub.docker.com/v2/repositories/<name>/tags/<tag>, field "digest") on
+# 2026-11-20. Licences: specifications/12-platform/adapters.md section 2.1. Grafana is not used (SC-1).
+postgres:17.6@sha256:00bc86618629af00d2937fdc5a5d63db3ff8450acf52f0636ec813c7f4902929  PostgreSQL Licence
+apache/kafka:4.1.0@sha256:bff074a5d0051dbc0bbbcd25b045bb1fe84833ec0d3c7c965d1797dd289ec88f  Apache-2.0
+clickhouse/clickhouse-server:25.8@sha256:0152dd511befe6a2c2ef53e930726179669b08116da78500b37c51c96ff5ee77  Apache-2.0
+prom/prometheus:v3.7.3@sha256:49214755b6153f90a597adcbff0252cc61069f8ab69ce8411285cd4a560e8038  Apache-2.0
+python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90  PSF-2.0
+eclipse-temurin:25-jre@sha256:945247f9d092703e0c6be92243ef3c51640229e23ab34d353c8dcdc73e6cd4e6  GPL-2.0-with-classpath-exception (OpenJDK); Apache-2.0 (Dockerfiles)

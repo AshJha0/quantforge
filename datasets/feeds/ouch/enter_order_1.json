@@ -1,0 +1,24 @@
+{
+ "format": "QF-OUCH-S",
+ "label": "simulated; not a certified implementation; not connected to any venue",
+ "fields": {
+  "type": "O",
+  "token": "QF0000000001  ",
+  "side": "B",
+  "shares": 100,
+  "stock": "QFSIM   ",
+  "price": 1012500,
+  "time_in_force": 0,
+  "firm": "    ",
+  "display": "Y",
+  "capacity": "P",
+  "sweep": "N",
+  "min_qty": 0,
+  "cross_type": "N",
+  "customer_type": " "
+ },
+ "hex": "4f51463030303030303030303120204200000064514653494d202020000f7314000000002020202059504e000000004e20",
+ "length": 49,
+ "sha256": "803121fc62851782e9a1c2cbccd7b57f779cb8554d654b80c779d1c01b722d53",
+ "derivation": "specifications/12-platform/adapters.md section 3.3"
+}
