@@ -16,7 +16,7 @@ Common checks, in order, `E_DOMAIN`: `expiry_years <= 0`; `alpha <= 0`; `beta` o
 - `chi = ln((sqrt(1 - 2 rho z + z^2) + z - rho)/(1 - rho))`
 - `m = z/chi`, or for `|z| < 1e-7`, `m = 1 - rho z/2 - (3 rho^2 - 2) z^2/12`
 
-**Evaluating `chi` (ruling KR-340, PROPOSED).** Plain idea: written as above, `chi` is the log of a number close to 1 when `z` is small, so it keeps only about `16 + log10|z|` digits, and for `z` far below 0 the sum `sqrt(...) + z - rho` cancels. Every build evaluates the same value from terms of one sign. With `d = z - rho`, `q = (1 - rho)(1 + rho)`:
+**Evaluating `chi` (ruling KR-340, CONFIRMED 2026-11-21).** Plain idea: written as above, `chi` is the log of a number close to 1 when `z` is small, so it keeps only about `16 + log10|z|` digits, and for `z` far below 0 the sum `sqrt(...) + z - rho` cancels. Every build evaluates the same value from terms of one sign. With `d = z - rho`, `q = (1 - rho)(1 + rho)`:
 
 - `s = hypot(d, sqrt(q))` (equal to `sqrt(1 - 2 rho z + z^2)`)
 - `w = s + d` if `d >= 0`, else `w = q/(s - d)` (equal to `s + z - rho`)

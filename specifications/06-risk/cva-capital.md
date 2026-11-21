@@ -1,6 +1,6 @@
 # CVA risk capital: BA-CVA (reduced and full) and SA-CVA
 
-Spec version 0.1.0. Status: implemented in all four builds (Python `python/quantforge_core/cva.py`; Java, C++ and Rust ports per `program/STAGE_K_W2A_HANDOVER.md` and `program/STAGE_K_W2B_HANDOVER.md`) on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; goldens in `datasets/golden/stage_k/` (spec lane 2026-11-19). The rulings stay PROPOSED except those confirmed in `stage-k-rulings-w2.md` (KR-312, KR-315, KR-319, KR-320, KR-324, KR-327, confirmed 2026-11-20). Rulings `stage-k-rulings-w2.md` KR-50, KR-62 to KR-64, KR-67 to KR-69. Parameters `specifications/tables/stage_k/mar50_cva.json`. Gate status: `program/STAGE_K_W2_GATE.md`.
+Spec version 0.1.0. Status: implemented in all four builds (Python `python/quantforge_core/cva.py`; Java, C++ and Rust ports per `program/STAGE_K_W2A_HANDOVER.md` and `program/STAGE_K_W2B_HANDOVER.md`) on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; goldens in `datasets/golden/stage_k/` (spec lane 2026-11-19). Every ruling of `stage-k-rulings-w2.md` is CONFIRMED: KR-312, KR-315, KR-319 (`bank_gsib` default), KR-320, KR-324 and KR-327 on 2026-11-20, the rest on 2026-11-21 (stage K coordinator, delegated by owner). Rulings `stage-k-rulings-w2.md` KR-50, KR-62 to KR-64, KR-67 to KR-69. Parameters `specifications/tables/stage_k/mar50_cva.json`. Gate status: `program/STAGE_K_W2_GATE.md`.
 
 Every output carries `label`: "regulatory formula on caller inputs; not a regulatory return" (KR-69).
 

@@ -575,7 +575,7 @@ public final class Leverage {
             rows.add(new CounterpartyRow(c.id(), bb.get(c.id()), obs.get(c.id()), net[0], net[1], prot.get(c.id()),
                     received.get(c.id()), e));
         }
-        TreeMap<String, List<LeCounterparty>> members = new TreeMap<>();
+        TreeMap<String, List<LeCounterparty>> members = new TreeMap<>(FrtbDrc.CODE_POINT); // KR-326: code-point order
         for (LeCounterparty c : cps) {
             members.computeIfAbsent(c.group() != null ? c.group() : c.id(), k -> new ArrayList<>()).add(c);
         }
@@ -610,7 +610,7 @@ public final class Leverage {
         // LEX20.4: largest first, ties by label; + 0.0 makes -0.0 equal to 0.0 as in Python's comparison
         ranked.sort((a, b) -> {
             int c = Double.compare(b.exposure() + 0.0, a.exposure() + 0.0);
-            return c != 0 ? c : a.group().compareTo(b.group());
+            return c != 0 ? c : FrtbDrc.CODE_POINT.compare(a.group(), b.group()); // KR-326
         });
         List<String> report = new ArrayList<>();
         for (int n = 0; n < ranked.size(); n++) {
