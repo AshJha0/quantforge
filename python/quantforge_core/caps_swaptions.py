@@ -40,7 +40,7 @@ def cap_price(
 ) -> tuple[list[float], float]:
     d, p = curves.build(discount), curves.build(proj)
     if not 1 <= start_months <= 1200:  # projection-and-fra.md, D40: every month count is 1 to 1200
-        raise QfError("E_INPUT", "start_months must be 1 to 1200", "start_months")
+        raise QfError("E_INPUT", "start_months must be at least 1", "start_months")
     start = projection._plus_months(INDEX, projection._spot(INDEX, d.as_of), start_months)
     _check_tenor(tenor_months)
     ps = projection._float_periods(INDEX, start, tenor_months)
@@ -77,7 +77,7 @@ def swaption_price(
 ) -> tuple[float, float, float]:
     d, p = curves.build(discount), curves.build(proj)
     if not 1 <= expiry_months <= 1200:  # projection-and-fra.md, D40: every month count is 1 to 1200
-        raise QfError("E_INPUT", "expiry_months must be 1 to 1200", "expiry_months")
+        raise QfError("E_INPUT", "expiry_months must be at least 1", "expiry_months")
     _check_tenor(tenor_months)
     s = projection._plus_months(INDEX, projection._spot(INDEX, d.as_of), expiry_months)
     if vol < 0:

@@ -61,7 +61,7 @@ pub fn cap_price(
     crate::error::finite("vols", &vols)?;
     crate::error::finite("t", &t)?;
     if !(1..=1200).contains(&t.start_months) {
-        return fail("E_INPUT", "start_months must be 1 to 1200");
+        return fail("E_INPUT", "start_months must be at least 1");
     }
     let as_of = discount.as_of;
     let ps = periods(forward_start(as_of, t.start_months)?, t.tenor_months, 3)?;
@@ -104,7 +104,7 @@ pub fn swaption_price(
     crate::error::finite("vol", &vol)?;
     crate::error::finite("t", &t)?;
     if !(1..=1200).contains(&t.expiry_months) {
-        return fail("E_INPUT", "expiry_months must be 1 to 1200");
+        return fail("E_INPUT", "expiry_months must be at least 1");
     }
     if vol < 0.0 {
         return fail("E_DOMAIN", "vol is negative");

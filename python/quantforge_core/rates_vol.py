@@ -77,7 +77,7 @@ def price_cube(
     if not _increasing(expiries_months) or not _increasing(tenors_months):
         raise _input("node months must be strictly increasing", "cube")
     if not 1 <= expiry_months <= 1200:
-        raise _input("expiry_months must be 1 to 1200", "expiry_months")
+        raise _input("expiry_months must be at least 1", "expiry_months")
     _check_tenor(tenor_months)
     # Every month count runs from 1 to 1200 (projection-and-fra.md, D40), node expiries too, and the
     # check comes before any date is built, as in the C++ and Java builds (fuzz run 44815591552).
@@ -149,7 +149,7 @@ def cap_strip(
     if any(v <= 0 for v in flat_vols):
         raise _domain("a flat vol is not above 0", "flat_vols")
     if not 1 <= start_months <= 1200:
-        raise _input("start_months must be 1 to 1200", "start_months")
+        raise _input("start_months must be at least 1", "start_months")
     _check_tenor(tenors[-1])
     start = projection._plus_months(INDEX, projection._spot(INDEX, d.as_of), start_months)
     ps = projection._float_periods(INDEX, start, tenors[-1])

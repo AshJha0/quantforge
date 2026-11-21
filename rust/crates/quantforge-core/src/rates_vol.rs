@@ -91,7 +91,7 @@ pub fn price_cube(
     // Every month count runs from 1 to 1200 (projection-and-fra.md, D40), node expiries too, checked
     // before any date is built, in the C++ order (fuzz run 44815591552).
     if !(1..=1200).contains(&t.expiry_months) {
-        return fail("E_INPUT", "expiry_months must be 1 to 1200");
+        return fail("E_INPUT", "expiry_months must be at least 1");
     }
     if !(1..=1200).contains(&t.tenor_months) {
         return fail("E_INPUT", "tenor_months must be 1 to 1200");
@@ -174,7 +174,7 @@ pub fn strip_caplets(
         return fail("E_DOMAIN", "flat vols must be above 0");
     }
     if !(1..=1200).contains(&x.start_months) {
-        return fail("E_INPUT", "start_months must be 1 to 1200");
+        return fail("E_INPUT", "start_months must be at least 1");
     }
     let as_of = discount.as_of;
     let longest = tenors[tenors.len() - 1];
