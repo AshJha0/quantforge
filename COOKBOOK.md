@@ -15,7 +15,7 @@ The sections below follow the order in which stages were built. To find recipes 
 | 03 Calibration | [Build a curve](#build-a-curve), [Stage F](#stage-f-recipes) (joint solve), [Stage G](#stage-g-recipes) (Hull-White calibration) |
 | 04 Pricing | [Stage B](#stage-b-recipes), [Stage D](#stage-d-recipes), [Stage E](#stage-e-recipes), [Stage G](#stage-g-recipes) |
 | 05 Volatility | [Stage C](#stage-c-recipes), [Stage E](#stage-e-recipes) |
-| 06 Risk and xVA | [stage K](#stage-k-recipes) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder; [desk recipes](#stage-k-desk-recipes); [wave 2 capital and xVA](#stage-k-wave-2-capital-and-xva-recipes): RRAO, securitisation and CTP DRC, SA-CVA, large exposures, wrong-way CVA), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
+| 06 Risk and xVA | [stage K](#stage-k-recipes) (intraday bounds, SA-CCR, backtesting zones, K-8 ladder; [desk recipes](#stage-k-desk-recipes); [wave 2 capital and xVA](#stage-k-wave-2-capital-and-xva-recipes): RRAO, securitisation and CTP DRC, RFET, SA-CVA, large exposures, wrong-way CVA), [R2 risk](#r2-risk-recipes), [Stage F](#stage-f-recipes), [Stage G](#stage-g-recipes), [stress scenarios and drift](#stage-j-wave-3-stress-scenarios-interpolation-backtests-drift-detectors) |
 | 07 Portfolio | [Stage F](#stage-f-recipes) (book), [portfolio construction](#stage-j-wave-2-portfolio-construction-estimation-es-backtest-baum-welch) |
 | 08 Hedging | [Stage I](#stage-i-recipes) |
 | 09 Microstructure | [Stage H](#stage-h-recipes-available-from-v0100) (book rebuild, quotes, estimators), [trading conventions](#stage-h-multi-asset-recipes-equities-fx-rates-and-their-simulated-venues) |
@@ -1708,6 +1708,34 @@ By hand at `b = 0`: every path has hazard `h = 0.03`, so `a_i = ln 0.03 = -3.506
 | identical paths | 1.0 | 0.11347051247504979 | -14.605170185988092 | `wwr_g-0007` |
 
 The last line, `too_big`, returns `E_DOMAIN` on `wwr_b` ("|wwr_b * value| must be at most 700 (KR-257)"): `b V = 800` would overflow the hazard, and the operation now says so instead of returning a wrong number. How to read it: at `b = 0.3` the CVA is about twice the independent figure on the same paths, because the recalibrated hazard is highest on the paths with the largest exposure; at `b = -0.2` it falls to about a third. The outputs differ from the goldens in the last digit or two, inside the `root_finding` tolerance (1e-9 absolute plus 1e-12 relative). Limits: the paths are inputs (four hand-written paths here, not a simulation); the choice of `b` is a model judgement the operation does not make.
+
+#### Is a risk factor modellable? The RFET on three observation patterns (risk.frtb.rfet)
+
+Plain idea: under the internal models approach a risk factor may stay in the ES model only if it has enough real prices. Either it was observed on at least 24 days in the last 12 months with no 90-day stretch holding fewer than 4 of them, or it was observed on at least 100 days. A factor that fails goes to the stress scenario charge instead ([Tutorial 59](docs/getting-started/tutorial-59-frtb-ima-pla-to-capital.md)).
+
+Formal statement (`specifications/06-risk/frtb-ima.md`, MAR31.12 to 31.16 read 2026-11-19 by the spec lane; ruling KR-59): count distinct calendar days in the 12 months ending at `as_of`; criterion 1 is at least 24 days and at least 4 in every 90-day window lying wholly inside the 12 months; criterion 2 is at least 100 days; pass is either. The goldens use dates in 2025 and 2026, so this recipe builds its own lists for the 12 months to 2028-06-30 (synthetic dates; none is a golden). By hand: every 14 days gives 26 days and at least `floor(90 / 14) = 6` in any 90-day window, so criterion 1 holds; 30 consecutive days give 30 days but leave most windows empty; 100 consecutive days fail criterion 1 for the same reason and pass criterion 2.
+
+```bash
+python -c "
+import datetime as dt, json
+start = dt.date(2027, 7, 5)
+for name, days in (('every_14_days', [start + dt.timedelta(14 * i) for i in range(26)]),
+                   ('one_quarter_daily', [start + dt.timedelta(i) for i in range(30)]),
+                   ('busy_quarter_100', [start + dt.timedelta(i) for i in range(100)])):
+    print(json.dumps({'schema_version': '1.0', 'case_id': name, 'operation': 'risk.frtb.rfet',
+                      'inputs': {'as_of': '2028-06-30', 'observations': [d.isoformat() for d in days]}}))
+for t in (0.75, 0.7499):
+    print(json.dumps({'schema_version': '1.0', 'case_id': f'bucket_{t}', 'operation': 'risk.frtb.rfet.bucket', 'inputs': {'row': 'A', 't': t}}))
+" | uv run --locked --project python quantforge batch
+```
+
+| Case | `distinct_days` | `min_window_count` | First failing window | `crit1` | `crit2` | `pass` |
+|---|---|---|---|---|---|---|
+| every 14 days | 26 | 6 | none | true | false | true |
+| 30 consecutive days | 30 | 0 | starts 2027-08-01, 3 days | false | false | false |
+| 100 consecutive days | 100 | 0 | starts 2027-10-10, 3 days | false | true | true |
+
+Every line has `window_start` 2027-07-01. The first failing window of the second case runs from 1 August, and holds only 1, 2 and 3 August before the observations stop. The bucket lines give `bucket` 2 for `t` 0.75 (lower bound inclusive, `[0.75, 1.5)`) and `bucket` 1 for 0.7499 (MAR31.16 Table 1 row A). Limits: no vendor audit, no representativeness test and no lag between the RFET and calibration periods (spec, Limits).
 
 ### Stage K platform recipes: simulated feeds, end-of-day rehearsal, soak and snapshots
 
