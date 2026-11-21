@@ -12,7 +12,7 @@
 
 Sources: `.github/workflows/release.yml` and `.github/workflows/docs.yml` (read 2026-11-20); the tag pattern `v[0-9]+.[0-9]+.[0-9]+` is the workflow's `on.push.tags`.
 
-**State before this runbook is used (read 2026-11-20).** The last tag is v0.10.0. Stage K round 1 is on `main`, not tagged (pull requests #58 and #59), and goes out with v1.0.0 (owner decision 2026-11-20: no v0.10.1 tag). The version string on `main` is 0.10.1 in every file `tools/check_versions.py` reads. The `release-verify` job and the attested `SHA256SUMS` were added on branch `k-v1-k7` and have never run: they can run only after a tag push.
+**State before this runbook is used (read 2026-11-20; pull request list re-read 2026-11-21).** The last tag is v0.10.0. Stage K is on `main`, not tagged (pull requests #58 to #64), and goes out with v1.0.0 (owner decision 2026-11-20: no v0.10.1 tag). The version string on `main` is 0.10.1 in every file `tools/check_versions.py` reads. The `release-verify` job and the attested `SHA256SUMS` were added on branch `k-v1-k7` and have never run: they can run only after a tag push.
 
 ## 1. Before the tag: what the release must say
 
@@ -86,6 +86,14 @@ For `rust/Cargo.lock`, run `cargo update --workspace` from `rust/` (recalled fro
 4. Build the site and check its anchors as `docs.yml` does: `uv run --no-project --with markdown==3.11.2 python tools/build_site.py --out site`, then `python tools/check_md_anchors.py --site site`. Both must report no broken link.
 
 ## 4. Merge, then tag
+
+Just before the release pull request is opened, the owner turns on the strict required-status-checks policy of ruleset 26732064 (G1k, ruling KR-225; owner decision: on just before the release pull request, not earlier). It was off when last read (`benchmarks/results/k7/ruleset-2026-11-20.json`). Check it, which only reads the setting:
+
+```bash
+gh api repos/AshJha0/quantforge/rulesets/26732064 > ruleset.json && python tools/check_ruleset.py --file ruleset.json
+```
+
+Exit 0 means strict is on and enforcement is active; anything else, the release pull request waits.
 
 The owner merges the release pull request (one pull request for the round; `--merge`, owner standing instruction). Wait for every check on the merge commit of `main` to finish green:
 

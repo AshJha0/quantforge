@@ -39,6 +39,8 @@ jobs:
         run: python3 conformance/mutation/check_stages.py && python3 conformance/mutation/test_gates.py
       - name: golden case figures by class (R6-12)
         run: python3 tools/case_figures.py --check
+      - name: golden totals equal the last TOTALS line in program/R6_HANDOVER.md, no duplicate case ids
+        run: python3 tools/check_case_total.py
       - name: references page lists every spec source (R6-17)
         run: python3 tools/build_references.py --check && python3 tools/test_build_references.py
       - name: E1 error-case coverage, every operation with a Real input has an E1 golden (J0B)

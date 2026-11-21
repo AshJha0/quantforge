@@ -33,5 +33,11 @@ Every material result should identify:
 ## Runtime topology
 Begin with libraries and command-line examples. Add services only when a concrete integration use case requires them. Do not prematurely split the platform into microservices.
 
+What exists on main (read 2026-11-21, commit 11ba1b40; detail in [ARCHITECTURE.md](../ARCHITECTURE.md#stage-k-round-1-platform-pieces-daily-jobs-and-capital-on-main-unreleased)):
+- Every operation is a pure function of one request through the CLI; no build keeps state between requests, and there is no persistent store or service. State a desk would keep (an append-only log, a cached curve, an average of past capital figures) stays with the caller.
+- One library component shares memory between threads: the K-5 snapshot cell (single writer, up to 64 readers; hazard pointers in C++ and Rust, `AtomicReference` in Java, a locked reference in Python that is not lock-free). It is not a CLI operation.
+- Infrastructure adapters and the five simulated feed codecs live in `platform/`, outside the library trees; `tools/check_adapter_deps.py` refuses any library import of them. Their container runs are on GitHub Actions only and have not yet run.
+- Two scheduled jobs (daily paper ledger, daily curve run) run on GitHub Actions and write hash-chained rows to their own branches; they call the Python CLI.
+
 ## Quality gates
 Mathematical correctness, numerical stability, deterministic reproducibility, cross-language conformance, performance evidence and operational behaviour.
