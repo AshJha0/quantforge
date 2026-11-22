@@ -2,7 +2,8 @@
 """Check conformance/mutation/stages.json against the tree (R6-14, review finding 5). Standard library only.
 
 Fails if a stage the library ships (A to I, from datasets/golden and the stage list below) has no modules,
-if a module target matches no source file, or if a suite glob matches no golden file. A gate that mutates
+if a module target matches no source file, or if a suite glob matches no golden file, a module maps no language, or a module's suite misses one of
+its own goldens (the 'goldens' field; PU-1). A gate that mutates
 nothing must fail loudly: plan_matrix.py --stage F returned an empty matrix at v0.8.0 and the run passed.
 
     python conformance/mutation/check_stages.py
@@ -27,7 +28,7 @@ def files_under(prefix):
 
 def problems(cfg):
     out = []
-    src = files_under("cpp26/src") + files_under("java25/src/main") + files_under("python/quantforge_core") + files_under("rust/crates")
+    src = files_under("cpp26/src") + files_under("cpp26/include") + files_under("java25/src/main") + files_under("python/quantforge_core") + files_under("rust/crates")
     goldens = [p.stem for p in (ROOT / "datasets" / "golden").rglob("*.json")]
     for st in REQUIRED_STAGES:
         mods = cfg["stages"].get(st) or []
@@ -37,6 +38,15 @@ def problems(cfg):
             out.append(f"stage {st}: no target")
     for st, mods in cfg["stages"].items():
         for m in mods:
+            if not any(m.get(lang) for lang in LANGS):  # PU-1: a module that maps nothing is scored vacuously
+                out.append(f"stage {st} module {m['module']}: maps no language")
+            for own in [g.strip() for g in m.get("goldens", "").split(",") if g.strip()]:
+                # PU-1: the suites a module is killed against must include the goldens of its own operations
+                if own not in goldens:
+                    out.append(f"stage {st} module {m['module']}: own golden {own!r} is not a golden file")
+                for lang in LANGS:
+                    if m.get(lang) and not any(fnmatch.fnmatch(own, g.strip()) for g in m.get(lang + "_suite", m["suite"]).split(",")):
+                        out.append(f"stage {st} module {m['module']} {lang}: suite excludes its own golden {own!r}")
             for lang in LANGS:
                 t = m.get(lang)
                 if not t:
