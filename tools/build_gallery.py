@@ -321,7 +321,7 @@ def is_live(spec):
 def planned_page(slug, spec):
     return f"""# {spec['title']}
 
-<p class="note">Status: Planned, stage D (in progress). No CLI operation exists yet, so this page has no numbers or charts. Nothing here is a result.</p>
+<p class="note">Status: Planned. No CLI operation exists yet, so this page has no numbers or charts. Nothing here is a result.</p>
 
 ## What it will show
 
