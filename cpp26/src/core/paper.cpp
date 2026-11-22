@@ -779,6 +779,13 @@ const Value* req(const Value& m, string_view key, const string& where) {
     return v;
 }
 
+// The E_SCHEMA part of dstr alone (KR-344, HR-66): a JSON string that parses as a finite decimal, checked for
+// every decimal of a case before any range (E_LIMIT) check.
+void schema_dec(const Value* v, const string& name) {
+    if (!v || v->kind != Kind::String) fail("E_SCHEMA", name, name + " must be a decimal string");
+    (void)parse_py(v->text, name);
+}
+
 // The E_SCHEMA checks of every fill, before any other check of the case (KR-230, HR-122): each fill an object,
 // side, quantity and price present, and side and each decimal a JSON string (fuzz run 44937631714).
 void fill_schema(const Value& fills) {
@@ -790,6 +797,8 @@ void fill_schema(const Value& fills) {
             if (req(f, key, w)->kind != Kind::String) fail("E_SCHEMA", w + key, w + key + " must be a string");
         if (present(f, "fee") && raw_get(f, "fee").kind != Kind::String)
             fail("E_SCHEMA", w + "fee", w + "fee must be a decimal string");
+        for (const char* key : {"quantity", "price", "fee"})  // malformed or non-finite before any E_LIMIT
+            if (present(f, key)) (void)parse_py(raw_get(f, key).text, w + key);
     }
 }
 
@@ -1242,6 +1251,9 @@ void book_apply_fill(const json::Value& in, json::Writer& out) {
     static const Value zero = S("0");
     const Value* position = get(in, "position") ? get(in, "position") : &zero;
     const Value* avg_cost = get(in, "avg_cost") ? get(in, "avg_cost") : &zero;
+    if (cash) schema_dec(cash, "cash");
+    schema_dec(position, "position");
+    schema_dec(avg_cost, "avg_cost");
     Book book;
     book.cash = cash ? dstr(cash, "cash") : Dec{};
     Pos& p = book.pos(sym1);
@@ -1272,11 +1284,19 @@ void book_end_of_day(const json::Value& in, json::Writer& out) {
     const Value *cash_rate = rate("cash_rate"), *debit_rate = rate("debit_rate"), *borrow_rate = rate("borrow_rate");
 
     fill_schema(fills);
+    // every E_SCHEMA before any E_LIMIT or E_DOMAIN (HR-66, KR-344)
+    const std::pair<const Value*, const char*> scalars[] = {
+        {cash_open, "cash_open"}, {position_open, "position_open"}, {avg_cost_open, "avg_cost_open"},
+        {prev_close, "prev_close"}, {close, "close"}, {cash_rate, "cash_rate"}, {debit_rate, "debit_rate"},
+        {borrow_rate, "borrow_rate"}};
+    for (const auto& [v, name] : scalars)
+        if (v) schema_dec(v, name);
+    const bool has_pos = !parse_py(position_open->text, "position_open").zero();
+    if (has_pos && !prev_close) fail("E_SCHEMA", "prev_close", "prev_close is missing (open position)");
+    if ((has_pos || !fills.items.empty()) && !close) fail("E_SCHEMA", "close", "close is missing (position or fills)");
     const Dec cash = dstr(cash_open, "cash_open");
     const Dec n = dstr(position_open, "position_open");
     const std::vector<DayFill> fl = fill_list(fills);
-    if (!n.zero() && !prev_close) fail("E_SCHEMA", "prev_close", "prev_close is missing (open position)");
-    if ((!n.zero() || !fl.empty()) && !close) fail("E_SCHEMA", "close", "close is missing (position or fills)");
     std::optional<Dec> prev, px;
     if (prev_close) prev = dstr(prev_close, "prev_close");
     if (close) px = dstr(close, "close");
@@ -1324,15 +1344,23 @@ void pretrade_check(const json::Value& in, json::Writer& out) {
     for (const char* k : {"side", "type", "quantity"}) req(order, k, "order/");
     for (const char* k : {"side", "type"})  // mistyped is E_SCHEMA; an unlisted string is E_INPUT later
         if (get(order, k)->kind != Kind::String) fail("E_SCHEMA", string("order/") + k, string("order/") + k + " must be a string");
-    dstr(get(order, "quantity"), "order/quantity");
-    if (get(order, "limit_price")) dstr(get(order, "limit_price"), "order/limit_price");
-    for (const char* k : {"max_order_qty", "max_notional", "max_abs_position", "price_band"})
-        dstr(req(limits, k, "limits/"), string("limits/") + k);
     const Value* mo = req(limits, "max_orders_per_day", "limits/");
     if (mo->kind != Kind::Number || !mo->integral) fail("E_SCHEMA", "limits", "limits/max_orders_per_day must be an integer");
     for (const char* k : {"kill_switch", "allow_short"})
         if (present(limits, k) && raw_get(limits, k).kind != Kind::Bool)
             fail("E_SCHEMA", string("limits/") + k, string("limits/") + k + " must be a boolean");
+    std::vector<std::pair<const Value*, string>> scalars = {{get(order, "quantity"), "order/quantity"}};
+    if (get(order, "limit_price")) scalars.emplace_back(get(order, "limit_price"), "order/limit_price");
+    for (const char* k : {"max_order_qty", "max_notional", "max_abs_position", "price_band"})
+        scalars.emplace_back(req(limits, k, "limits/"), string("limits/") + k);
+    scalars.emplace_back(ref_price, "ref_price");
+    scalars.emplace_back(position, "position");
+    scalars.emplace_back(cash, "cash");
+    for (const auto& [v, name] : scalars) schema_dec(v, name);  // every E_SCHEMA before any E_LIMIT (HR-66, KR-344)
+    dstr(get(order, "quantity"), "order/quantity");
+    if (get(order, "limit_price")) dstr(get(order, "limit_price"), "order/limit_price");
+    for (const char* k : {"max_order_qty", "max_notional", "max_abs_position", "price_band"})
+        dstr(req(limits, k, "limits/"), string("limits/") + k);
     const Dec p_ref = dstr(ref_price, "ref_price");
     const Dec pos = dstr(position, "position");
     const Dec c = dstr(cash, "cash");
@@ -1391,6 +1419,25 @@ void ledger_verify(const json::Value& in, json::Writer& out) {
     write_label(out);
 }
 
+// A malformed or non-finite decimal string anywhere in the script is E_SCHEMA before the cash range check
+// (KR-344, HR-66). Only string values are read; every other check of a step stays in step order.
+static void script_decimal_schema(const Value& script) {
+    for (std::size_t k = 0; k < script.items.size(); ++k) {
+        const Value& step = script.items[k];
+        if (step.kind != Kind::Object) continue;
+        const string w = "script/" + std::to_string(k) + "/";
+        std::vector<std::pair<const Value*, string>> found;
+        if (const Value* order = get(step, "order"); order && order->kind == Kind::Object)
+            for (const char* key : {"quantity", "limit_price"}) found.emplace_back(get(*order, key), w + "order/" + key);
+        for (const char* r : {"cash_rate", "debit_rate", "borrow_rate"}) found.emplace_back(get(step, r), w + r);
+        for (const char* name : {"prev_marks", "marks"})
+            if (const Value* m = get(step, name); m && m->kind == Kind::Object)
+                for (const auto& [sym, v] : m->members) found.emplace_back(&v, w + name + "/" + sym);
+        for (const auto& [v, path] : found)
+            if (v && v->kind == Kind::String) (void)parse_py(v->text, path);
+    }
+}
+
 void session_run(const json::Value& in, json::Writer& out) {
     const Value* cash = get(in, "cash");
     if (!cash) string_input(in, "cash");
@@ -1398,9 +1445,11 @@ void session_run(const json::Value& in, json::Writer& out) {
     const Value& lit = object_input(in, "lit");
     const Value& script = array_input(in, "script");
     const Value* dark = get(in, "dark") ? &object_input(in, "dark") : nullptr;
-    dstr(cash, "cash");
+    schema_dec(cash, "cash");
     for (const char* k : {"tick_size", "lot_size", "fee_schedule"})
         if (!get(lit, k)) fail("E_SCHEMA", string("lit/") + k, string("lit/") + k + " is missing");
+    script_decimal_schema(script);  // malformed step decimals before the cash range (HR-66, KR-344)
+    dstr(cash, "cash");
     Session s(*cash, limits, lit, dark);
     std::vector<Value> results;
     std::set<string> symbols;
