@@ -58,6 +58,16 @@ DAY = "pt_h-0002"  # paper.book.end_of_day with two fills
 PRE = "pt_h-0017"  # paper.pretrade.check, SELL LIMIT 2 @ 100
 SES = "pt_h-0030"  # paper.session.run, first step a LIT BUY order
 ORDER = ("script", 0, "order")
+D19 = "1.0000000000000000001"  # 19 decimals: outside the HR-77 input range, E_LIMIT
+
+
+def drop(*path):
+    def edit(inputs):
+        h = inputs
+        for p in path[:-1]:
+            h = h[p]
+        h.pop(path[-1], None)
+    return edit
 
 CASES = [
     case(1, FILL, setter("fills", 0, "price", "\u00e9"), "E_SCHEMA", [],
@@ -76,6 +86,30 @@ CASES = [
          ["two_errors"],
          "two errors: fill 0 side HOLD [structural] and fill 1 price \"1..0\" [schema]; E_SCHEMA first "
          "(was E_PARSE)"),
+    case(7, FILL, both(setter("cash", D19), setter("fills", 1, "price", "é")), "E_SCHEMA", ["two_errors"],
+         "two errors: cash with 19 decimals [limit] and fill 1 price \"é\" [schema]; E_SCHEMA first "
+         "(HR-66; was E_LIMIT in all four builds)"),
+    case(8, DAY, both(setter("cash_open", D19), setter("close", "NaN")), "E_SCHEMA", ["two_errors"],
+         "end_of_day, two errors: cash_open with 19 decimals [limit] and close \"NaN\" [schema]; E_SCHEMA "
+         "first (HR-66; was E_LIMIT)"),
+    case(9, DAY, both(setter("position_open", "1"), drop("prev_close"), setter("fills", 0, "quantity", "0")),
+         "E_SCHEMA", ["two_errors"],
+         "end_of_day, two errors: fill 0 quantity 0 [domain] and prev_close missing with an open position "
+         "[schema]; E_SCHEMA first (HR-66; was E_DOMAIN)"),
+    case(10, PRE, both(setter("cash", D19), setter("order", "limit_price", "é")), "E_SCHEMA",
+         ["two_errors"],
+         "pretrade, two errors: cash with 19 decimals [limit] and limit_price \"é\" [schema]; E_SCHEMA "
+         "first (HR-66; was E_LIMIT)"),
+    case(11, PRE, both(setter("limits", "max_notional", D19), setter("limits", "max_orders_per_day", "3")),
+         "E_SCHEMA", ["two_errors"],
+         "pretrade, two errors: max_notional with 19 decimals [limit] and max_orders_per_day a string "
+         "[schema]; E_SCHEMA first (HR-66; was E_LIMIT)"),
+    case(12, SES, both(setter("cash", D19), setter(*ORDER, "quantity", "é")), "E_SCHEMA", ["two_errors"],
+         "session, two errors: cash with 19 decimals [limit] and order quantity \"é\" [schema]; "
+         "E_SCHEMA first (HR-66; was E_LIMIT)"),
+    case(13, SES, both(setter("cash", D19), drop("lit", "tick_size")), "E_SCHEMA", ["two_errors"],
+         "session, two errors: cash with 19 decimals [limit] and lit/tick_size missing [schema]; E_SCHEMA "
+         "first (HR-66; was E_LIMIT)"),
 ]
 
 

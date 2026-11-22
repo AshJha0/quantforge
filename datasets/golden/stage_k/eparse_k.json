@@ -296,6 +296,411 @@
     "synthetic"
    ],
    "description": "two errors: fill 0 side HOLD [structural] and fill 1 price \"1..0\" [schema]; E_SCHEMA first (was E_PARSE)"
+  },
+  {
+   "case_id": "eparse_k-0007",
+   "operation": "paper.book.apply_fill",
+   "inputs": {
+    "cash": "1.0000000000000000001",
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "2",
+      "price": "100",
+      "fee": "0.20"
+     },
+     {
+      "side": "SELL",
+      "quantity": "1",
+      "price": "\u00e9",
+      "fee": "0.11"
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "paper",
+    "malformed",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "two errors: cash with 19 decimals [limit] and fill 1 price \"\u00e9\" [schema]; E_SCHEMA first (HR-66; was E_LIMIT in all four builds)"
+  },
+  {
+   "case_id": "eparse_k-0008",
+   "operation": "paper.book.end_of_day",
+   "inputs": {
+    "cash_open": "1.0000000000000000001",
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "2",
+      "price": "100",
+      "fee": "0.20"
+     },
+     {
+      "side": "SELL",
+      "quantity": "1",
+      "price": "110",
+      "fee": "0.11"
+     }
+    ],
+    "close": "NaN",
+    "days": 1
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "paper",
+    "malformed",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "end_of_day, two errors: cash_open with 19 decimals [limit] and close \"NaN\" [schema]; E_SCHEMA first (HR-66; was E_LIMIT)"
+  },
+  {
+   "case_id": "eparse_k-0009",
+   "operation": "paper.book.end_of_day",
+   "inputs": {
+    "cash_open": "10000",
+    "fills": [
+     {
+      "side": "BUY",
+      "quantity": "0",
+      "price": "100",
+      "fee": "0.20"
+     },
+     {
+      "side": "SELL",
+      "quantity": "1",
+      "price": "110",
+      "fee": "0.11"
+     }
+    ],
+    "close": "105",
+    "days": 1,
+    "position_open": "1"
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "paper",
+    "malformed",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "end_of_day, two errors: fill 0 quantity 0 [domain] and prev_close missing with an open position [schema]; E_SCHEMA first (HR-66; was E_DOMAIN)"
+  },
+  {
+   "case_id": "eparse_k-0010",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "SELL",
+     "type": "LIMIT",
+     "quantity": "2",
+     "limit_price": "\u00e9"
+    },
+    "ref_price": "100",
+    "position": "1",
+    "cash": "1.0000000000000000001",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "paper",
+    "malformed",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "pretrade, two errors: cash with 19 decimals [limit] and limit_price \"\u00e9\" [schema]; E_SCHEMA first (HR-66; was E_LIMIT)"
+  },
+  {
+   "case_id": "eparse_k-0011",
+   "operation": "paper.pretrade.check",
+   "inputs": {
+    "order": {
+     "side": "SELL",
+     "type": "LIMIT",
+     "quantity": "2",
+     "limit_price": "100"
+    },
+    "ref_price": "100",
+    "position": "1",
+    "cash": "10000",
+    "orders_today": 0,
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1.0000000000000000001",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": "3",
+     "kill_switch": false,
+     "allow_short": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "paper",
+    "malformed",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "pretrade, two errors: max_notional with 19 decimals [limit] and max_orders_per_day a string [schema]; E_SCHEMA first (HR-66; was E_LIMIT)"
+  },
+  {
+   "case_id": "eparse_k-0012",
+   "operation": "paper.session.run",
+   "inputs": {
+    "cash": "1.0000000000000000001",
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    },
+    "lit": {
+     "tick_size": "0.5",
+     "lot_size": "1",
+     "fee_schedule": {
+      "maker_rebate": "0",
+      "taker_fee": "0.001"
+     }
+    },
+    "script": [
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:01Z",
+      "order": {
+       "order_id": "O1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "\u00e9",
+       "limit_price": "101",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     },
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:02Z",
+      "order": {
+       "order_id": "O2",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "106",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "paper",
+    "malformed",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "session, two errors: cash with 19 decimals [limit] and order quantity \"\u00e9\" [schema]; E_SCHEMA first (HR-66; was E_LIMIT)"
+  },
+  {
+   "case_id": "eparse_k-0013",
+   "operation": "paper.session.run",
+   "inputs": {
+    "cash": "1.0000000000000000001",
+    "limits": {
+     "max_order_qty": "10",
+     "max_notional": "1000",
+     "max_abs_position": "5",
+     "price_band": "0.05",
+     "max_orders_per_day": 3,
+     "kill_switch": false,
+     "allow_short": true
+    },
+    "lit": {
+     "lot_size": "1",
+     "fee_schedule": {
+      "maker_rebate": "0",
+      "taker_fee": "0.001"
+     }
+    },
+    "script": [
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:01Z",
+      "order": {
+       "order_id": "O1",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "101",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     },
+     {
+      "op": "SUBMIT",
+      "ts": "2026-11-18T00:00:02Z",
+      "order": {
+       "order_id": "O2",
+       "symbol": "BTC-USD",
+       "side": "BUY",
+       "type": "LIMIT",
+       "quantity": "3",
+       "limit_price": "106",
+       "venue": "LIT"
+      },
+      "snapshot": {
+       "bids": [
+        [
+         "99.5",
+         "4"
+        ]
+       ],
+       "asks": [
+        [
+         "100.5",
+         "2"
+        ],
+        [
+         "101",
+         "5"
+        ]
+       ]
+      }
+     }
+    ]
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "reference-computed"
+   ],
+   "tags": [
+    "invalid",
+    "paper",
+    "malformed",
+    "two_errors",
+    "synthetic"
+   ],
+   "description": "session, two errors: cash with 19 decimals [limit] and lit/tick_size missing [schema]; E_SCHEMA first (HR-66; was E_LIMIT)"
   }
  ]
 }

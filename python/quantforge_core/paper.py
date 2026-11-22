@@ -395,6 +395,25 @@ def input_decimal(v: Any, name: str) -> Decimal:
     return check_range(dec(v, name), name, MAX_INPUT_SCALE)
 
 
+def schema_decimal(v: Any, name: str) -> None:
+    """The E_SCHEMA part of `input_decimal` alone (KR-344, HR-66): a JSON string that parses as a
+    finite decimal, checked for every decimal of a case before any range (E_LIMIT) check."""
+    if not isinstance(v, str):
+        raise QfError("E_SCHEMA", f"{name} must be a decimal string", name)
+    dec_text(v, name)
+
+
+def dec_text(v: str, name: str) -> Decimal:
+    """Python `Decimal(v)` without the range check: malformed or non-finite is E_SCHEMA."""
+    try:
+        d = Decimal(v)
+    except InvalidOperation:
+        raise QfError("E_SCHEMA", f"{name} is not a decimal", name) from None
+    if not d.is_finite():
+        raise QfError("E_SCHEMA", f"{name} is not a finite decimal", name)
+    return d
+
+
 def fill_schema(fills: Sequence[Any]) -> None:
     """The E_SCHEMA checks of every fill, before any other check of the case (KR-230, HR-122):
     each fill an object, `side`, `quantity` and `price` present, and `side` and each decimal a JSON
@@ -408,6 +427,9 @@ def fill_schema(fills: Sequence[Any]) -> None:
                 raise QfError("E_SCHEMA", f"{w}{key} must be a string", w + key)
         if "fee" in f and not isinstance(f["fee"], str):
             raise QfError("E_SCHEMA", f"{w}fee must be a decimal string", w + "fee")
+        for key in ("quantity", "price", "fee"):  # malformed or non-finite before any E_LIMIT
+            if key in f:
+                dec_text(f[key], w + key)
 
 
 def _fill_list(fills: Sequence[Any]) -> list[dict[str, Any]]:
@@ -447,6 +469,9 @@ def book_case(
     """`paper.book.apply_fill`: fills in order on one symbol (HR-50). Without `cash` the output
     gives `cash_delta` (the change of cash) instead of `cash`."""
     fill_schema(fills)
+    for v, name in ((cash, "cash"), (position, "position"), (avg_cost, "avg_cost")):
+        if v is not None:
+            schema_decimal(v, name)
     start = Decimal(0) if cash is None else input_decimal(cash, "cash")
     book = Book(cash=start)
     pos = book.pos(_SYM)
@@ -479,13 +504,27 @@ def day_case(
 ) -> dict[str, Any]:
     """`paper.book.end_of_day` with `paper.pnl.explain` for one symbol (HR-51 to HR-53)."""
     fill_schema(fills)
+    scalars = (
+        (cash_open, "cash_open"),
+        (position_open, "position_open"),
+        (avg_cost_open, "avg_cost_open"),
+        (prev_close, "prev_close"),
+        (close, "close"),
+        (cash_rate, "cash_rate"),
+        (debit_rate, "debit_rate"),
+        (borrow_rate, "borrow_rate"),
+    )
+    for v, name in scalars:  # every E_SCHEMA before any E_LIMIT or E_DOMAIN (HR-66, KR-344)
+        if v is not None:
+            schema_decimal(v, name)
+    n_text = dec_text(position_open, "position_open")
+    if n_text != 0 and prev_close is None:
+        raise QfError("E_SCHEMA", "prev_close is missing (open position)", "prev_close")
+    if (n_text != 0 or len(fills) > 0) and close is None:
+        raise QfError("E_SCHEMA", "close is missing (position or fills)", "close")
     cash = input_decimal(cash_open, "cash_open")
     n = input_decimal(position_open, "position_open")
     fl = _fill_list(fills)
-    if n != 0 and prev_close is None:
-        raise QfError("E_SCHEMA", "prev_close is missing (open position)", "prev_close")
-    if (n != 0 or fl) and close is None:
-        raise QfError("E_SCHEMA", "close is missing (position or fills)", "close")
     prev = None if prev_close is None else input_decimal(prev_close, "prev_close")
     px = None if close is None else input_decimal(close, "close")
     for name, v in (("prev_close", prev), ("close", px)):
@@ -540,6 +579,20 @@ def pretrade_case(
     for k in ("side", "type"):  # mistyped is E_SCHEMA; an unlisted string is E_INPUT later
         if not isinstance(order[k], str):
             raise QfError("E_SCHEMA", f"order/{k} must be a string", "order/" + k)
+    mo = _req(limits, "max_orders_per_day", "limits/")
+    if isinstance(mo, bool) or not isinstance(mo, int):
+        raise QfError("E_SCHEMA", "limits/max_orders_per_day must be an integer", "limits")
+    for k in ("kill_switch", "allow_short"):
+        if k in limits and not isinstance(limits[k], bool):
+            raise QfError("E_SCHEMA", f"limits/{k} must be a boolean", "limits/" + k)
+    scalars = [(order["quantity"], "order/quantity")]
+    if order.get("limit_price") is not None:
+        scalars.append((order["limit_price"], "order/limit_price"))
+    for k in ("max_order_qty", "max_notional", "max_abs_position", "price_band"):
+        scalars.append((_req(limits, k, "limits/"), "limits/" + k))
+    scalars += [(ref_price, "ref_price"), (position, "position"), (cash, "cash")]
+    for v, name in scalars:  # every E_SCHEMA before any E_LIMIT (HR-66, KR-344)
+        schema_decimal(v, name)
     input_decimal(order["quantity"], "order/quantity")
     if order.get("limit_price") is not None:
         input_decimal(order["limit_price"], "order/limit_price")
