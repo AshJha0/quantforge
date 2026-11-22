@@ -20,7 +20,7 @@ Written 2026-11-20 by the lane `k-v1-aad`. **Status: CONFIRMED 2026-11-22** by t
 |---|---|---|
 | KR-346 | One normative `xva.sens.aad` spec (**CONFIRMED 2026-11-22**, coordinator) | Two specs described `xva.sens.aad` with different `wrt` grammars: `06-risk/xva-aad-sensitivities.md` (K-8b design, seven operations, KR-161 and KR-162) and `06-risk/xva-aad-adjustments.md` (this file, KR-262 to KR-268). The implemented and goldened one, `xva-aad-adjustments.md` with suite `aadadj_k`, is normative. `xva-aad-sensitivities.md` is marked superseded by KR-346 and its conflicting request grammar is removed; its design text for the other six operations stays as design notes for a later version (KR-262: adding an operation is a minor change). |
 
-## Ruling KR-350 (lane `k-v1-pt`, 2026-11-22; PROPOSED, for the coordinator)
+## Ruling KR-350 (lane `k-v1-pt`, 2026-11-22; CONFIRMED by the coordinator 2026-11-22: built in four builds and both AAD tapes, pinned by goldens g41tiny_k and aadtiny_k, follow-up audit STAGE_K_PRETAG_AUDIT2 PU-4)
 
 Number check (read 2026-11-22, `git grep -E "KR-3[4-9][0-9]"` over every remote branch after `git fetch`): the highest ruling in use is KR-346; KR-347 to KR-349 sit inside the block KR-340 to KR-349 that `stage-k-rulings-rev1.md` reserved for its lane, so this ruling takes KR-350.
 
