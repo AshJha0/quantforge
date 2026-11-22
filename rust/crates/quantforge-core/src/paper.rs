@@ -91,7 +91,14 @@ fn req<'a>(m: &'a Json, k: &str, w: &str) -> Result<&'a Json> {
         .ok_or_else(|| e("E_SCHEMA", format!("{w}{k} is missing")))
 }
 
+/// +1 BUY, -1 SELL. A present side that is not a JSON string is mistyped, `E_SCHEMA` (cli-contract.md,
+/// error table; fuzz run 44937631714); a string that is not listed (or no side) is `E_INPUT`
+/// (paper-trading.md, Errors; rule_h-0040).
 fn side_sign(v: &Json) -> Result<i64> {
+    match v {
+        Json::Null | Json::Str(_) => {}
+        _ => return Err(e("E_SCHEMA", "side must be a string")),
+    }
     match v.as_str() {
         Some("BUY") => Ok(1),
         Some("SELL") => Ok(-1),
@@ -610,6 +617,9 @@ fn pretrade_check(
         ));
     }
     let sg = side_sign(order.get("side").unwrap_or(&Json::Null))?;
+    if !matches!(order.get("type"), None | Some(Json::Null | Json::Str(_))) {
+        return Err(e("E_SCHEMA", "type must be a string"));
+    }
     let otype = order.get("type").and_then(Json::as_str).unwrap_or("");
     if !TYPES.contains(&otype) {
         return Err(e("E_INPUT", "unknown type"));
@@ -674,18 +684,45 @@ fn pretrade_check(
 
 // ---------------------------------------------------------------- CLI cases (one symbol)
 
-fn fill_list(fills: &[Json]) -> Result<Vec<DayFill>> {
-    let mut out = Vec::new();
+/// The `E_SCHEMA` checks of every fill, before any other check of the case (KR-230, HR-122): each fill an
+/// object, `side`, `quantity` and `price` present, and `side` and each decimal a JSON string (fuzz run
+/// 44937631714: a `side` that was an array crashed the Python side lookup).
+fn fill_schema(fills: &[Json]) -> Result<()> {
     for (k, f) in fills.iter().enumerate() {
         let w = format!("fills/{k}/");
         if !matches!(f, Json::Obj(_)) {
             return Err(e("E_SCHEMA", format!("{w} is not an object")));
         }
-        let sign = side_sign(req(f, "side", &w)?)?;
-        let q = dstr(req(f, "quantity", &w)?, "quantity")?;
-        let p = dstr(req(f, "price", &w)?, "price")?;
-        let zero = s("0");
+        for key in ["side", "quantity", "price"] {
+            if !matches!(req(f, key, &w)?, Json::Str(_)) {
+                return Err(e("E_SCHEMA", format!("{w}{key} must be a string")));
+            }
+        }
+        if !matches!(f.get("fee"), None | Some(Json::Str(_))) {
+            return Err(e("E_SCHEMA", format!("{w}fee must be a decimal string")));
+        }
+    }
+    Ok(())
+}
+
+/// Fills in the KR-230 order over the whole list: schema, decimals (malformed, then `E_LIMIT`), unknown
+/// side (structural `E_INPUT`), then a non-positive quantity or price (`E_DOMAIN`).
+fn fill_list(fills: &[Json]) -> Result<Vec<DayFill>> {
+    fill_schema(fills)?;
+    let zero = s("0");
+    let mut parsed = Vec::new();
+    for f in fills {
+        let q = dstr(req(f, "quantity", "")?, "quantity")?;
+        let p = dstr(req(f, "price", "")?, "price")?;
         let fee = dstr(f.get("fee").unwrap_or(&zero), "fee")?;
+        parsed.push((q, p, fee));
+    }
+    let mut signs = Vec::new();
+    for f in fills {
+        signs.push(side_sign(req(f, "side", "")?)?);
+    }
+    let mut out = Vec::new();
+    for ((q, p, fee), sign) in parsed.into_iter().zip(signs) {
         if !q.is_pos() || !p.is_pos() {
             return Err(e("E_DOMAIN", "quantity and price must be positive"));
         }
@@ -702,6 +739,7 @@ fn fill_list(fills: &[Json]) -> Result<Vec<DayFill>> {
 
 /// `paper.book.apply_fill`: fills in order on one symbol; `cash_delta` when no `cash` is given.
 pub fn book_case(fills: &[Json], cash: Option<&Json>, position: &Json, avg: &Json) -> Result<Json> {
+    fill_schema(fills)?;
     let start = match cash {
         Some(c) => dstr(c, "cash")?,
         None => PyDec::zero(),
@@ -740,6 +778,7 @@ pub struct DayInputs<'a> {
 
 /// `paper.book.end_of_day` with `paper.pnl.explain` for one symbol (HR-51 to HR-53).
 pub fn day_case(d: &DayInputs) -> Result<Json> {
+    fill_schema(d.fills)?;
     let cash = dstr(d.cash_open, "cash_open")?;
     let n = dstr(d.position_open, "position_open")?;
     let fl = fill_list(d.fills)?;
@@ -814,6 +853,12 @@ pub fn pretrade_case(
 ) -> Result<Json> {
     for k in ["side", "type", "quantity"] {
         req(order, k, "order/")?;
+    }
+    for k in ["side", "type"] {
+        // mistyped is E_SCHEMA; an unlisted string is E_INPUT later
+        if !matches!(req(order, k, "order/")?, Json::Str(_)) {
+            return Err(e("E_SCHEMA", format!("order/{k} must be a string")));
+        }
     }
     dstr(req(order, "quantity", "order/")?, "order/quantity")?;
     if let Some(l) = order.get("limit_price").filter(|v| **v != Json::Null) {
@@ -1402,6 +1447,12 @@ pub fn session_case(
             };
             for key in ["order_id", "symbol", "side", "type", "quantity"] {
                 req(order, key, &format!("{w}order/"))?;
+            }
+            // mistyped text fields are E_SCHEMA (fuzz run 44937631714 class); a null venue stays E_INPUT
+            for key in ["order_id", "symbol", "side", "type", "venue"] {
+                if !matches!(order.get(key), None | Some(Json::Null | Json::Str(_))) {
+                    return Err(e("E_SCHEMA", format!("{w}order/{key} must be a string")));
+                }
             }
             for key in ["quantity", "limit_price"] {
                 if let Some(v) = order.get(key).filter(|v| **v != Json::Null) {

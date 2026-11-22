@@ -258,6 +258,7 @@ STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-
                  "sbim_alias_k": None,  # KR-153: the deprecated alias's invariance and error cases; no value case
                  "lim_k": None,  # KR-230/KR-231: size-limit error cases only (bitemporal_query, trigger.check)
                  "fuzzfix_k": None,  # fuzz run 44815591552 and siblings: error cases only (gen_stage_k_fuzz.py)
+                 "fuzzfix_k2": None,  # fuzz run 44937631714 and siblings: error cases only (gen_stage_k_fuzz3.py)
                  "fuzzrev_k": None,  # K-9 finding 1: fuzz runs 2026-11-09..16, error cases only (gen_stage_k_rev1.py)
                  "drc_k": "K-8a", "ima_k": "K-8f", "cva_k": "K-8g", "sacva_k": "K-8g", "df_k": "K-8g",
                  "lev_k": "K-8i", "lex_k": "K-8i",

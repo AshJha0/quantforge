@@ -371,6 +371,30 @@ Stage K v1 integration plus branch `k-v1-rev1` (2026-11-21, merge of local `k-v1
 
 TOTALS: 16609 value 8142 error 5913 invariance 2554
 
+Stage K lane `k-v1-fin` (2026-11-21, counted by `tools/check_case_total.py`, measured): `lex_k-0011` (1 value case, KR-326: group labels U+FFFF and U+1F600 in code-point order, not UTF-16 order).
+
+TOTALS: 16610 value 8143 error 5913 invariance 2554
+
+Stage K error-parity fixes (branch `k-v1-fix`, merged with `k-v1` 19399ec0, then with `origin/k-v1` 5e4facc9 on 2026-11-21, counted 2026-11-21 by `tools/check_case_total.py`, measured): 12 error goldens tag `kr258` (`wwr_g-0027` to `-0032`, `xvaadj_g-0013` to `-0018`) and 11 two-error goldens tag `hr122` add 23 error cases.
+
+TOTALS: 16632 value 8142 error 5936 invariance 2554
+
+Merge of `k-v1-fix` into `k-v1` (2026-11-21, after `k-v1-fin`; counted by `tools/check_case_total.py`, measured): 16,610 + 23 error goldens of `k-v1-fix`.
+
+TOTALS: 16633 value 8143 error 5936 invariance 2554
+
+Stage K lane `k-v1-fuzz3` (2026-11-21, counted by `tools/check_case_total.py`, measured): new golden set `fuzzfix_k2` adds 19 error cases (fuzz run 44937631714, Python `paper.book.apply_fill` with an array `side`, and the same fault class in the sibling `paper.*` handlers; `oracle/python/gen_stage_k_fuzz3.py`).
+
+TOTALS: 16629 value 8143 error 5932 invariance 2554
+
+Merge of `k-v1-fuzz3` into `k-v1` (2026-11-21, after `k-v1-fix`; counted by `tools/check_case_total.py`, measured): 16,633 + 19 error goldens of `fuzzfix_k2`.
+
+TOTALS: 16652 value 8143 error 5955 invariance 2554
+
 Branch `k-v1-aad` after merging `k-xva-spec` (c7a036cc), local `k-v1` (47072365) and `origin/k-v1` (5e4facc9), counted 2026-11-21 by `tools/check_case_total.py` (measured): the 16,609 above plus `aadadj_k` (K-8 AAD, 37 cases: 13 value, 24 error). The K-8b candidates under `oracle/xva_k8b_candidates/` are not goldens (KR-299) and are not counted.
 
 TOTALS: 16646 value 8155 error 5937 invariance 2554
+
+Branch `k-v1-aad` after merging `origin/k-v1` (990ddd45), counted 2026-11-22 by `tools/check_case_total.py` (measured): `k-v1`'s 16,652 (value 8,143, error 5,955) plus `aadadj_k` (37: 13 value, 24 error) = 16,689 (value 8,156, error 5,979, invariance 2,554).
+
+TOTALS: 16689 value 8156 error 5979 invariance 2554

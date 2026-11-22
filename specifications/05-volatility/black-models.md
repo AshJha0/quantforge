@@ -34,7 +34,7 @@ Checks for both, in order, all `E_DOMAIN`: `expiry_years < 0`; `vol < 0`; `disco
 
 Further checks for `vol.option.implied`, `E_DOMAIN`: `expiry_years = 0`; `price < I`, where `I = D max(phi (F-K), 0)`; lognormal `price >= U`, with `U = D F` for a call and `D K` for a put. `price = I` exactly gives `vol = 0`. A solve that fails is `E_NO_CONVERGENCE`, but a correct build meets none on valid inputs. Any solver: the result is judged, not the path. Stop on `|V(v) - price| <= 1e-13 max(1, price)` or better.
 
-**Acceptance by the vol error (ruling KR-341, PROPOSED).** Plain idea: far out of the money the price is tiny, so a price residual of `1e-13 max(1, price)` says nothing about the vol; a build could stop anywhere. A returned `v` must also pass an estimate of its own relative error. With `M` the sum of the magnitudes of the two terms of `V` (lognormal `D (F N(phi d1) + K N(phi d2))`, normal `D (|F - K| N(phi d) + v sqrt T n(d))`), which bounds how much the rounding of their difference can be:
+**Acceptance by the vol error (ruling KR-341, CONFIRMED 2026-11-21).** Plain idea: far out of the money the price is tiny, so a price residual of `1e-13 max(1, price)` says nothing about the vol; a build could stop anywhere. A returned `v` must also pass an estimate of its own relative error. With `M` the sum of the magnitudes of the two terms of `V` (lognormal `D (F N(phi d1) + K N(phi d2))`, normal `D (|F - K| N(phi d) + v sqrt T n(d))`), which bounds how much the rounding of their difference can be:
 
 `e = (|V(v) - price| + 2^-52 M + 2^-1070 (1 + D (|F| + |K| + v sqrt T))) / (v vega(v))`
 

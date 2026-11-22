@@ -774,6 +774,526 @@
     "synthetic"
    ],
    "description": "im without im_spread"
+  },
+  {
+   "case_id": "xvaadj_g-0013",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.0,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "first time 0 (the implied t_0 = 0 is not before it)"
+  },
+  {
+   "case_id": "xvaadj_g-0014",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     -0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "negative first time"
+  },
+  {
+   "case_id": "xvaadj_g-0015",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     0.5,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "two equal times: not increasing"
+  },
+  {
+   "case_id": "xvaadj_g-0016",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     2.0,
+     1.5,
+     1.0,
+     0.5
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "times decreasing"
+  },
+  {
+   "case_id": "xvaadj_g-0017",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.0,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": -0.01,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "two errors: first time 0 [structural] and negative counterparty hazard [domain]; structural E_INPUT first"
+  },
+  {
+   "case_id": "xvaadj_g-0018",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     -1.0,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": -0.01,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_INPUT"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "kr258",
+    "synthetic"
+   ],
+   "description": "two errors: negative first time [structural] and negative counterparty hazard [domain]; structural E_INPUT first"
+  },
+  {
+   "case_id": "xvaadj_g-0019",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     1.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "hr122",
+    "synthetic"
+   ],
+   "description": "two errors: positive ENE [domain] and funding without borrow_spread [schema]; E_SCHEMA first (HR-122)"
+  },
+  {
+   "case_id": "xvaadj_g-0020",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.0,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     120.0,
+     150.0,
+     130.0,
+     80.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": [
+      0.4
+     ]
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": false
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "hr122",
+    "synthetic"
+   ],
+   "description": "two errors: first time 0 [structural] and a list recovery [schema]; E_SCHEMA first (HR-122)"
+  },
+  {
+   "case_id": "xvaadj_g-0021",
+   "operation": "xva.adjustments.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "ee": [
+     1.0
+    ],
+    "ene": [
+     -60.0,
+     -90.0,
+     -100.0,
+     -70.0
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "own": {
+     "hazard_rate": 0.01,
+     "recovery": 0.4
+    },
+    "funding": {
+     "borrow_spread": 0.008,
+     "lend_spread": 0.008,
+     "exclude_dva_overlap": 1
+    }
+   },
+   "expected": {
+    "status": "error",
+    "error_code": "E_SCHEMA"
+   },
+   "tolerance_class": "date_and_convention",
+   "verified_by": [
+    "hand"
+   ],
+   "tags": [
+    "invalid",
+    "xva",
+    "hr122",
+    "synthetic"
+   ],
+   "description": "two errors: ee length differs [structural] and a numeric flag [schema]; E_SCHEMA first (HR-122)"
   }
  ]
 }

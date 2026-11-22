@@ -62,7 +62,7 @@ Checks for both, in order, all `E_DOMAIN`: `expiry_years < 0`; `vol < 0`; `disco
 
 Further checks for `vol.option.implied`, `E_DOMAIN`: `expiry_years = 0`; `price < I`, where `I = D max(phi (F-K), 0)`; lognormal `price >= U`, with `U = D F` for a call and `D K` for a put. `price = I` exactly gives `vol = 0`. A solve that fails is `E_NO_CONVERGENCE`, but a correct build meets none on valid inputs. Any solver: the result is judged, not the path. Stop on `|V(v) - price| <= 1e-13 max(1, price)` or better.
 
-**Acceptance by the vol error (ruling KR-341, PROPOSED).** Plain idea: far out of the money the price is tiny, so a price residual of `1e-13 max(1, price)` says nothing about the vol; a build could stop anywhere. A returned `v` must also pass an estimate of its own relative error. With `M` the sum of the magnitudes of the two terms of `V` (lognormal `D (F N(phi d1) + K N(phi d2))`, normal `D (|F - K| N(phi d) + v sqrt T n(d))`), which bounds how much the rounding of their difference can be:
+**Acceptance by the vol error (ruling KR-341, CONFIRMED 2026-11-21).** Plain idea: far out of the money the price is tiny, so a price residual of `1e-13 max(1, price)` says nothing about the vol; a build could stop anywhere. A returned `v` must also pass an estimate of its own relative error. With `M` the sum of the magnitudes of the two terms of `V` (lognormal `D (F N(phi d1) + K N(phi d2))`, normal `D (|F - K| N(phi d) + v sqrt T n(d))`), which bounds how much the rounding of their difference can be:
 
 `e = (|V(v) - price| + 2^-52 M + 2^-1070 (1 + D (|F| + |K| + v sqrt T))) / (v vega(v))`
 
@@ -114,7 +114,7 @@ Common checks, in order, `E_DOMAIN`: `expiry_years <= 0`; `alpha <= 0`; `beta` o
 - `chi = ln((sqrt(1 - 2 rho z + z^2) + z - rho)/(1 - rho))`
 - `m = z/chi`, or for `|z| < 1e-7`, `m = 1 - rho z/2 - (3 rho^2 - 2) z^2/12`
 
-**Evaluating `chi` (ruling KR-340, PROPOSED).** Plain idea: written as above, `chi` is the log of a number close to 1 when `z` is small, so it keeps only about `16 + log10|z|` digits, and for `z` far below 0 the sum `sqrt(...) + z - rho` cancels. Every build evaluates the same value from terms of one sign. With `d = z - rho`, `q = (1 - rho)(1 + rho)`:
+**Evaluating `chi` (ruling KR-340, CONFIRMED 2026-11-21).** Plain idea: written as above, `chi` is the log of a number close to 1 when `z` is small, so it keeps only about `16 + log10|z|` digits, and for `z` far below 0 the sum `sqrt(...) + z - rho` cancels. Every build evaluates the same value from terms of one sign. With `d = z - rho`, `q = (1 - rho)(1 + rho)`:
 
 - `s = hypot(d, sqrt(q))` (equal to `sqrt(1 - 2 rho z + z^2)`)
 - `w = s + d` if `d >= 0`, else `w = q/(s - d)` (equal to `s + z - rho`)
@@ -175,7 +175,7 @@ Targets in `stage-c-targets.md`. Suites `sabr`, `sabr_deep`, `strata_vol`.
 
 ## Sources
 
-Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for this backfil
+Added in R1 (v0.4.1) to meet plan 11.2.4 and 11.5. These are references only: they do not change any rule above. "(not opened)" means the reference was checked from memory for 
 
 [... truncated to fit one chat; the rest of this file is not included, so answer "cannot check" for anything that depends on it]
 

@@ -2,6 +2,7 @@
 #include "quantforge/core/paper.hpp"
 
 #include <algorithm>
+#include <array>
 #include <charconv>
 #include <cstdio>
 #include <functional>
@@ -419,8 +420,11 @@ Dec dstr(const Value* v, const string& name) {  // a CLI decimal must be a JSON 
     return rng(dec(v, name), name, 18);
 }
 
+// A present side that is not a JSON string is mistyped, E_SCHEMA (cli-contract.md, error table; fuzz run
+// 44937631714); a string that is not listed is E_INPUT (paper-trading.md, Errors; rule_h-0040).
 int side_sign(const Value* side) {
-    if (side && side->kind == Kind::String) {
+    if (side && side->kind != Kind::String) fail("E_SCHEMA", "side", "side must be a string");
+    if (side) {
         if (side->text == "BUY") return 1;
         if (side->text == "SELL") return -1;
     }
@@ -728,7 +732,8 @@ std::vector<string> pretrade(const Value& order, const Dec& p_ref, const Dec& po
         fail("E_UNSUPPORTED_OPERATION", "mode", "paper trading never places live orders");
     const int s = side_sign(get(order, "side"));
     const Value* otype = get(order, "type");
-    if (!otype || otype->kind != Kind::String || std::find(std::begin(types), std::end(types), otype->text) == std::end(types))
+    if (otype && otype->kind != Kind::String) fail("E_SCHEMA", "type", "type must be a string");
+    if (!otype || std::find(std::begin(types), std::end(types), otype->text) == std::end(types))
         fail("E_INPUT", "type", "unknown type");
     const Dec q = dec(get(order, "quantity"), "quantity");
     const Dec band = dec(get(limits, "price_band"), "price_band");
@@ -774,20 +779,40 @@ const Value* req(const Value& m, string_view key, const string& where) {
     return v;
 }
 
-std::vector<DayFill> fill_list(const Value& fills) {
-    std::vector<DayFill> out;
+// The E_SCHEMA checks of every fill, before any other check of the case (KR-230, HR-122): each fill an object,
+// side, quantity and price present, and side and each decimal a JSON string (fuzz run 44937631714).
+void fill_schema(const Value& fills) {
     for (std::size_t k = 0; k < fills.items.size(); ++k) {
         const Value& f = fills.items[k];
         const string w = "fills/" + std::to_string(k) + "/";
         if (f.kind != Kind::Object) fail("E_SCHEMA", w, w + " is not an object");
-        const int s = side_sign(req(f, "side", w));
-        const Dec q = dstr(req(f, "quantity", w), w + "quantity");
-        const Dec p = dstr(req(f, "price", w), w + "price");
-        static const Value zero_text = S("0");
-        const Dec fee = dstr(present(f, "fee") ? (raw_get(f, "fee").kind == Kind::Null ? nullptr : &raw_get(f, "fee")) : &zero_text,
-                             w + "fee");
-        if (sign(q) <= 0 || sign(p) <= 0) fail("E_DOMAIN", w + "quantity", "quantity and price must be positive");
-        out.push_back({sym1, s, parse_py(fmt(q), "quantity"), parse_py(fmt(p), "price"), parse_py(fmt(fee), "fee")});
+        for (const char* key : {"side", "quantity", "price"})
+            if (req(f, key, w)->kind != Kind::String) fail("E_SCHEMA", w + key, w + key + " must be a string");
+        if (present(f, "fee") && raw_get(f, "fee").kind != Kind::String)
+            fail("E_SCHEMA", w + "fee", w + "fee must be a decimal string");
+    }
+}
+
+// Fills in the KR-230 order over the whole list: schema, decimals (malformed, then E_LIMIT), unknown side
+// (structural E_INPUT), then a non-positive quantity or price (E_DOMAIN).
+std::vector<DayFill> fill_list(const Value& fills) {
+    fill_schema(fills);
+    static const Value zero_text = S("0");
+    std::vector<std::array<Dec, 3>> parsed;
+    for (std::size_t k = 0; k < fills.items.size(); ++k) {
+        const Value& f = fills.items[k];
+        const string w = "fills/" + std::to_string(k) + "/";
+        parsed.push_back({dstr(get(f, "quantity"), w + "quantity"), dstr(get(f, "price"), w + "price"),
+                          dstr(present(f, "fee") ? &raw_get(f, "fee") : &zero_text, w + "fee")});
+    }
+    std::vector<int> sides;
+    for (const Value& f : fills.items) sides.push_back(side_sign(get(f, "side")));
+    std::vector<DayFill> out;
+    for (std::size_t k = 0; k < fills.items.size(); ++k) {
+        const auto& [q, p, fee] = parsed[k];
+        if (sign(q) <= 0 || sign(p) <= 0)
+            fail("E_DOMAIN", "fills/" + std::to_string(k) + "/quantity", "quantity and price must be positive");
+        out.push_back({sym1, sides[k], parse_py(fmt(q), "quantity"), parse_py(fmt(p), "price"), parse_py(fmt(fee), "fee")});
     }
     return out;
 }
@@ -1212,6 +1237,7 @@ Verify verify(std::string_view text) {
 
 void book_apply_fill(const json::Value& in, json::Writer& out) {
     const Value& fills = array_input(in, "fills");
+    fill_schema(fills);
     const Value* cash = get(in, "cash");
     static const Value zero = S("0");
     const Value* position = get(in, "position") ? get(in, "position") : &zero;
@@ -1245,6 +1271,7 @@ void book_end_of_day(const json::Value& in, json::Writer& out) {
     const auto rate = [&](const char* k) { return get(in, k) ? get(in, k) : &zero; };
     const Value *cash_rate = rate("cash_rate"), *debit_rate = rate("debit_rate"), *borrow_rate = rate("borrow_rate");
 
+    fill_schema(fills);
     const Dec cash = dstr(cash_open, "cash_open");
     const Dec n = dstr(position_open, "position_open");
     const std::vector<DayFill> fl = fill_list(fills);
@@ -1295,6 +1322,8 @@ void pretrade_check(const json::Value& in, json::Writer& out) {
     const long long orders_today = integer_input(in, "orders_today", 0);
     const Value& limits = object_input(in, "limits");
     for (const char* k : {"side", "type", "quantity"}) req(order, k, "order/");
+    for (const char* k : {"side", "type"})  // mistyped is E_SCHEMA; an unlisted string is E_INPUT later
+        if (get(order, k)->kind != Kind::String) fail("E_SCHEMA", string("order/") + k, string("order/") + k + " must be a string");
     dstr(get(order, "quantity"), "order/quantity");
     if (get(order, "limit_price")) dstr(get(order, "limit_price"), "order/limit_price");
     for (const char* k : {"max_order_qty", "max_notional", "max_abs_position", "price_band"})
@@ -1391,6 +1420,10 @@ void session_run(const json::Value& in, json::Writer& out) {
                 fail("E_SCHEMA", w + "order", w + "order and snapshot are required");
             for (const char* key : {"order_id", "symbol", "side", "type", "quantity"})
                 if (!get(*order, key)) fail("E_SCHEMA", w + "order/" + key, w + "order/" + key + " is missing");
+            // mistyped text fields are E_SCHEMA (fuzz run 44937631714 class); a null venue stays E_INPUT
+            for (const char* key : {"order_id", "symbol", "side", "type", "venue"})
+                if (const Value* v = get(*order, key); v && v->kind != Kind::String)
+                    fail("E_SCHEMA", w + "order/" + key, w + "order/" + key + " must be a string");
             for (const char* key : {"quantity", "limit_price"})
                 if (get(*order, key)) dstr(get(*order, key), w + "order/" + key);
             symbols.insert(text_of(get(*order, "symbol"), w + "order/symbol"));
