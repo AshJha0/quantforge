@@ -35,7 +35,8 @@ CASES = [
 def inputs(hc, hb, excl, extra):
     x = {**json.loads(json.dumps(BASE)), "counterparty": {"hazard_rate": hc, "recovery": 0.4},
          "own": {"hazard_rate": hb, "recovery": 0.4},
-         "funding": {"borrow_spread": 0.008, "lend_spread": 0.012, "exclude_dva_overlap": excl}}
+         "funding": {"borrow_spread": 0.008, "lend_spread": 0.02 if excl else 0.012,
+                     "exclude_dva_overlap": excl}}
     if extra:
         x.update({"im": [50.0, 55.0, 60.0, 40.0], "im_spread": 0.005,
                   "capital": [30.0, 32.0, 28.0, 20.0], "hurdle_rate": 0.1})
