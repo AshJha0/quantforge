@@ -340,9 +340,9 @@ Stage H (v0.10.0, execution and microstructure) is implemented in all four langu
 | Spread cost | In attribution, what fills paid against the mid at the fill time; negative means price improvement |
 | Coordinated omission | Undercounting slow samples when a load generator waits for a slow response; not corrected here because replay is unpaced |
 
-## Stage K terms (in progress)
+## Stage K terms
 
-Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59) and the parts toward v1.0.0 by pull requests #60 to #64 the same day, not tagged, and released with v1.0.0; these terms are defined as its specs use them (read 2026-11-19; the K-3, K-5, K-6, KR-257 and IMA rows read 2026-11-21). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k-in-progress) use them.
+Stage K round 1 is merged to main by 2026-11-20 (pull requests #58 and #59) and the parts toward v1.0.0 by pull requests #60 to #64 the same day, not tagged, and released with v1.0.0; these terms are defined as its specs use them (read 2026-11-19; the K-3, K-5, K-6, KR-257 and IMA rows read 2026-11-21). [Tutorials 51 to 58](docs/getting-started/README.md#stage-k) use them.
 
 | Term | Meaning |
 |---|---|
