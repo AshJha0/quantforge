@@ -125,8 +125,13 @@ impl Tape {
             .collect();
         let sb: Vec<f64> = t.iter().map(|v| (-x.own.hazard_rate * v).exp()).collect();
         let dt: Vec<f64> = (0..n).map(|i| x.times[i] - t[i]).collect();
-        let bc = (0..n).map(|i| sc[i] - sc[i + 1]).collect();
-        let bb = (0..n).map(|i| sb[i] - sb[i + 1]).collect();
+        // b_i = S(t_i) (1 - e^(-h dt_i)), cancellation free (PT-6)
+        let bc = (0..n)
+            .map(|i| sc[i] * -(-x.counterparty.hazard_rate * dt[i]).exp_m1())
+            .collect();
+        let bb = (0..n)
+            .map(|i| sb[i] * -(-x.own.hazard_rate * dt[i]).exp_m1())
+            .collect();
         let df = x.discount_factors.clone();
         let w = (0..n).map(|i| df[i] * sc[i] * sb[i] * dt[i]).collect();
         Tape {
@@ -228,7 +233,7 @@ fn hazards(s: &[f64], gs: &[f64], b: &[f64], gp: &[f64], t: &[f64], dt: &[f64]) 
     }
     let mut pairs = 0.0;
     for i in 0..n {
-        pairs += gp[i] * (t[i] * s[i] - t[i + 1] * s[i + 1]);
+        pairs += gp[i] * (t[i] * b[i] - dt[i] * s[i + 1]);
     }
     let mut buckets = vec![0.0; n];
     let mut tail = 0.0;

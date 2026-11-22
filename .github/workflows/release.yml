@@ -38,6 +38,10 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           # The section's text, up to the next "## " heading, becomes the release notes
           awk -v h="## $version" '/^## / { if (on) exit; c = substr($0, length(h) + 1, 1); if (index($0, h) == 1 && (c == "" || c == ":" || c == " ")) on = 1 } on' CHANGELOG.md > notes.md
+          # No draft placeholder may be published (audit PT-4): notes.md and the version's release page, when present
+          python3 tools/check_release_notes.py --self-test
+          pages=(notes.md); [[ -f "docs/releases/v$version.md" ]] && pages+=("docs/releases/v$version.md")
+          python3 tools/check_release_notes.py "${pages[@]}" || { echo "::error::release notes hold a draft marker"; exit 1; }
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: notes

@@ -204,11 +204,10 @@ void op_xva_adjustments(const In& in, Out& out) {
     const double sl = excl ? std::max(sl0 - b.h * (1 - b.R), 0.0) : sl0;
     double cva = 0, dva = 0, fca = 0, fba = 0, mva = 0, kva = 0, prev = 0;
     for (std::size_t i = 0; i < n; ++i) {
-        const double Sc0 = std::exp(-c.h * prev), Sc1 = std::exp(-c.h * t[i]);
-        const double Sb0 = std::exp(-b.h * prev), Sb1 = std::exp(-b.h * t[i]);
+        const double Sc0 = std::exp(-c.h * prev), Sb0 = std::exp(-b.h * prev);
         const double dt = t[i] - prev, w = D[i] * Sc0 * Sb0 * dt;
-        cva += D[i] * ee[i] * (Sc0 - Sc1) * Sb0;
-        dva += D[i] * std::fabs(ene[i]) * (Sb0 - Sb1) * Sc0;
+        cva += D[i] * ee[i] * (Sc0 * -std::expm1(-c.h * dt)) * Sb0;  // cancellation free (PT-6)
+        dva += D[i] * std::fabs(ene[i]) * (Sb0 * -std::expm1(-b.h * dt)) * Sc0;
         fca += w * ee[i];
         fba += w * std::fabs(ene[i]);
         if (has_im) mva += w * im[i];
@@ -290,11 +289,10 @@ void op_xva_sens_aad(const In& in, Out& out) {
     const double sl = r.exclude_overlap ? std::max(r.sl - r.hb * (1 - r.rb), 0.0) : r.sl;
     double cva = 0, dva = 0, fca = 0, fba = 0, mva = 0, kva = 0, prev = 0;
     for (std::size_t i = 0; i < n; ++i) {
-        const double Sc0 = std::exp(-r.hc * prev), Sc1 = std::exp(-r.hc * r.t[i]);
-        const double Sb0 = std::exp(-r.hb * prev), Sb1 = std::exp(-r.hb * r.t[i]);
+        const double Sc0 = std::exp(-r.hc * prev), Sb0 = std::exp(-r.hb * prev);
         const double dt = r.t[i] - prev, w = r.df[i] * Sc0 * Sb0 * dt;
-        cva += r.df[i] * r.ee[i] * (Sc0 - Sc1) * Sb0;
-        dva += r.df[i] * std::fabs(r.ene[i]) * (Sb0 - Sb1) * Sc0;
+        cva += r.df[i] * r.ee[i] * (Sc0 * -std::expm1(-r.hc * dt)) * Sb0;  // cancellation free (PT-6)
+        dva += r.df[i] * std::fabs(r.ene[i]) * (Sb0 * -std::expm1(-r.hb * dt)) * Sc0;
         fca += w * r.ee[i];
         fba += w * std::fabs(r.ene[i]);
         if (r.has_im) mva += w * r.im[i];

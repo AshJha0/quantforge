@@ -94,8 +94,8 @@ public final class XvaAad {
             w = new double[n];
             for (int i = 0; i < n; i++) {
                 dt[i] = r.t()[i] - t[i];
-                bc[i] = sc[i] - sc[i + 1];
-                bb[i] = sb[i] - sb[i + 1];
+                bc[i] = sc[i] * -Math.expm1(-r.hc() * dt[i]); // cancellation free (PT-6)
+                bb[i] = sb[i] * -Math.expm1(-r.hb() * dt[i]);
                 w[i] = df[i] * sc[i] * sb[i] * dt[i];
             }
         }
@@ -180,7 +180,7 @@ public final class XvaAad {
         }
         double pairs = 0.0;
         for (int i = 0; i < n; i++) {
-            pairs += gp[i] * (t[i] * s[i] - t[i + 1] * s[i + 1]);
+            pairs += gp[i] * (t[i] * b[i] - dt[i] * s[i + 1]);
         }
         out[0] = -flat - pairs;
         double tail = 0.0;
