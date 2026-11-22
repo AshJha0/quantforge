@@ -5,7 +5,8 @@
 
 Each check shows the gate failing on a planted fault and passing on the real content:
   1. every stage in stages.json plans a non-empty matrix; a planted empty stage F makes plan_matrix exit 1;
-  2. check_stages.py passes on the committed file and fails on an empty stage and on a target naming no file;
+  2. check_stages.py passes on the committed file and fails on an empty stage, on a target naming no file, on a module mapping no language and on a suite
+     that excludes the module's own goldens (PU-1);
   3. stage_report --gate fails a 17/20 module (85%, Wilson lower bound 64%) and passes a 39/40 module;
   4. a countersigned reason clears a listed module; an unsigned one does not; a Rust module with a shard
      file missing fails the gate however well the shards present scored (K9-1c);
@@ -263,6 +264,17 @@ def main():
         bp2 = tmp / "bad2.json"
         bp2.write_text(json.dumps(bad2), encoding="utf-8")
         check("planted missing target: check_stages fails", quiet(check_stages.main, [str(bp2)]) == 1)
+        bad3 = json.loads(json.dumps(cfg))
+        bad3["stages"]["K"].append({"module": "planted_empty", "suite": "aadadj_k"})
+        bp3 = tmp / "bad3.json"
+        bp3.write_text(json.dumps(bad3), encoding="utf-8")
+        check("planted module with no mapped language: check_stages fails", quiet(check_stages.main, [str(bp3)]) == 1)
+        bad4 = json.loads(json.dumps(cfg))
+        aad = next(m for m in bad4["stages"]["K"] if m["module"] == "xva_aad")
+        aad["suite"] = "*_g"  # the PU-1 shape: stage G goldens only, none calls xva.sens.aad
+        bp4 = tmp / "bad4.json"
+        bp4.write_text(json.dumps(bad4), encoding="utf-8")
+        check("planted suite excluding the module's own goldens: check_stages fails", quiet(check_stages.main, [str(bp4)]) == 1)
 
         one = {"target": {"T": 0.8}, "stages": {"T": [{"module": "m", "suite": "x", "python": "p"}]}}
         sp = tmp / "one.json"
