@@ -165,7 +165,7 @@ impl PyDec {
         PyDec::make(n < 0, mag, 0)
     }
 
-    /// Python `Decimal(text)`: `None` when the text is not a decimal (`E_PARSE` for the caller),
+    /// Python `Decimal(text)`: `None` when the text is not a decimal (`E_SCHEMA` for the caller, KR-344),
     /// `Some(Err(E_SCHEMA))` for a non-finite token (HR-12, ruling F-2a).
     pub fn parse(text: &str) -> Option<Result<PyDec>> {
         let t = text.trim();

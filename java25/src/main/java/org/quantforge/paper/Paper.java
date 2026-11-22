@@ -81,20 +81,20 @@ public final class Paper {
     private static final Pattern NON_FINITE =
             Pattern.compile("(?i)[+-]?(inf|infinity|nan\\d*|snan\\d*)");
 
-    /** Python {@code Decimal(text)}: a non-finite token is E_SCHEMA (HR-12, F-2a), anything else malformed E_PARSE. */
+    /** Python {@code Decimal(text)}: a non-finite token (HR-12, F-2a) and anything else malformed (KR-344) are E_SCHEMA. */
     static BigDecimal parse(String text, String name) {
         String t = text.strip();
         if (FINITE.matcher(t).matches()) {
             try {
                 return new BigDecimal(t);
             } catch (NumberFormatException | ArithmeticException e) {
-                throw new QfError("E_PARSE", name + " is not a decimal", name);
+                throw new QfError("E_SCHEMA", name + " is not a decimal", name);
             }
         }
         if (NON_FINITE.matcher(t).matches()) {
             throw new QfError("E_SCHEMA", name + " is not a finite decimal", name);
         }
-        throw new QfError("E_PARSE", name + " is not a decimal", name);
+        throw new QfError("E_SCHEMA", name + " is not a decimal", name);
     }
 
     /** Python {@code dec}: a decimal given as a string or an integer; reals and booleans are refused (E_INPUT). */
@@ -119,7 +119,7 @@ public final class Paper {
             case String s -> {
                 return rng(parse(s, name), name);
             }
-            case null, default -> throw new QfError("E_PARSE", name + " is not a decimal", name);
+            case null, default -> throw new QfError("E_SCHEMA", name + " is not a decimal", name);
         }
     }
 

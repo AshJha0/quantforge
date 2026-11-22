@@ -57,7 +57,7 @@ fn set_key(o: &mut Json, k: &str, v: Json) {
 }
 
 fn parse_text(t: &str, name: &str) -> Result<PyDec> {
-    PyDec::parse(t).unwrap_or_else(|| Err(e("E_PARSE", format!("{name} is not a decimal"))))
+    PyDec::parse(t).unwrap_or_else(|| Err(e("E_SCHEMA", format!("{name} is not a decimal"))))
 }
 
 /// Python `dec`: a decimal given as a string (or integer); floats and booleans are `E_INPUT`.
@@ -71,7 +71,7 @@ fn dec(v: &Json, name: &str) -> Result<PyDec> {
         }
         Json::Int(n) => PyDec::int(*n).rng(name, 36),
         Json::Str(t) => parse_text(t, name)?.rng(name, 36),
-        _ => Err(e("E_PARSE", format!("{name} is not a decimal"))),
+        _ => Err(e("E_SCHEMA", format!("{name} is not a decimal"))),
     }
 }
 

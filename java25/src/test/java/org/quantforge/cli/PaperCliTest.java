@@ -210,7 +210,7 @@ class PaperCliTest {
         String j = run("paper.book.apply_fill", "{\"fills\":[{\"side\":\"BUY\",\"quantity\":\" 2 \",\"price\":\"1E+2\"}]}");
         assertTrue(j.contains("\"cash_delta\":\"-200\""), j);
         String p = run("paper.book.apply_fill", "{\"fills\":[{\"side\":\"BUY\",\"quantity\":\"x\",\"price\":\"1\"}]}");
-        assertTrue(p.contains("\"E_PARSE\""), p);
+        assertTrue(p.contains("\"E_SCHEMA\""), p);
     }
 
     /** HR-78: a repeated key at any level is PARSE; HR-77: out of the exact range is E_LIMIT, never rounded. */

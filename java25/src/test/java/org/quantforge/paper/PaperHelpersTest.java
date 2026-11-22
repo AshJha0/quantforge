@@ -31,8 +31,8 @@ class PaperHelpersTest {
         assertEquals(new BigDecimal("12.5"), Paper.parse(" 12.5 ", "p"));
         assertEquals("E_SCHEMA", code(() -> Paper.parse("NaN", "p")));
         assertEquals("E_SCHEMA", code(() -> Paper.parse("-Infinity", "p")));
-        assertEquals("E_PARSE", code(() -> Paper.parse("12,5", "p")));
-        assertEquals("E_PARSE", code(() -> Paper.parse("abc", "p")));
+        assertEquals("E_SCHEMA", code(() -> Paper.parse("12,5", "p")));
+        assertEquals("E_SCHEMA", code(() -> Paper.parse("abc", "p")));
     }
 
     @Test
@@ -44,8 +44,8 @@ class PaperHelpersTest {
         assertEquals(new BigDecimal("1.5"), Paper.dec(new BigDecimal("1.5"), "q"));
         assertEquals("E_INPUT", code(() -> Paper.dec(Boolean.TRUE, "q")));
         assertEquals("E_INPUT", code(() -> Paper.dec(new Json.Number(1.5, "1.5"), "q")));
-        assertEquals("E_PARSE", code(() -> Paper.dec(null, "q")));
-        assertEquals("E_PARSE", code(() -> Paper.dec(List.of(), "q")));
+        assertEquals("E_SCHEMA", code(() -> Paper.dec(null, "q")));
+        assertEquals("E_SCHEMA", code(() -> Paper.dec(List.of(), "q")));
     }
 
     @Test

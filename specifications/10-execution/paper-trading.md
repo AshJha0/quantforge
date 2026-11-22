@@ -81,7 +81,7 @@ Canonical bytes (HR-45): the record without `hash`, JSON with keys sorted by cod
 When an order reaches a final state, a `TCA` record carries `exec.tca.shortfall` (`tca.md`) with decision price = P_ref at the pre-trade check, arrival price = mid at venue entry, end price = close P_t, the order's fills and fees.
 
 ## Errors
-`E_UNSUPPORTED_OPERATION` live mode; `E_DOMAIN` non-positive quantity or price; `E_INPUT` unknown side/type/kind, a fill for an unknown order, a fill over the order quantity; `E_SCHEMA` missing field, a JSON number where a decimal string is expected, or a non-finite token ("NaN", "Infinity", "-Infinity") in a decimal string (HR-12, ruling F-2a).
+`E_UNSUPPORTED_OPERATION` live mode; `E_DOMAIN` non-positive quantity or price; `E_INPUT` unknown side/type/kind, a fill for an unknown order, a fill over the order quantity; `E_SCHEMA` missing field, a JSON number where a decimal string is expected, or a non-finite token ("NaN", "Infinity", "-Infinity") in a decimal string (HR-12, ruling F-2a), or a decimal string that is not a decimal, such as "é" (ruling KR-344; `E_PARSE` is only for input that is not valid JSON or has a duplicate key).
 
 ## Acceptance tests (fixed before any run, HR-55)
 - A1 Ledger: every golden pt_h-0020..0023 passes; appending 10,000 random records and flipping any one byte in any line makes `verify` fail at that seq or earlier; truncating the last line leaves a valid shorter chain (detected only by the published head hash, HR-46).

@@ -60,7 +60,7 @@ def dec(value: Any, name: str) -> Decimal:
     try:
         d = Decimal(str(value))
     except InvalidOperation:
-        raise QfError("E_PARSE", f"{name} is not a decimal", name) from None
+        raise QfError("E_SCHEMA", f"{name} is not a decimal", name) from None
     if not d.is_finite():  # HR-12, ruling F-2a: a non-finite token is a malformed decimal
         raise QfError("E_SCHEMA", f"{name} is not a finite decimal", name)
     return check_range(d, name)

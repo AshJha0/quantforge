@@ -310,7 +310,7 @@ Dec parse_py(string_view t, const string& name) {
         ok = run(ep) && ep.size() < 9;
         if (ok) e = (eneg ? -1 : 1) * std::stol(ep);
     }
-    if (!ok || i != t.size()) fail("E_PARSE", name, name + " is not a decimal");
+    if (!ok || i != t.size()) fail("E_SCHEMA", name, name + " is not a decimal");
     Dec x;
     x.d = ip + fp;
     x.neg = negative;
@@ -408,11 +408,11 @@ Dec dec(const Value* v, const string& name) {
             if (!v->integral) fail("E_INPUT", name, name + " must be a decimal string");
             return rng(parse_py(v->text, name), name);
         case Kind::String: return rng(parse_py(v->text, name), name);
-        default: fail("E_PARSE", name, name + " is not a decimal");
+        default: fail("E_SCHEMA", name, name + " is not a decimal");
     }
 }
 Dec dec(const Value& v, const string& name) {
-    if (v.kind == Kind::Null) fail("E_PARSE", name, name + " is not a decimal");
+    if (v.kind == Kind::Null) fail("E_SCHEMA", name, name + " is not a decimal");
     return dec(&v, name);
 }
 Dec dstr(const Value* v, const string& name) {  // a CLI decimal must be a JSON string
