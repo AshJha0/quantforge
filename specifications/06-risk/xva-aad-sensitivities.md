@@ -1,6 +1,8 @@
 # AAD sensitivities of the xVA set
 
-Spec version 0.1.0. Status: **PROPOSED** (stage K item K-8b; xVA spec lane 2026-11-19; nothing implemented, no golden file written). Rulings `stage-k-rulings-xva.md` KR-161, KR-162, KR-173 to KR-176; stage G G-9, G-35, G-41; plan 14.8 K-8 ("AAD xVA sensitivities equal bump to 1e-8 relative"). Gate: `program/STAGE_K_XVA_GATE.md`.
+**Superseded by KR-346 (2026-11-22).** The normative `xva.sens.aad` is `xva-aad-adjustments.md` (rulings KR-262 to KR-268, suite `aadadj_k`): its request, `wrt` keys, outputs and error order apply. This file is kept as design notes for the six operations beyond `xva.adjustments.value`; its own request grammar has been removed.
+
+Spec version 0.1.0. Status: **SUPERSEDED** (was PROPOSED (stage K item K-8b; xVA spec lane 2026-11-19; nothing implemented, no golden file written). Rulings `stage-k-rulings-xva.md` KR-161, KR-162, KR-173 to KR-176; stage G G-9, G-35, G-41; plan 14.8 K-8 ("AAD xVA sensitivities equal bump to 1e-8 relative"). Gate: `program/STAGE_K_XVA_GATE.md`.
 
 **Plain idea.** A desk hedging CVA needs to know how CVA moves when each input moves: the counterparty's spread, recovery, every point of the exposure profile, every discount factor, the funding spreads. Bumping each input and recomputing costs one full recomputation per input. Reverse-mode automatic differentiation (AAD) records the calculation once and runs it backwards, giving every derivative for a small fixed multiple of one calculation. The acceptance is the plan's: each AAD number must equal a careful bump-and-recompute to 1e-8 relative. Because AAD differentiates exactly what the code computes, the bump must recompute the same code; and where the code has a kink (`max(x, 0)` of a path value, a funding overlap floor, an exercise decision) neither number means much, so no test sits on one.
 
@@ -17,9 +19,7 @@ Spec version 0.1.0. Status: **PROPOSED** (stage K item K-8b; xVA spec lane 2026-
 
 ### `xva.sens.aad` (KR-162)
 
-Inputs: `operation` (one of `xva.adjustments.value`, `xva.colva.value`, `xva.funding.asymmetric`, `xva.mva.value`, `xva.wwr.cva_gaussian_copula`, `xva.exposure.closeout_normal`, `xva.exposure.portfolio_hw`), `inputs` (that operation's inputs), optional `wrt` (list of input paths such as `counterparty.hazard_rate`, `ee[2]`, `borrow_curve.zero_spreads[0]`; default: every real input; for `xva.exposure.portfolio_hw` only `hazard_rate` and `recovery`).
-
-Outputs: the operation's outputs; `gradient` (map from output name to a map from input path to `d output / d input`, per unit absolute change); `reference` (optional, when `check: true`: the KR-161 Richardson value per entry and the agreement flag).
+Request, `wrt` grammar, outputs: as `xva-aad-adjustments.md` (KR-262, KR-263; normative by KR-346). A later version that adds an operation here extends KR-263's key list for it; the path grammar this file first proposed (`ee[2]`, `borrow_curve.zero_spreads[0]`, a `reference` output) is withdrawn.
 
 Definition: the derivative of the operation **as computed** (KR-161). For `xva.exposure.portfolio_hw`, `d cva / d hazard_rate` and `d cva / d recovery` with the exact one-factor EE fixed (it does not depend on them), so `d cva / d R = -cva / (1 - R)` and `d cva / d h = (1 - R) sum_i ee_i (t_i e^(-h t_i) - t_(i-1) e^(-h t_(i-1)))`.
 
@@ -57,11 +57,10 @@ Definition: the derivative of the operation **as computed** (KR-161). For `xva.e
 | aadx_k-0009 .. 0012 | closed forms above on the exact EE | O |
 <!-- strip:end -->
 
-## Errors (order KR-175)
+## Errors
 
-`E_SCHEMA`: unknown `operation`; `wrt` not a list of strings. Structural `E_INPUT`: a `wrt` path that names no real input, or names an input the operation does not differentiate (`xva.exposure.portfolio_hw` with `wrt` `sigma`). Then the wrapped operation's own errors, in its own order. Error goldens: aadx_ke-0001 `wrt ["counterparty.colour"]` (`E_INPUT`); aadx_ke-0002 wrapped `xva.adjustments.value` with `recovery 1` (`E_DOMAIN`, the wrapped error); aadx_ke-0003 `operation "xva.cva.magic"` and `wrt 5` at once (`E_SCHEMA`).
+As `xva-aad-adjustments.md` (KR-267, the KR-230 order; KR-345 amends KR-175 to the same order). The design error cases aadx_ke-0001 to -0003 are realised as `aadadj_k-0018`, `-0022`, `-0014` and `-0017`.
 
-<!-- strip:begin -->
 ## Acceptance (fixed before any run; proposed, frozen on confirmation)
 
 - A1 (plan 14.8 K-8, KR-161) Every gradient entry of every value case in all four builds: `|AAD - ref| <= 1e-10 + 1e-8 |ref|`, `ref` the Richardson central bump of the same build's operation. Entries failing the second-pair kink test are dropped before the golden is frozen, with the list recorded; none is expected in the cases above (aadx_k-0002 sits 20 bp from the overlap kink; the bump moves `s_l` by at most 1e-4 relative, 8e-7 absolute).
