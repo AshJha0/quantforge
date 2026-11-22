@@ -10,7 +10,7 @@
   "version": "1.0.0",
   "stage_h_outside": "78.0% (160 of 205 value cases, oracle/OUTSIDE_SHARES.md)",
   "stage_h_unchecked": "45 of the 205 stage H value cases",
-  "next_stage": "no stage planned after v1.0.0; open items and every recorded miss in docs/known-issues.md",
+  "next_stage": "no stage planned after v1.0.0; open items and the misses at the tag are in docs/known-issues.md",
   "status_glance": [
     [
       "Release",
