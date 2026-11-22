@@ -254,8 +254,8 @@ pub fn adjustments(x: &AdjInputs) -> Result<Adjustments> {
         let (t, d) = (x.times[i], x.discount_factors[i]);
         let dt = t - prev;
         let alive = sc(prev) * sb(prev);
-        o.cva += d * x.ee[i] * (sc(prev) - sc(t)) * sb(prev);
-        o.dva += d * x.ene[i].abs() * (sb(prev) - sb(t)) * sc(prev);
+        o.cva += d * x.ee[i] * (sc(prev) * -(-hc * dt).exp_m1()) * sb(prev);
+        o.dva += d * x.ene[i].abs() * (sb(prev) * -(-hb * dt).exp_m1()) * sc(prev);
         o.fca += d * x.ee[i] * alive * dt;
         o.fba += d * x.ene[i].abs() * alive * dt;
         if let (Some(m), Some((im, _))) = (o.mva.as_mut(), x.im.as_ref()) {

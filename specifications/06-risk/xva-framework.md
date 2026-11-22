@@ -27,7 +27,7 @@ Worked example (`collexp_g-0001` and `-0004`). Four paths, quarterly to one year
 Inputs: `times` `t_1 < ... < t_n` (buckets from 0; `t_1 > 0` and strictly increasing, else `E_INPUT`, KR-258), `discount_factors`, `ee` (`>= 0`), `ene` (`<= 0`) (all length `n`, else `E_INPUT`; signs else `E_DOMAIN`); `counterparty` and `own` `{hazard_rate >= 0, recovery in [0, 1)}` (else `E_DOMAIN`); `funding` `{borrow_spread, lend_spread, exclude_dva_overlap}`; optional `im` with `im_spread`, optional `capital` with `hurdle_rate` (each pair together, else `E_INPUT`).
 
 Formal statement, buckets `(t_(i-1), t_i]`, exposure at the bucket end, `S_c`, `S_b` the survival curves `e^(-h t)`, both names alive at the bucket start for the first-to-default weight [BM]:
-- `CVA = (1 - R_c) sum D_i ee_i (S_c(t_(i-1)) - S_c(t_i)) S_b(t_(i-1))`; `DVA = (1 - R_b) sum D_i |ene_i| (S_b(t_(i-1)) - S_b(t_i)) S_c(t_(i-1))`;
+- `CVA = (1 - R_c) sum D_i ee_i (S_c(t_(i-1)) - S_c(t_i)) S_b(t_(i-1))`; `DVA = (1 - R_b) sum D_i |ene_i| (S_b(t_(i-1)) - S_b(t_i)) S_c(t_(i-1))`; each bucket default probability `S(t_(i-1)) - S(t_i)` is evaluated as `S(t_(i-1)) (1 - e^(-h (t_i - t_(i-1))))` with `expm1`, which is the same number in exact arithmetic and loses no digits at small `h dt` (KR-350, `stage-k-rulings-xva-aad.md`);
 - `FCA = s_b sum D_i ee_i S_c S_b(t_(i-1)) dt_i`, `FBA = s_l sum D_i |ene_i| S_c S_b(t_(i-1)) dt_i`, `FVA = FCA - FBA`. **Overlap (G-41):** with `exclude_dva_overlap`, `s_l` is replaced by `max(s_l - h_b (1 - R_b), 0)`, removing the part of the lending benefit that is the bank's own credit spread and is already in DVA;
 - `MVA = s_IM sum D_i IM_i S_c S_b dt_i`; `KVA = hurdle sum D_i capital_i S_c S_b dt_i` [GK14].
 

@@ -620,7 +620,7 @@ class GalleryVol(unittest.TestCase):
     def test_planned_page_has_no_numbers(self):
         spec = {"title": "T", "shows": "Something.", "kind": "none"}
         text = self.bg.planned_page("x", spec)
-        self.assertIn("Planned, stage D", text)
+        self.assertIn("Status: Planned. No CLI operation exists yet", text)
         self.assertNotIn("<svg", text)
 
     def test_stage_d_renderer_hook_routes_live_entries(self):

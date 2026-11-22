@@ -88,8 +88,8 @@ struct Tape {
         }
         for (std::size_t i = 0; i < n; ++i) {
             dt[i] = r.t[i] - t[i];
-            bc[i] = sc[i] - sc[i + 1];
-            bb[i] = sb[i] - sb[i + 1];
+            bc[i] = sc[i] * -std::expm1(-r.hc * dt[i]);  // cancellation free (PT-6)
+            bb[i] = sb[i] * -std::expm1(-r.hb * dt[i]);
             w[i] = df[i] * sc[i] * sb[i] * dt[i];
         }
     }
@@ -165,7 +165,7 @@ inline std::pair<double, Vec> hazards(const Vec& s, const Vec& gs, const Vec& b,
     const std::size_t n = dt.size();
     double single = 0.0, pairs = 0.0;
     for (std::size_t k = 0; k <= n; ++k) single += gs[k] * t[k] * s[k];
-    for (std::size_t i = 0; i < n; ++i) pairs += gp[i] * (t[i] * s[i] - t[i + 1] * s[i + 1]);
+    for (std::size_t i = 0; i < n; ++i) pairs += gp[i] * (t[i] * b[i] - dt[i] * s[i + 1]);
     Vec buckets(n);
     double tail = 0.0;
     for (std::size_t j = n; j-- > 0;) {

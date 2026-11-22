@@ -23,6 +23,7 @@ PLACES = (
     ("rust/Cargo.toml", r'(?m)^version = "([^"]+)"', 1),
     ("rust/Cargo.lock", r'(?m)^name = "quantforge[a-z-]*"\nversion = "([^"]+)"', None),
     ("java25/pom.xml", r"<artifactId>quantforge</artifactId><version>([^<]+)</version>", 1),
+    ("java25/src/main/java/org/quantforge/cli/Main.java", r'String VERSION = "([^"]+)"', 1),
     ("cpp26/CMakeLists.txt", r"project\(quantforge_cpp26 VERSION ([0-9.]+)", 1),
     ("tools/site_facts.json", r'"version": "([^"]+)"', 1),
 )
@@ -54,6 +55,7 @@ def self_test():
     good = {rel: (["1.0.0"], n) if n else (["1.0.0", "1.0.0"], n) for rel, _, n in PLACES}
     planted = {"one file behind": {**good, "java25/pom.xml": (["0.10.1"], 1)},
                "a file with no version line": {**good, "cpp26/CMakeLists.txt": ([], 1)},
+               "the Java CLI constant behind": {**good, "java25/src/main/java/org/quantforge/cli/Main.java": (["0.10.1"], 1)},
                "a lock entry not bumped": {**good, "rust/Cargo.lock": (["1.0.0", "0.10.1"], None)}}
     bad = [k for k, v in planted.items() if not problems(v, "1.0.0")]
     wrong_tag = not problems(good, "1.0.1")

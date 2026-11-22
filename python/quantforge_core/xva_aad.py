@@ -85,8 +85,9 @@ class _Tape:
         self.df = dfs
         self.sc = [math.exp(-cpty.hazard_rate * x) for x in self.t]
         self.sb = [math.exp(-own.hazard_rate * x) for x in self.t]
-        self.bc = [self.sc[i] - self.sc[i + 1] for i in range(n)]
-        self.bb = [self.sb[i] - self.sb[i + 1] for i in range(n)]
+        # b_i = S(t_i) (1 - e^(-h dt_i)), cancellation free (PT-6); equal to S(t_i) - S(t_(i+1)) in exact arithmetic
+        self.bc = [self.sc[i] * -math.expm1(-cpty.hazard_rate * self.dt[i]) for i in range(n)]
+        self.bb = [self.sb[i] * -math.expm1(-own.hazard_rate * self.dt[i]) for i in range(n)]
         self.w = [dfs[i] * self.sc[i] * self.sb[i] * self.dt[i] for i in range(n)]
 
     def through_w(self, bar: _Bar, i: int, gw: float) -> None:
@@ -157,12 +158,12 @@ def _hazards(
 ) -> tuple[float, list[float]]:
     """Survival adjoints to hazard adjoints. `gs[k]`: adjoint of S(t_k) used alone; `gp[i]`: adjoint of the
     bucket difference b_i = S(t_i) - S(t_(i+1)) (t_0 = 0). Flat: d / d h = -sum_k gs_k t_k S_k
-    - sum_i gp_i (t_i S_i - t_(i+1) S_(i+1)). Bucket j (S_k depends on h_j for k > j):
+    - sum_i gp_i (t_i b_i - dt_i S_(i+1)). Bucket j (S_k depends on h_j for k > j):
     d / d h_j = -dt_j (sum_(k > j) gs_k S_k + sum_(i > j) gp_i b_i - gp_j S_(j+1)). Keeping b_i whole means a
     difference that is 0 (h = 0) gives an exact 0, with no cancellation."""
     n = len(dt)
     flat = -ordered_sum(gs[k] * t[k] * s[k] for k in range(n + 1)) - ordered_sum(
-        gp[i] * (t[i] * s[i] - t[i + 1] * s[i + 1]) for i in range(n)
+        gp[i] * (t[i] * b[i] - dt[i] * s[i + 1]) for i in range(n)
     )
     buckets = [0.0] * n
     tail = 0.0
