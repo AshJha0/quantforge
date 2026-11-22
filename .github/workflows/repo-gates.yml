@@ -64,7 +64,7 @@ jobs:
           python3 tools/check_examples.py --self-test && python3 tools/check_examples.py --static
           python3 tools/release_verify.py --self-test
           python3 tools/check_ruleset.py --self-test
-          python3 tools/check_versions.py --self-test && python3 tools/check_versions.py && python3 tools/check_release_notes.py --self-test
+          python3 tools/check_versions.py --self-test && python3 tools/check_versions.py && python3 tools/check_release_notes.py --self-test && python3 tools/check_release_notes.py docs/releases/v1.0.0.md
       - name: every red scheduled workflow on main has an open known-issues row (K-9 review finding 1)
         env:
           GITHUB_TOKEN: ${{ github.token }}
