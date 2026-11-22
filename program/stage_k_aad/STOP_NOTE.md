@@ -71,3 +71,15 @@ Written 2026-11-20 before the 23:00 UTC shutdown. Branch `k-v1-aad` (off `k-v1` 
 
 1. Run the mutation samples in slices (a few mutants per locked job): Python `golden_mutants.py --impl python --target 'quantforge_core.xva*' --suite '*_g' --max 40 --seed <content seed>` and Rust likewise; add kill tests until each cell kills at least 32 of 40; never edit skip-equivalents.json.
 2. C++ ASan and coverage, Rust llvm-cov: leave to CI or run in a quiet window.
+
+## Verification 2026-11-22 after merging origin/k-v1 990ddd45 (head 1ae78992; local laptop, not the acceptance machine; measured)
+
+| Build | Steps | Result |
+|---|---|---|
+| Python (Windows) | ruff, format, mypy; `coverage run -m pytest -q`; per-file coverage gate; conformance; tutorial | 4,494 passed, 2 skipped; gate rc 0; conformance 16,689 of 16,689; rc 0 |
+| Java (Windows, mvn.lockdir) | `mvn -B -Pcoverage verify`; coverage gate; package; conformance; tutorial | 1,105 tests, 0 failures, 0 errors, 1 skipped; conformance 16,689 of 16,689; rc 0 |
+| Rust (WSL, lock) | fmt, clippy `-D warnings`, `cargo test --workspace`, release CLI conformance | rc 0 each; 801 passed, 0 failed; conformance 16,689 of 16,689 |
+| C++ (WSL, lock) | Release `-Werror` build, ctest, conformance | rc 0; ctest all pass; conformance 16,689 of 16,689 |
+| C++ ASan/UBSan (WSL, lock, 10-minute cap per step) | `quantforge_core_tests --order decl --shard-count 8`, excluding the one property test below; conformance on the ASan binary, one locked step per golden folder | 710 of 711 test cases, all pass, no sanitizer report; ASan conformance 16,689 of 16,689 (15 steps, rc 0 each) |
+
+Not run under ASan: `fast book: property test, 1,000 seeded streams of 10,000 messages` exceeds the 10-minute cap under ASan (killed by SIGTERM at stream 747 to 759 in three tries, never an assertion failure); it passes in the plain Release ctest. A first 6-shard run used Catch2's default random order without a fixed seed, which does not guarantee disjoint shards; it is replaced by the `--order decl` run above.
