@@ -68,7 +68,7 @@ Outside-checked share: value-checked cases re-derived outside the author's own c
 | R6 |  |  |  | 43 | 93 | 0 | not in the share table |  |
 | J | Research and portfolio | v0.9 | Published study reports | 215 | 229 | 0 | 143 of 215 (66.5%) | met |
 | H | Microstructure and execution | v0.10 | Use case 5 | 205 | 207 | 0 | 160 of 205 (78.0%) | met |
-| K | Platform and release | v1.0.0 | Clean-machine run of all examples | 241 | 354 | 16 | 184 of 241 (76.3%) | met |
+| K | Platform and release | v1.0.0 | Clean-machine run of all examples | 241 | 367 | 16 | 184 of 241 (76.3%) | met |
 
 Stage H per plan item:
 
