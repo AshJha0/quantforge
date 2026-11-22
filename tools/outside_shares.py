@@ -440,7 +440,7 @@ def under_review_text(u):
 BLOCK = re.compile(r"<!-- generated:(stage-k-[a-z-]+) -->(.*?)<!-- /generated -->")
 # Docs that state stage K or per-item shares must carry the blocks (a doc may hold more than one copy).
 BLOCK_DOCS = {"README.md": ("stage-k-total", "stage-k-items"), "LEARN.md": ("stage-k-total", "stage-k-items"), "CHANGELOG.md": ("stage-k-total",), "ROADMAP.md": ("stage-k-total", "stage-k-items"), "docs/known-issues.md": ("stage-k-total",),
-              "docs/releases/v0.10.1.md": ("stage-k-total", "stage-k-items")}
+              "docs/releases/v0.10.1.md": ("stage-k-total", "stage-k-items"), "docs/releases/v1.0.0.md": ("stage-k-total", "stage-k-items")}
 ITEM_NAME = {"K-8": "K-8 method", "K-8d": "K-8d SA-CCR", "K-8e": "K-8e FRTB backtesting"}
 
 
