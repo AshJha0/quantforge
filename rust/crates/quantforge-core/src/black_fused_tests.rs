@@ -173,16 +173,18 @@ fn case(r: &mut Rng, i: usize) -> (Option_, f64) {
     (o, price)
 }
 
-/// The lognormal solve starts from the Corrado-Miller estimate rather than the bracket midpoint,
-/// so it takes another Newton path to the root. Where binary64 pins the vol to the last bit both
-/// paths agree; where it pins it only to the identification bound of KR-341 (1e-10 relative) the
-/// two can stop at different vols inside that bound. Checked here: every error code is the same,
-/// every Bachelier result (start unchanged) is bitwise the same, and every lognormal result is
-/// within 1e-10 relative of the old one. The count of differing results is pinned so that any
-/// change to it is seen.
 /// Lognormal results that differ from the old solver on the 4000 cases (measured 2026-11-22).
 const DIFFER_4000: usize = 326;
 
+/// The lognormal solve starts from the Corrado-Miller estimate rather than the bracket midpoint,
+/// so it takes another Newton path to the root. Where binary64 pins the vol to the last bit both
+/// paths agree; where the binary64 price is flat over many ulps of v, the two can stop at
+/// different vols that both pass the KR-341 identification check (1e-10 relative). Checked here:
+/// every error code is the same, every Bachelier result (start unchanged) is bitwise the same,
+/// every lognormal result is within 1e-10 relative of the old one, and the count and the largest
+/// difference on these seeded cases are pinned. Against a 60-digit root, on the 326 cases plus
+/// 2000 of a 200k-case run, old and new have the same median error (4 ulps) and the new maximum
+/// is lower (254,110 vs 294,934 ulps).
 #[test]
 fn solver_matches_the_old_one() {
     let mut r = Rng(0x5EED_2026_1122);
@@ -193,6 +195,10 @@ fn solver_matches_the_old_one() {
             (Ok(a), Ok(b)) => {
                 if a.to_bits() != b.to_bits() {
                     assert!(!o.is_normal(), "case {i}: {o:?} {price}: {a} vs {b}");
+                    // Both pass the identification check. The KR-341 estimate is not a strict
+                    // bound to the ulp (case 28: old +9, new -4 ulps from the 60-digit root,
+                    // estimate about 1 ulp), so the pair is held to the 1e-10 acceptance and the
+                    // seeded maximum is pinned below.
                     let rel = (a - b).abs() / b;
                     assert!(rel <= 1e-10, "case {i}: {o:?} {price}: {a} vs {b}");
                     max_rel = max_rel.max(rel);
@@ -212,4 +218,5 @@ fn solver_matches_the_old_one() {
     // Both paths are exercised in quantity.
     assert!(ok > 2000 && errs > 500, "ok {ok} errs {errs}");
     assert_eq!(differ, DIFFER_4000, "max_rel {max_rel:e}");
+    assert!(max_rel <= 2.25e-11, "max_rel {max_rel:e}"); // measured 2.237e-11
 }

@@ -208,8 +208,11 @@ impl Option_ {
         if price == intrinsic {
             return Ok(0.0);
         }
-        // Bracket, then Newton held inside it. The result is polished to rounding, as a stop at
-        // the spec's price tolerance would cost too much in vol where vega is small.
+        // Bracket, then Newton held inside it, stepped until the step is below rounding in v (a
+        // stop at the spec's price tolerance would cost too much in vol where vega is small).
+        // Where vega is small the binary64 price is flat over many ulps of v, so the vol is
+        // fixed only to the KR-341 estimated error that `identified` checks, and two start
+        // points can stop at different vols inside it.
         let mut hi = if self.is_normal() {
             (f - k).abs().max(price).max(1e-8)
         } else {
