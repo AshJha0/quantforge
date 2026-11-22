@@ -10,7 +10,7 @@ Prepared 2026-11-22 on branch `k-v1-rel` (from `k-v1` 990ddd45). Source for ever
    python tools/release/bump_version.py --self-test
    python tools/release/bump_version.py --to 1.0.0
    ```
-   plus the prose edits, the CHANGELOG heading from `CHANGELOG_1.0.0.md`, and every `{{generated}}` in `docs/releases/v1.0.0.md` filled. Then `python tools/outside_shares.py --check`, `python tools/case_figures.py --check`, `python tools/build_site.py`, `python research/test_preregs.py`, `git grep -i interview` (must print nothing).
+   plus the prose edits, the CHANGELOG heading from `CHANGELOG_1.0.0.md`, and every `{{generated}}` in `docs/releases/v1.0.0.md` filled. Then `python tools/outside_shares.py --check`, `python tools/case_figures.py --check`, `python tools/build_site.py`, `python research/test_preregs.py`, the banned-word `git grep` named in the lane rules (must print nothing).
 3. **KR-225: strict required status checks ON** (owner decision: just before PR #65 is ready). Read 2026-11-22 (GET): ruleset `main`, enforcement `active`, target `branch`, conditions `~DEFAULT_BRANCH`, bypass actors none, 15 required checks, `strict_required_status_checks_policy: false`. The update endpoint is `PUT /repos/{owner}/{repo}/rulesets/{id}` and replaces the whole `rules` array, so send the current ruleset with only that one field changed (no `jq` on this machine; Python does the edit):
    ```bash
    gh api repos/AshJha0/quantforge/rulesets/26732064 > rs_before.json
