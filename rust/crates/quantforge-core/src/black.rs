@@ -143,13 +143,49 @@ impl Option_ {
         Ok(self.value(v))
     }
 
-    fn vega(&self, v: f64) -> f64 {
-        let (f, d, k) = self.fdk();
+    /// Value, vega and the magnitude sum M at `v`, each term evaluated once (shared `d1`, `d2`,
+    /// cdf and pdf); bitwise identical to `value`, `vega` and the M of `identified` taken apart.
+    fn eval(&self, f: f64, d: f64, k: f64, v: f64) -> Eval {
+        let p = phi(self.call);
         let r = self.t.sqrt();
+        let s = v * r;
         if self.is_normal() {
-            d * r * normal_pdf((f - k) / (v * r))
+            let x = (f - k) / s;
+            let px = normal_pdf(x);
+            let cx = normal_cdf(p * x);
+            let value = if self.t == 0.0 || v == 0.0 {
+                d * (p * (f - k)).max(0.0)
+            } else {
+                d * (p * (f - k) * cx + s * px)
+            };
+            Eval {
+                value,
+                vega: d * r * px,
+                mag: d * ((f - k).abs() * cx + s * px),
+            }
         } else {
-            d * f * r * normal_pdf(d1_d2(f, k, v, self.t).0)
+            let d1 = ((f / k).ln() + v * v * self.t / 2.0) / s;
+            let d2 = d1 - s;
+            let c1 = normal_cdf(p * d1);
+            let c2 = normal_cdf(p * d2);
+            let value = if self.t == 0.0 || v == 0.0 {
+                d * (p * (f - k)).max(0.0)
+            } else {
+                d * p * (f * c1 - k * c2)
+            };
+            Eval {
+                value,
+                vega: d * f * r * normal_pdf(d1),
+                mag: d * (f * c1 + k * c2),
+            }
+        }
+    }
+
+    fn value_at(&self, f: f64, d: f64, k: f64, v: f64) -> f64 {
+        if self.is_normal() {
+            bachelier(self.call, f, k, v, self.t, d)
+        } else {
+            black(self.call, f, k, v, self.t, d)
         }
     }
 
@@ -180,7 +216,7 @@ impl Option_ {
         };
         let mut lo = 0.0;
         let mut guard = 0;
-        while self.value(hi) < price {
+        while self.value_at(f, d, k, hi) < price {
             lo = hi;
             hi *= 2.0;
             guard += 1;
@@ -190,17 +226,18 @@ impl Option_ {
         }
         let mut v = (lo + hi) / 2.0;
         for _ in 0..300 {
-            let val = self.value(v);
+            let ev = self.eval(f, d, k, v);
+            let val = ev.value;
             let e = val - price;
             if e == 0.0 {
-                return self.identified(v, price);
+                return self.identified(f, d, k, v, price, &ev);
             }
             if e > 0.0 {
                 hi = v;
             } else {
                 lo = v;
             }
-            let vega = self.vega(v);
+            let vega = ev.vega;
             // Newton on ln V - ln price (ruling KR-341): the same step near the root, and it keeps its size
             // far out of the money, where V spans hundreds of decades over the bracket.
             let mut next = if vega > 0.0 && val > 0.0 {
@@ -212,12 +249,14 @@ impl Option_ {
                 next = (lo + hi) / 2.0;
             }
             if (next - v).abs() <= 2e-16 * v {
-                return self.identified(next, price);
+                let en = self.eval(f, d, k, next);
+                return self.identified(f, d, k, next, price, &en);
             }
             v = next;
         }
-        if (self.value(v) - price).abs() <= 1e-13 * price.max(1.0) {
-            return self.identified(v, price);
+        let ev = self.eval(f, d, k, v);
+        if (ev.value - price).abs() <= 1e-13 * price.max(1.0) {
+            return self.identified(f, d, k, v, price, &ev);
         }
         fail("E_NO_CONVERGENCE", "implied vol did not converge")
     }
@@ -225,20 +264,12 @@ impl Option_ {
     /// Returns v if the price identifies the vol in binary64, else `E_NO_CONVERGENCE` (ruling KR-341).
     /// Estimated vol error: (|V(v) - price| + 2^-52 M + 2^-1070 (1 + D (|F| + |K| + v sqrt T)))/(v vega), M the
     /// sum of the magnitudes of the two terms of V (they cancel far from the money); above 1e-10 it is refused.
-    fn identified(&self, v: f64, price: f64) -> Result<f64> {
-        let (f, d, k) = self.fdk();
-        let p = phi(self.call);
+    /// `ev` is `eval` at `v` (each term computed once, not again here).
+    fn identified(&self, f: f64, d: f64, k: f64, v: f64, price: f64, ev: &Eval) -> Result<f64> {
         let root = v * self.t.sqrt();
-        let mag = if self.is_normal() {
-            let x = (f - k) / root;
-            d * ((f - k).abs() * normal_cdf(p * x) + root * normal_pdf(x))
-        } else {
-            let (d1, d2) = d1_d2(f, k, v, self.t);
-            d * (f * normal_cdf(p * d1) + k * normal_cdf(p * d2))
-        };
-        let scale = v * self.vega(v);
-        let error = (self.value(v) - price).abs()
-            + f64::EPSILON * mag
+        let scale = v * ev.vega;
+        let error = (ev.value - price).abs()
+            + f64::EPSILON * ev.mag
             + f64::from_bits(16) * (1.0 + d * (f.abs() + k.abs() + root)); // 2^-1070
         if scale.is_nan() || scale <= 0.0 || error > 1e-10 * scale {
             return fail(
@@ -248,6 +279,13 @@ impl Option_ {
         }
         Ok(v)
     }
+}
+
+/// One evaluation of the price terms at a vol: value, vega and the magnitude sum M.
+struct Eval {
+    value: f64,
+    vega: f64,
+    mag: f64,
 }
 
 impl crate::error::Finite for Model {
@@ -278,6 +316,10 @@ impl crate::error::Finite for Option_ {
         self.model.is_all_finite() && self.strike.is_all_finite() && self.t.is_all_finite()
     }
 }
+
+#[cfg(test)]
+#[path = "black_fused_tests.rs"]
+mod fused_tests;
 
 #[cfg(test)]
 mod tests {

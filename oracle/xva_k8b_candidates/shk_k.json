@@ -1,0 +1,191 @@
+{
+ "schema_version": "1.0",
+ "suite": "shk_k",
+ "status": "PENDING implementation (candidate golden; K-8b specs PROPOSED)",
+ "spec": "specifications/06-risk/xva-stress-shocks.md",
+ "generator": "oracle/python/gen_stage_k_xva_k8b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "survival_convention": "KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA",
+ "cases": [
+  {
+   "case_id": "shk_k-0001",
+   "operation": "xva.stress.shocked",
+   "inputs": {
+    "curve": {
+     "tenors": [
+      1.0,
+      2.0,
+      5.0,
+      15.0,
+      20.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.03,
+      0.03,
+      0.03,
+      0.03
+     ]
+    },
+    "scenario": {
+     "tenors": [
+      0.08333333333333333,
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      3.0,
+      5.0,
+      7.0,
+      10.0,
+      20.0,
+      30.0
+     ],
+     "shift_bp": [
+      349.0,
+      403.0,
+      423.99999999999994,
+      419.00000000000006,
+      376.0,
+      355.0,
+      308.0,
+      284.00000000000006,
+      269.0,
+      260.0,
+      243.00000000000003
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      419.00000000000006,
+      376.0,
+      308.0,
+      264.5,
+      260.0
+     ],
+     "shocked_zero_rates": [
+      0.0719,
+      0.0676,
+      0.0608,
+      0.05645,
+      0.056
+     ],
+     "shocked_discount_factors": [
+      0.9306239535535964,
+      0.8735411859788502,
+      0.7378608664505911,
+      0.4288062902100498,
+      0.32627979462303947
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "curve outputs, hikes_2022"
+  },
+  {
+   "case_id": "shk_k-0002",
+   "operation": "xva.stress.shocked",
+   "inputs": {
+    "curve": {
+     "tenors": [
+      1.0,
+      2.0,
+      5.0,
+      15.0,
+      20.0
+     ],
+     "zero_rates": [
+      0.03,
+      0.03,
+      0.03,
+      0.03,
+      0.03
+     ]
+    },
+    "scenario": {
+     "tenors": [
+      0.08333333333333333,
+      0.25,
+      0.5,
+      1.0,
+      2.0,
+      3.0,
+      5.0,
+      7.0,
+      10.0,
+      20.0,
+      30.0
+     ],
+     "shift_bp": [
+      -104.0,
+      -125.0,
+      -129.0,
+      -115.99999999999999,
+      -104.0,
+      -98.99999999999999,
+      -95.0,
+      -94.0,
+      -102.0,
+      -99.00000000000001,
+      -101.99999999999999
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "applied_bp": [
+      -115.99999999999999,
+      -104.0,
+      -95.0,
+      -100.5,
+      -99.00000000000001
+     ],
+     "shocked_zero_rates": [
+      0.0184,
+      0.0196,
+      0.020499999999999997,
+      0.01995,
+      0.020099999999999996
+     ],
+     "shocked_discount_factors": [
+      0.9817682465077646,
+      0.9615583782382694,
+      0.9025781497529256,
+      0.7413740427544523,
+      0.6689807456903467
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "curve outputs, covid_2020"
+  }
+ ]
+}

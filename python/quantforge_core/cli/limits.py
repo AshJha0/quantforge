@@ -274,7 +274,16 @@ def _select_subsets(raw: Raw) -> None:
         raise _over("max_instruments", 100_000)
 
 
+def _aad_buckets(raw: Raw) -> None:
+    """KR-266: at most 10,000 buckets in each profile of the wrapped request."""
+    inner = raw.get("inputs")
+    if isinstance(inner, dict):
+        for key in ("times", "discount_factors", "ee", "ene", "im", "capital"):
+            _caps_list(key, 10_000)(inner)
+
+
 _BY_OPERATION: dict[str, Callable[[Raw], None]] = {
+    "xva.sens.aad": _aad_buckets,
     "core.integrate.trapezoid": _POINTS,
     "core.integrate.simpson": _POINTS,
     "core.integrate.adaptive_simpson": _caps(max_depth=60),

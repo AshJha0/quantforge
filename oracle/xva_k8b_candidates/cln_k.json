@@ -1,0 +1,181 @@
+{
+ "schema_version": "1.0",
+ "suite": "cln_k",
+ "status": "PENDING implementation (candidate golden; K-8b specs PROPOSED)",
+ "spec": "specifications/06-risk/xva-mpor-closeout.md",
+ "generator": "oracle/python/gen_stage_k_xva_k8b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "survival_convention": "KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA",
+ "cases": [
+  {
+   "case_id": "cln_k-0001",
+   "operation": "xva.exposure.closeout_normal",
+   "inputs": {
+    "v0": 5000000.0,
+    "sigma": 1000000.0,
+    "mpor_days": 10,
+    "threshold_receive": 0.0,
+    "im": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "s": 200000.0,
+     "vm": 5000000.0,
+     "im": 0.0,
+     "ee": 79788.45608028653
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "closed form with Phi and phi"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "normal close-out"
+  },
+  {
+   "case_id": "cln_k-0002",
+   "operation": "xva.exposure.closeout_normal",
+   "inputs": {
+    "v0": 5000000.0,
+    "sigma": 1000000.0,
+    "mpor_days": 10,
+    "threshold_receive": 1000000.0,
+    "im": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "s": 200000.0,
+     "vm": 4000000.0,
+     "im": 0.0,
+     "ee": 1000000.0106923311
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "closed form with Phi and phi"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "normal close-out"
+  },
+  {
+   "case_id": "cln_k-0003",
+   "operation": "xva.exposure.closeout_normal",
+   "inputs": {
+    "v0": 500000.0,
+    "sigma": 1000000.0,
+    "mpor_days": 10,
+    "threshold_receive": 1000000.0,
+    "im": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "s": 200000.0,
+     "vm": 0.0,
+     "im": 0.0,
+     "ee": 500400.82743582566
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "closed form with Phi and phi"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "normal close-out"
+  },
+  {
+   "case_id": "cln_k-0004",
+   "operation": "xva.exposure.closeout_normal",
+   "inputs": {
+    "v0": 5000000.0,
+    "sigma": 1000000.0,
+    "mpor_days": 10,
+    "threshold_receive": 0.0,
+    "im_quantile": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "s": 200000.0,
+     "vm": 5000000.0,
+     "im": 465269.57480816817,
+     "ee": 677.7326926099281
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "closed form with Phi and phi"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "normal close-out"
+  },
+  {
+   "case_id": "cln_k-0005",
+   "operation": "xva.exposure.closeout_normal",
+   "inputs": {
+    "v0": 5000000.0,
+    "sigma": 1000000.0,
+    "mpor_days": 10,
+    "threshold_receive": 1000000.0,
+    "im_quantile": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "s": 200000.0,
+     "vm": 4000000.0,
+     "im": 465269.57480816817,
+     "ee": 534961.4566317102
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "closed form with Phi and phi"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "normal close-out"
+  }
+ ]
+}

@@ -1,0 +1,639 @@
+{
+ "schema_version": "1.0",
+ "suite": "str_k",
+ "status": "PENDING implementation (candidate golden; K-8b specs PROPOSED)",
+ "spec": "specifications/06-risk/xva-stressed-exposure.md",
+ "generator": "oracle/python/gen_stage_k_xva_k8b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "survival_convention": "KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA",
+ "cases": [
+  {
+   "case_id": "str_k-0001",
+   "operation": "xva.exposure.stressed_eepe",
+   "inputs": {
+    "grid": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "netting_sets": [
+     {
+      "id": "A",
+      "ee_current": [
+       10.0,
+       14.0,
+       12.0,
+       15.0,
+       11.0
+      ],
+      "ee_stressed": [
+       10.0,
+       20.0,
+       24.0,
+       22.0,
+       18.0
+      ],
+      "capital_weight": 0.08
+     },
+     {
+      "id": "B",
+      "ee_current": [
+       20.0,
+       18.0,
+       22.0,
+       19.0,
+       16.0
+      ],
+      "ee_stressed": [
+       20.0,
+       16.0,
+       15.0,
+       14.0,
+       12.0
+      ],
+      "capital_weight": 0.04
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "A": {
+       "eee_current": [
+        10.0,
+        14.0,
+        14.0,
+        15.0,
+        15.0
+       ],
+       "eepe_current": 14.5,
+       "ead_current": 20.299999999999997,
+       "eee_stressed": [
+        10.0,
+        20.0,
+        24.0,
+        24.0,
+        24.0
+       ],
+       "eepe_stressed": 23.0,
+       "ead_stressed": 32.199999999999996,
+       "ead_used": 32.199999999999996
+      },
+      "B": {
+       "eee_current": [
+        20.0,
+        20.0,
+        22.0,
+        22.0,
+        22.0
+       ],
+       "eepe_current": 21.5,
+       "ead_current": 30.099999999999998,
+       "eee_stressed": [
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0
+       ],
+       "eepe_stressed": 20.0,
+       "ead_stressed": 28.0,
+       "ead_used": 28.0
+      }
+     },
+     "k_current": 2.828,
+     "k_stressed": 3.6959999999999997,
+     "calibration": "stressed"
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "portfolio uses stressed"
+  },
+  {
+   "case_id": "str_k-0002",
+   "operation": "xva.exposure.stressed_eepe",
+   "inputs": {
+    "grid": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "netting_sets": [
+     {
+      "id": "A",
+      "ee_current": [
+       10.0,
+       14.0,
+       12.0,
+       15.0,
+       11.0
+      ],
+      "ee_stressed": [
+       10.0,
+       20.0,
+       24.0,
+       22.0,
+       18.0
+      ],
+      "capital_weight": 0.004
+     },
+     {
+      "id": "B",
+      "ee_current": [
+       20.0,
+       18.0,
+       22.0,
+       19.0,
+       16.0
+      ],
+      "ee_stressed": [
+       20.0,
+       16.0,
+       15.0,
+       14.0,
+       12.0
+      ],
+      "capital_weight": 0.04
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "A": {
+       "eee_current": [
+        10.0,
+        14.0,
+        14.0,
+        15.0,
+        15.0
+       ],
+       "eepe_current": 14.5,
+       "ead_current": 20.299999999999997,
+       "eee_stressed": [
+        10.0,
+        20.0,
+        24.0,
+        24.0,
+        24.0
+       ],
+       "eepe_stressed": 23.0,
+       "ead_stressed": 32.199999999999996,
+       "ead_used": 20.299999999999997
+      },
+      "B": {
+       "eee_current": [
+        20.0,
+        20.0,
+        22.0,
+        22.0,
+        22.0
+       ],
+       "eepe_current": 21.5,
+       "ead_current": 30.099999999999998,
+       "eee_stressed": [
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0
+       ],
+       "eepe_stressed": 20.0,
+       "ead_stressed": 28.0,
+       "ead_used": 30.099999999999998
+      }
+     },
+     "k_current": 1.2852,
+     "k_stressed": 1.2488,
+     "calibration": "current"
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "choice flips"
+  },
+  {
+   "case_id": "str_k-0003",
+   "operation": "xva.exposure.stressed_eepe",
+   "inputs": {
+    "grid": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "netting_sets": [
+     {
+      "id": "A",
+      "ee_current": [
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0
+      ],
+      "ee_stressed": [
+       5.0,
+       6.0,
+       7.0,
+       8.0,
+       9.0
+      ],
+      "capital_weight": 0.08
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "A": {
+       "eee_current": [
+        5.0,
+        6.0,
+        7.0,
+        8.0,
+        9.0
+       ],
+       "eepe_current": 7.5,
+       "ead_current": 10.5,
+       "eee_stressed": [
+        5.0,
+        6.0,
+        7.0,
+        8.0,
+        9.0
+       ],
+       "eepe_stressed": 7.5,
+       "ead_stressed": 10.5,
+       "ead_used": 10.5
+      }
+     },
+     "k_current": 0.84,
+     "k_stressed": 0.84,
+     "calibration": "current"
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "tie: current"
+  },
+  {
+   "case_id": "str_k-0004",
+   "operation": "xva.exposure.stressed_eepe",
+   "inputs": {
+    "grid": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "netting_sets": [
+     {
+      "id": "A",
+      "ee_current": [
+       10.0,
+       12.0,
+       9.0,
+       0.0,
+       0.0
+      ],
+      "ee_stressed": [
+       10.0,
+       15.0,
+       11.0,
+       0.0,
+       0.0
+      ],
+      "capital_weight": 0.08,
+      "maturity": 0.5
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "A": {
+       "eee_current": [
+        10.0,
+        12.0,
+        12.0,
+        12.0,
+        12.0
+       ],
+       "eepe_current": 12.0,
+       "ead_current": 16.799999999999997,
+       "eee_stressed": [
+        10.0,
+        15.0,
+        15.0,
+        15.0,
+        15.0
+       ],
+       "eepe_stressed": 15.0,
+       "ead_stressed": 21.0,
+       "ead_used": 21.0
+      }
+     },
+     "k_current": 1.3439999999999999,
+     "k_stressed": 1.68,
+     "calibration": "stressed"
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "horizon 0.5"
+  },
+  {
+   "case_id": "str_k-0005",
+   "operation": "xva.exposure.stressed_eepe",
+   "inputs": {
+    "grid": [
+     0.0,
+     0.25,
+     0.5,
+     0.75,
+     1.0
+    ],
+    "netting_sets": [
+     {
+      "id": "A",
+      "ee_current": [
+       10.0,
+       14.0,
+       12.0,
+       15.0,
+       11.0
+      ],
+      "ee_stressed": [
+       10.0,
+       20.0,
+       24.0,
+       22.0,
+       18.0
+      ],
+      "capital_weight": 0.08
+     },
+     {
+      "id": "B",
+      "ee_current": [
+       20.0,
+       18.0,
+       22.0,
+       19.0,
+       16.0
+      ],
+      "ee_stressed": [
+       20.0,
+       16.0,
+       15.0,
+       14.0,
+       12.0
+      ],
+      "capital_weight": 0.04
+     }
+    ],
+    "alpha": 1.25,
+    "own_alpha": true
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "A": {
+       "eee_current": [
+        10.0,
+        14.0,
+        14.0,
+        15.0,
+        15.0
+       ],
+       "eepe_current": 14.5,
+       "ead_current": 18.125,
+       "eee_stressed": [
+        10.0,
+        20.0,
+        24.0,
+        24.0,
+        24.0
+       ],
+       "eepe_stressed": 23.0,
+       "ead_stressed": 28.75,
+       "ead_used": 28.75
+      },
+      "B": {
+       "eee_current": [
+        20.0,
+        20.0,
+        22.0,
+        22.0,
+        22.0
+       ],
+       "eepe_current": 21.5,
+       "ead_current": 26.875,
+       "eee_stressed": [
+        20.0,
+        20.0,
+        20.0,
+        20.0,
+        20.0
+       ],
+       "eepe_stressed": 20.0,
+       "ead_stressed": 25.0,
+       "ead_used": 25.0
+      }
+     },
+     "k_current": 2.525,
+     "k_stressed": 3.3000000000000003,
+     "calibration": "stressed"
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "own alpha 1.25"
+  },
+  {
+   "case_id": "str_k-0006",
+   "operation": "xva.exposure.stressed_eepe",
+   "inputs": {
+    "grid": [
+     0.0,
+     0.08333333333333333,
+     0.16666666666666666,
+     0.25,
+     0.3333333333333333,
+     0.4166666666666667,
+     0.5,
+     0.5833333333333334,
+     0.6666666666666666,
+     0.75,
+     0.8333333333333334,
+     0.9166666666666666,
+     1.0
+    ],
+    "netting_sets": [
+     {
+      "id": "A",
+      "ee_current": [
+       0.0,
+       28.867513459481287,
+       40.8248290463863,
+       50.0,
+       57.735026918962575,
+       64.54972243679028,
+       70.71067811865476,
+       76.37626158259734,
+       81.6496580927726,
+       86.60254037844386,
+       91.28709291752769,
+       95.74271077563381,
+       100.0
+      ],
+      "ee_stressed": [
+       0.0,
+       43.30127018922193,
+       61.23724356957945,
+       75.0,
+       86.60254037844386,
+       96.82458365518542,
+       106.06601717798213,
+       114.564392373896,
+       122.4744871391589,
+       129.9038105676658,
+       136.93063937629154,
+       143.6140661634507,
+       150.0
+      ],
+      "capital_weight": 0.08
+     }
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "netting_sets": {
+      "A": {
+       "eee_current": [
+        0.0,
+        28.867513459481287,
+        40.8248290463863,
+        50.0,
+        57.735026918962575,
+        64.54972243679028,
+        70.71067811865476,
+        76.37626158259734,
+        81.6496580927726,
+        86.60254037844386,
+        91.28709291752769,
+        95.74271077563381,
+        100.0
+       ],
+       "eepe_current": 70.36216947727087,
+       "ead_current": 98.50703726817922,
+       "eee_stressed": [
+        0.0,
+        43.30127018922193,
+        61.23724356957945,
+        75.0,
+        86.60254037844386,
+        96.82458365518542,
+        106.06601717798213,
+        114.564392373896,
+        122.4744871391589,
+        129.9038105676658,
+        136.93063937629154,
+        143.6140661634507,
+        150.0
+       ],
+       "eepe_stressed": 105.54325421590632,
+       "ead_stressed": 147.76055590226883,
+       "ead_used": 147.76055590226883
+      }
+     },
+     "k_current": 7.880562981454338,
+     "k_stressed": 11.820844472181506,
+     "calibration": "stressed"
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "monthly grid, sqrt profile"
+  }
+ ]
+}

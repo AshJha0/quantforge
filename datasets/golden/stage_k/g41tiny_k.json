@@ -1,0 +1,302 @@
+{
+  "schema_version": "1.0",
+  "suite": "g41tiny_k",
+  "spec": "specifications/06-risk/xva-framework.md",
+  "spec_version": "1.0.0",
+  "generator": "oracle/python/gen_stage_k_pt6.py",
+  "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+  "cases": [
+    {
+      "case_id": "g41tiny_k-0001",
+      "operation": "xva.adjustments.value",
+      "inputs": {
+        "times": [
+          0.5,
+          1.0,
+          1.5,
+          2.0
+        ],
+        "discount_factors": [
+          0.985,
+          0.97,
+          0.955,
+          0.94
+        ],
+        "ee": [
+          120.0,
+          150.0,
+          130.0,
+          80.0
+        ],
+        "ene": [
+          -60.0,
+          -90.0,
+          -100.0,
+          -70.0
+        ],
+        "counterparty": {
+          "hazard_rate": 1e-09,
+          "recovery": 0.4
+        },
+        "own": {
+          "hazard_rate": 1e-09,
+          "recovery": 0.4
+        },
+        "funding": {
+          "borrow_spread": 0.008,
+          "lend_spread": 0.012,
+          "exclude_dva_overlap": false
+        }
+      },
+      "expected": {
+        "status": "ok",
+        "outputs": {
+          "cva": 1.3891499977945125e-07,
+          "dva": 9.23099998342125e-08,
+          "fca": 1.8521999975224,
+          "fba": 1.8461999971458,
+          "fva": 0.006000000376600005
+        }
+      },
+      "tolerance_class": "simple_analytic",
+      "verified_by": [
+        "mpmath-50"
+      ],
+      "tags": [
+        "xva",
+        "adjustments",
+        "tiny-hazard",
+        "synthetic"
+      ],
+      "description": "PT-6 / KR-350: both names h = 1e-9",
+      "tolerance_limit": {
+        "absolute": 1e-300,
+        "relative": 1e-13,
+        "reason": "short sums of products; cancellation-free bucket probability (KR-350); exact 0 at h = 0"
+      }
+    },
+    {
+      "case_id": "g41tiny_k-0002",
+      "operation": "xva.adjustments.value",
+      "inputs": {
+        "times": [
+          0.5,
+          1.0,
+          1.5,
+          2.0
+        ],
+        "discount_factors": [
+          0.985,
+          0.97,
+          0.955,
+          0.94
+        ],
+        "ee": [
+          120.0,
+          150.0,
+          130.0,
+          80.0
+        ],
+        "ene": [
+          -60.0,
+          -90.0,
+          -100.0,
+          -70.0
+        ],
+        "counterparty": {
+          "hazard_rate": 0.0,
+          "recovery": 0.4
+        },
+        "own": {
+          "hazard_rate": 0.0,
+          "recovery": 0.4
+        },
+        "funding": {
+          "borrow_spread": 0.008,
+          "lend_spread": 0.012,
+          "exclude_dva_overlap": false
+        }
+      },
+      "expected": {
+        "status": "ok",
+        "outputs": {
+          "cva": 0.0,
+          "dva": 0.0,
+          "fca": 1.8522,
+          "fba": 1.8462,
+          "fva": 0.006000000000000005
+        }
+      },
+      "tolerance_class": "simple_analytic",
+      "verified_by": [
+        "mpmath-50"
+      ],
+      "tags": [
+        "xva",
+        "adjustments",
+        "tiny-hazard",
+        "synthetic"
+      ],
+      "description": "PT-6 / KR-350: both names h = 0: CVA and DVA exactly 0",
+      "tolerance_limit": {
+        "absolute": 1e-300,
+        "relative": 1e-13,
+        "reason": "short sums of products; cancellation-free bucket probability (KR-350); exact 0 at h = 0"
+      }
+    },
+    {
+      "case_id": "g41tiny_k-0003",
+      "operation": "xva.adjustments.value",
+      "inputs": {
+        "times": [
+          0.5,
+          1.0,
+          1.5,
+          2.0
+        ],
+        "discount_factors": [
+          0.985,
+          0.97,
+          0.955,
+          0.94
+        ],
+        "ee": [
+          120.0,
+          150.0,
+          130.0,
+          80.0
+        ],
+        "ene": [
+          -60.0,
+          -90.0,
+          -100.0,
+          -70.0
+        ],
+        "counterparty": {
+          "hazard_rate": 1e-09,
+          "recovery": 0.4
+        },
+        "own": {
+          "hazard_rate": 0.02,
+          "recovery": 0.4
+        },
+        "funding": {
+          "borrow_spread": 0.008,
+          "lend_spread": 0.02,
+          "exclude_dva_overlap": true
+        },
+        "im": [
+          50.0,
+          55.0,
+          60.0,
+          40.0
+        ],
+        "im_spread": 0.005,
+        "capital": [
+          30.0,
+          32.0,
+          28.0,
+          20.0
+        ],
+        "hurdle_rate": 0.1
+      },
+      "expected": {
+        "status": "ok",
+        "outputs": {
+          "cva": 1.370764259420913e-07,
+          "dva": 1.8089141927483328,
+          "fca": 1.8276856796848056,
+          "fba": 1.211982558647927,
+          "fva": 0.6157031210368786,
+          "mva": 0.48680823633777753,
+          "kva": 5.236801766278306
+        }
+      },
+      "tolerance_class": "simple_analytic",
+      "verified_by": [
+        "mpmath-50"
+      ],
+      "tags": [
+        "xva",
+        "adjustments",
+        "tiny-hazard",
+        "synthetic"
+      ],
+      "description": "PT-6 / KR-350: counterparty h = 1e-9, own h = 0.02, overlap excluded, im and capital",
+      "tolerance_limit": {
+        "absolute": 1e-300,
+        "relative": 1e-13,
+        "reason": "short sums of products; cancellation-free bucket probability (KR-350); exact 0 at h = 0"
+      }
+    },
+    {
+      "case_id": "g41tiny_k-0004",
+      "operation": "xva.adjustments.value",
+      "inputs": {
+        "times": [
+          0.5,
+          1.0,
+          1.5,
+          2.0
+        ],
+        "discount_factors": [
+          0.985,
+          0.97,
+          0.955,
+          0.94
+        ],
+        "ee": [
+          120.0,
+          150.0,
+          130.0,
+          80.0
+        ],
+        "ene": [
+          -60.0,
+          -90.0,
+          -100.0,
+          -70.0
+        ],
+        "counterparty": {
+          "hazard_rate": 0.0,
+          "recovery": 0.4
+        },
+        "own": {
+          "hazard_rate": 1e-09,
+          "recovery": 0.4
+        },
+        "funding": {
+          "borrow_spread": 0.008,
+          "lend_spread": 0.012,
+          "exclude_dva_overlap": false
+        }
+      },
+      "expected": {
+        "status": "ok",
+        "outputs": {
+          "cva": 0.0,
+          "dva": 9.23099999055675e-08,
+          "fca": 1.8521999987612,
+          "fba": 1.8461999985729,
+          "fva": 0.006000000188300005
+        }
+      },
+      "tolerance_class": "simple_analytic",
+      "verified_by": [
+        "mpmath-50"
+      ],
+      "tags": [
+        "xva",
+        "adjustments",
+        "tiny-hazard",
+        "synthetic"
+      ],
+      "description": "PT-6 / KR-350: counterparty h = 0, own h = 1e-9",
+      "tolerance_limit": {
+        "absolute": 1e-300,
+        "relative": 1e-13,
+        "reason": "short sums of products; cancellation-free bucket probability (KR-350); exact 0 at h = 0"
+      }
+    }
+  ]
+}

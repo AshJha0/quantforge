@@ -50,7 +50,7 @@ Tutorials 51 to 58 are marked `<!-- tutorial:only python -->`. Step 1 of each is
 ## Question bank and LEARN
 
 - `docs/question-bank/14-stage-k-risk-platform.md` and its checker `docs/question-bank/verify/v14_stage_k.py` restate every number with the standard library (no build needed), so they run on this branch. After the merge, the checker can also be pointed at the goldens: replace the inline golden constants with reads of `datasets/golden/stage_k/*.json` (to do; the constants are copied from those files and cite them).
-- LEARN section "Stage K: risk platform and capital (in progress)" cites files on lane branches by path in backticks, not as links, so the link checker passes today. After the merge, turn the backticked spec paths into links.
+- LEARN section "Stage K: risk platform and capital" cites files on lane branches by path in backticks, not as links, so the link checker passes today. After the merge, turn the backticked spec paths into links.
 
 ## Generated or quoted figures to refresh after the merge
 

@@ -1344,6 +1344,126 @@ Entries for the stage H specs, confirmed 2026-11-18 (spec version 0.1.0, rulings
 - **Retirement trigger:** a superseding stage K ruling or a change of LEV or LEX.
 - **Validation report:** `specifications/06-risk/leverage-large-exposures.md`.
 
+### MK-12 AAD sensitivities of the valuation adjustments (stage K, K-8 AAD, PROPOSED)
+- **Purpose:** `xva.sens.aad` on `xva.adjustments.value` (MG-8, G-41): the outputs and their derivatives with respect to hazard rates (flat and per bucket), recoveries, discount factors, profile points, spreads and the MVA and KVA inputs, by a hand-written backward pass in each build.
+- **Inputs:** as in the spec page; `wrt` optional.
+- **Limitations:** spec 0.1.0 and rulings KR-262 to KR-268 PROPOSED (`specifications/06-risk/xva-aad-adjustments.md`); only `xva.adjustments.value` is wrapped; derivatives of the formulas as computed, not of a credit model; the overlap floor's kink takes the linear branch by convention (KR-264); bucket hazards are derivatives of a piecewise-flat curve at the flat input, not a bucketed-curve input; no second derivatives; no outside check (0 of 13 value cases, a recorded miss, KR-268).
+- **Validation:** goldens `aadadj_k` (37: 13 value, 24 error) against a 50-digit Richardson bump, itself checked against a 50-digit closed-form adjoint to 1e-30; Python on 1,000 random requests, largest relative gap 2.4e-12 (`python/tests/test_xva_aad.py`, measured 2026-11-20, local laptop, not the acceptance machine). **Review:** 2026-11-20.
+- **Tier:** 2.
+- **Challenger:** none outside (KR-268); a DR-H2 blind packet of the 13 value inputs is the planned route.
+- **Monitoring thresholds:** any gradient entry more than 1e-12 + 1e-10 max(|a|, |e|) from its golden in any build.
+- **Data lineage hash:** sha256 6800fb924b30c5ed1e30430723db9eda2c6b301843af2789841db71a5e3d75c9 (`aadadj_k`, 37 cases) (2026-11-20).
+- **Retirement trigger:** a superseding stage K ruling, or a golden failing in any build.
+- **Validation report:** `specifications/06-risk/xva-aad-adjustments.md`.
+
+### MKX-1 AAD xVA sensitivities (stage K, K-8b, PROPOSED)
+- **Purpose:** `xva.sens.aad`: AAD gradients of the K-8b and G-41 xVA operations. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share 8 of 12 value cases (blind v2) once implemented; ORE bump cases not run (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 2fa1701895f2bc304974cbecd94333744f0e53df338640e0a78d7f08ba5a0bc1 (spec page `xva-aad-sensitivities.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-aad-sensitivities.md`.
+
+### MKX-2 ColVA (stage K, K-8b, PROPOSED)
+- **Purpose:** `xva.colva.value`: collateral remuneration adjustment, profile and path forms. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share 6 of 10 (blind v2) once implemented; ORE `colva` not run (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 f7994aad94b282badb1dd7033648a7295b2d675112b64dc466046ca583609e96 (spec page `xva-colva.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-colva.md`.
+
+### MKX-3 MVA from projected initial margin (stage K, K-8b, PROPOSED)
+- **Purpose:** `xva.mva.value`, `xva.im.project`: MVA on a given, normal-MPoR or regressed IM profile. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share 5 of 10 (blind v2): under the 60% floor until an ORE `dimModel Flat` case passes (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 984a2802f4a56ab4031e5689772d83f511d9d70bbd0d2f2a3aa0956c876a0c73 (spec page `xva-mva-im.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-mva-im.md`.
+
+### MKX-4 WWR, Gaussian copula (stage K, K-8b, PROPOSED)
+- **Purpose:** `xva.wwr.cva_gaussian_copula`: wrong-way CVA with one Gaussian factor. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share 9 L (SciPy quadrature) plus 1 blind, 10 of 10, subject to the D6 reading (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 d474b9ce2408bad06808476b7e37f5ea9b6f3bffbb21bd809b8c4b72551b6dbf (spec page `xva-wwr-copula.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-wwr-copula.md`.
+
+### MKX-5 Stressed exposure (stage K, K-8b, PROPOSED)
+- **Purpose:** `xva.exposure.stressed_eepe`: current and stressed Effective EPE, portfolio-level choice. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share 6 of 8 (blind v2) once implemented (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 09e1ff1f8b0862101136edf44cbbf99aa6a7a7e6ba6593e0daad4d87074db0e8 (spec page `xva-stressed-exposure.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-stressed-exposure.md`.
+
+### MKX-6 MPoR floors and close-out with VM and IM (stage K, K-8b, PROPOSED)
+- **Purpose:** `xva.mpor.days`, `xva.exposure.closeout`, `xva.exposure.closeout_normal`. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share 12 of 14 (7 blind, 5 L) once implemented; ORE close-out cases not run (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 190c5a5aaffaccc12ff8e7c51c18b5cf477978402054bd828d4df0541b3b3a91 (spec page `xva-mpor-closeout.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-mpor-closeout.md`.
+
+### MKX-7 Asymmetric funding curves (stage K, K-8b, PROPOSED)
+- **Purpose:** `xva.funding.asymmetric`: FCA and FBA from borrowing and lending spread curves. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share 6 of 10 (blind v2) once implemented; ORE `fva` not run (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 200ebd59ee987d2213e4ca3adeaff4ddcb0cbfbcd7f26338e79a046c893ede0b (spec page `xva-funding-asymmetric.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-funding-asymmetric.md`.
+
+### MKX-8 LSMC and AMC (stage K, K-8b, PROPOSED)
+- **Purpose:** `pricing.american.lsmc`, `xva.exposure.amc`. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share per `program/STAGE_K_XVA_GATE.md` (not changed by this lane) (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 94fe08565a1e193dbd154f2d22a881e05ed057deb629300f3b60f46d0facf15b (spec page `xva-amc-lsmc.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-amc-lsmc.md`.
+
+### MKX-9 xVA under the shock library (stage K, K-8b, PROPOSED)
+- **Purpose:** `xva.stress.shocked`: shocked curve and portfolio exposure under a stage J shock. Specified only.
+- **Inputs:** as in the spec page.
+- **Limitations:** spec and rulings (KR-160 to KR-176, KR-298, KR-299) PROPOSED, KR-296 and KR-297 confirmed 2026-11-21; nothing implemented; goldens held as candidates under `oracle/xva_k8b_candidates/` (2026-11-20). Not a model in use.
+- **Validation:** outside share 2 of 6 (blind v2): under the floor until 2 ORE cases pass (`program/STAGE_K_BLIND_XVA.md`). **Review:** 2026-11-20.
+- **Tier:** 3.
+- **Challenger:** blind re-derivation (DR-H2) of the spec's cases, `program/STAGE_K_BLIND_XVA.md`; gate status `program/STAGE_K_XVA_GATE.md`.
+- **Monitoring thresholds:** none until built; then any golden difference across the four builds.
+- **Data lineage hash:** sha256 4a88d742e844a5a9d5aaf2187b3ffc4428571286ad783de73f02f986ee8b8d60 (spec page `xva-stress-shocks.md`, candidate goldens only) (2026-11-20).
+- **Retirement trigger:** the K-8b build replaces this entry's limitations, or the item moves to a point release.
+- **Validation report:** `specifications/06-risk/xva-stress-shocks.md`.
+
 ## Why there is no ISDA SIMM here
 
 Plain idea: ISDA SIMM is the initial-margin methodology many dealers use for uncleared derivatives. It is not free to reuse. The methodology document carries a notice that it may be used, revised or distributed only for a market participant's own commercial transactions or under a written ISDA licence, and it cites a US patent (owner's reading, 2026-11-19; evidence class: read by the owner, not by any lane). An open-source project that publishes code, specs and test data is neither, so the owner decided on 2026-11-19 that QuantForge uses **no ISDA material** at all: the methodology document, ISDA parameter sets, ISDA test portfolios and the margin calibration files the Open Source Risk Engine ships are not opened, read, quoted or fetched.

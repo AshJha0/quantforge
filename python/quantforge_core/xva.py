@@ -189,6 +189,13 @@ def adjustments(
     def sb(t: float) -> float:
         return math.exp(-own.hazard_rate * t)
 
+    def qc(t: float, p: float) -> float:
+        # bucket default probability S(p) - S(t) written as S(p) (1 - e^(-h (t - p))): no cancellation at tiny h
+        return sc(p) * -math.expm1(-cpty.hazard_rate * (t - p))
+
+    def qb(t: float, p: float) -> float:
+        return sb(p) * -math.expm1(-own.hazard_rate * (t - p))
+
     def funding(profile: Floats) -> float:
         return ordered_sum(
             d * x * sc(p) * sb(p) * (t - p)
@@ -196,11 +203,10 @@ def adjustments(
         )
 
     cva = (1 - cpty.recovery) * ordered_sum(
-        d * e * (sc(p) - sc(t)) * sb(p) for d, e, t, p in zip(dfs, ee, times, prev, strict=True)
+        d * e * qc(t, p) * sb(p) for d, e, t, p in zip(dfs, ee, times, prev, strict=True)
     )
     dva = (1 - own.recovery) * ordered_sum(
-        d * abs(e) * (sb(p) - sb(t)) * sc(p)
-        for d, e, t, p in zip(dfs, ene, times, prev, strict=True)
+        d * abs(e) * qb(t, p) * sc(p) for d, e, t, p in zip(dfs, ene, times, prev, strict=True)
     )
     s_l = (
         max(lend_spread - own.hazard_rate * (1 - own.recovery), 0.0)

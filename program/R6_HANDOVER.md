@@ -391,6 +391,22 @@ Merge of `k-v1-fuzz3` into `k-v1` (2026-11-21, after `k-v1-fix`; counted by `too
 
 TOTALS: 16652 value 8143 error 5955 invariance 2554
 
+Branch `k-v1-aad` after merging `k-xva-spec` (c7a036cc), local `k-v1` (47072365) and `origin/k-v1` (5e4facc9), counted 2026-11-21 by `tools/check_case_total.py` (measured): the 16,609 above plus `aadadj_k` (K-8 AAD, 37 cases: 13 value, 24 error). The K-8b candidates under `oracle/xva_k8b_candidates/` are not goldens (KR-299) and are not counted.
+
+TOTALS: 16646 value 8155 error 5937 invariance 2554
+
+Branch `k-v1-aad` after merging `origin/k-v1` (990ddd45), counted 2026-11-22 by `tools/check_case_total.py` (measured): `k-v1`'s 16,652 (value 8,143, error 5,955) plus `aadadj_k` (37: 13 value, 24 error) = 16,689 (value 8,156, error 5,979, invariance 2,554).
+
+TOTALS: 16689 value 8156 error 5979 invariance 2554
+
+Branch `k-v1-pt` (pre-tag audit PT-6, 2026-11-22), counted by `tools/check_case_total.py` (measured): 16,689 plus `g41tiny_k` (4 value cases, G-41 at h = 1e-9 and h = 0, mpmath-50, KR-350) = 16,693 (value 8,160, error 5,979, invariance 2,554).
+
+TOTALS: 16693 value 8160 error 5979 invariance 2554
+
+Branch `k-v1-aadg` (KR-350 follow-up, 2026-11-22), counted by `tools/check_case_total.py` (measured): 16,693 plus `aadtiny_k` (5 value cases, `xva.sens.aad` gradients at h = 1e-9 and h = 0, mpmath-50) = 16,698 (value 8,165, error 5,979, invariance 2,554).
+
+TOTALS: 16698 value 8165 error 5979 invariance 2554
+
 Stage K lane `k-v1-eparse` (2026-11-22, counted by `tools/check_case_total.py`, measured): new golden set `eparse_k` adds 6 error cases (ruling KR-344: a decimal string that is not a decimal is `E_SCHEMA`, was `E_PARSE`; `oracle/python/gen_stage_k_eparse.py`).
 
 TOTALS: 16658 value 8143 error 5961 invariance 2554
@@ -398,3 +414,7 @@ TOTALS: 16658 value 8143 error 5961 invariance 2554
 Lane `k-v1-eparse`, second step (2026-11-22, coordinator: fix the KR-230/HR-66 order in the paper operations; counted by `tools/check_case_total.py`, measured): `eparse_k` grows from 6 to 13 error cases (7 more two-error cases).
 
 TOTALS: 16665 value 8143 error 5968 invariance 2554
+
+Merge of `k-v1` (e0dab443) into `k-v1-eparse` (2026-11-22; counted by `tools/check_case_total.py`, measured): 16,698 + 13 error goldens of `eparse_k`.
+
+TOTALS: 16711 value 8165 error 5992 invariance 2554

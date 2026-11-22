@@ -252,13 +252,17 @@ def load_stage_h():
 # The 28 printed-figure cases count through the blind pub packet (program/STAGE_K_BLIND_PUB.md, 28 of 28 MATCH at
 # full tolerance), not through the printed figure (KR-250).
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
-                 "k8_k": "K-8", "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
+                 "k8_k": "K-8", "aadadj_k": "K-8 AAD",
+                 "aadtiny_k": "K-8 AAD",  # KR-350 follow-up: gradients at h = 1e-9 and 0, mpmath only, not outside
+                 # aadadj_k: KR-268 bump not outside; blind packet 13 of 13 MATCH (STAGE_K_BLIND_AADADJ.md)
+                 "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
                  "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)",
                  "sbim_alias_k": None,  # KR-153: the deprecated alias's invariance and error cases; no value case
                  "lim_k": None,  # KR-230/KR-231: size-limit error cases only (bitemporal_query, trigger.check)
                  "fuzzfix_k": None,  # fuzz run 44815591552 and siblings: error cases only (gen_stage_k_fuzz.py)
                  "fuzzfix_k2": None,  # fuzz run 44937631714 and siblings: error cases only (gen_stage_k_fuzz3.py)
                  "eparse_k": None,  # KR-344: malformed decimal string is E_SCHEMA, error cases only (gen_stage_k_eparse.py)
+                 "g41tiny_k": None,  # PT-6 / KR-350: G-41 precision at h = 1e-9 and 0 (a stage G operation), mpmath only, not outside
                  "fuzzrev_k": None,  # K-9 finding 1: fuzz runs 2026-11-09..16, error cases only (gen_stage_k_rev1.py)
                  "drc_k": "K-8a", "ima_k": "K-8f", "cva_k": "K-8g", "sacva_k": "K-8g", "df_k": "K-8g",
                  "lev_k": "K-8i", "lex_k": "K-8i",
@@ -441,7 +445,7 @@ def under_review_text(u):
 BLOCK = re.compile(r"<!-- generated:(stage-k-[a-z-]+) -->(.*?)<!-- /generated -->")
 # Docs that state stage K or per-item shares must carry the blocks (a doc may hold more than one copy).
 BLOCK_DOCS = {"README.md": ("stage-k-total", "stage-k-items"), "LEARN.md": ("stage-k-total", "stage-k-items"), "CHANGELOG.md": ("stage-k-total",), "ROADMAP.md": ("stage-k-total", "stage-k-items"), "docs/known-issues.md": ("stage-k-total",),
-              "docs/releases/v0.10.1.md": ("stage-k-total", "stage-k-items")}
+              "docs/releases/v0.10.1.md": ("stage-k-total", "stage-k-items"), "docs/releases/v1.0.0.md": ("stage-k-total", "stage-k-items")}
 ITEM_NAME = {"K-8": "K-8 method", "K-8d": "K-8d SA-CCR", "K-8e": "K-8e FRTB backtesting"}
 
 

@@ -1,0 +1,579 @@
+{
+ "schema_version": "1.0",
+ "suite": "wwr_k",
+ "status": "PENDING implementation (candidate golden; K-8b specs PROPOSED)",
+ "spec": "specifications/06-risk/xva-wwr-copula.md",
+ "generator": "oracle/python/gen_stage_k_xva_k8b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "survival_convention": "KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA",
+ "cases": [
+  {
+   "case_id": "wwr_k-0001",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     1.0
+    ],
+    "stdev": [
+     1.0
+    ],
+    "pd_at_times": [
+     0.02
+    ],
+    "recovery": 0.0,
+    "mean": [
+     0.0
+    ],
+    "rho": 0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.024889865831758257,
+     "bucket_terms": [
+      0.024889865831758257
+     ],
+     "wwr_factor": [
+      3.1194820722828647
+     ],
+     "cva_independent": 0.007978845608028654
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "single bucket"
+  },
+  {
+   "case_id": "wwr_k-0002",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     1.0
+    ],
+    "stdev": [
+     1.0
+    ],
+    "pd_at_times": [
+     0.02
+    ],
+    "recovery": 0.0,
+    "mean": [
+     0.0
+    ],
+    "rho": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.007978845608028654,
+     "bucket_terms": [
+      0.007978845608028654
+     ],
+     "wwr_factor": [
+      1.0
+     ],
+     "cva_independent": 0.007978845608028654
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "single bucket"
+  },
+  {
+   "case_id": "wwr_k-0003",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     1.0
+    ],
+    "stdev": [
+     1.0
+    ],
+    "pd_at_times": [
+     0.02
+    ],
+    "recovery": 0.0,
+    "mean": [
+     0.0
+    ],
+    "rho": -0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.0006807978913872521,
+     "bucket_terms": [
+      0.0006807978913872521
+     ],
+     "wwr_factor": [
+      0.08532536219302256
+     ],
+     "cva_independent": 0.007978845608028654
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "single bucket"
+  },
+  {
+   "case_id": "wwr_k-0004",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     1.0
+    ],
+    "stdev": [
+     1.0
+    ],
+    "pd_at_times": [
+     0.02
+    ],
+    "recovery": 0.0,
+    "mean": [
+     0.5
+    ],
+    "rho": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.025438333326790488,
+     "bucket_terms": [
+      0.025438333326790488
+     ],
+     "wwr_factor": [
+      1.8227614522437938
+     ],
+     "cva_independent": 0.01395593114802612
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "single bucket"
+  },
+  {
+   "case_id": "wwr_k-0005",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0
+    ],
+    "discount_factors": [
+     1.0
+    ],
+    "stdev": [
+     1.0
+    ],
+    "pd_at_times": [
+     0.02
+    ],
+    "recovery": 0.0,
+    "mean": [
+     -0.5
+    ],
+    "rho": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.010127126375944323,
+     "bucket_terms": [
+      0.010127126375944323
+     ],
+     "wwr_factor": [
+      2.5599854994942026
+     ],
+     "cva_independent": 0.003955931148026121
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "single bucket"
+  },
+  {
+   "case_id": "wwr_k-0006",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "discount_factors": [
+     0.9704455335485082,
+     0.9417645335842487
+    ],
+    "mean": [
+     0.0,
+     0.0
+    ],
+    "stdev": [
+     1.0,
+     1.4142135623730951
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4,
+    "rho": 0.0
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.010787339602702136,
+     "bucket_terms": [
+      0.0045996710183817645,
+      0.006187668584320372
+     ],
+     "wwr_factor": [
+      1.0,
+      1.0
+     ],
+     "cva_independent": 0.010787339602702136
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "two buckets"
+  },
+  {
+   "case_id": "wwr_k-0007",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "discount_factors": [
+     0.9704455335485082,
+     0.9417645335842487
+    ],
+    "mean": [
+     0.0,
+     0.0
+    ],
+    "stdev": [
+     1.0,
+     1.4142135623730951
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4,
+    "rho": 0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.0299991469463851,
+     "bucket_terms": [
+      0.014367873683905737,
+      0.015631273262479362
+     ],
+     "wwr_factor": [
+      3.123674198977947,
+      2.526197557200979
+     ],
+     "cva_independent": 0.010787339602702136
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "two buckets"
+  },
+  {
+   "case_id": "wwr_k-0008",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "discount_factors": [
+     0.9704455335485082,
+     0.9417645335842487
+    ],
+    "mean": [
+     0.0,
+     0.0
+    ],
+    "stdev": [
+     1.0,
+     1.4142135623730951
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4,
+    "rho": -0.5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.0013268543824397707,
+     "bucket_terms": [
+      0.0003906334113742648,
+      0.000936220971065506
+     ],
+     "wwr_factor": [
+      0.08492638056355946,
+      0.1513043173381815
+     ],
+     "cva_independent": 0.010787339602702136
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "two buckets"
+  },
+  {
+   "case_id": "wwr_k-0009",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0
+    ],
+    "discount_factors": [
+     0.9704455335485082,
+     0.9417645335842487
+    ],
+    "mean": [
+     0.2,
+     0.4
+    ],
+    "stdev": [
+     1.0,
+     1.4142135623730951
+    ],
+    "hazard_rate": 0.02,
+    "recovery": 0.4,
+    "rho": 0.3
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.026384614677401816,
+     "bucket_terms": [
+      0.011672494502106041,
+      0.014712120175295777
+     ],
+     "wwr_factor": [
+      1.9972355037515694,
+      1.705355683012752
+     ],
+     "cva_independent": 0.014471335350567757
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "two buckets"
+  },
+  {
+   "case_id": "wwr_k-0010",
+   "operation": "xva.wwr.cva_gaussian_copula",
+   "inputs": {
+    "times": [
+     1.0,
+     2.0,
+     3.0,
+     4.0,
+     5.0,
+     6.0,
+     7.0,
+     8.0,
+     9.0,
+     10.0
+    ],
+    "discount_factors": [
+     0.9801986733067553,
+     0.9607894391523232,
+     0.9417645335842487,
+     0.9231163463866358,
+     0.9048374180359595,
+     0.8869204367171575,
+     0.8693582353988059,
+     0.8521437889662113,
+     0.835270211411272,
+     0.8187307530779818
+    ],
+    "mean": [
+     0.45,
+     0.8,
+     1.05,
+     1.2000000000000002,
+     1.25,
+     1.2000000000000002,
+     1.05,
+     0.8,
+     0.45,
+     0.0
+    ],
+    "stdev": [
+     0.3,
+     0.4242640687119285,
+     0.5196152422706631,
+     0.6,
+     0.6708203932499369,
+     0.7348469228349535,
+     0.7937253933193772,
+     0.848528137423857,
+     0.8999999999999999,
+     0.9486832980505138
+    ],
+    "hazard_rate": 0.03,
+    "recovery": 0.4,
+    "rho": 0.4
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.16297062031847553,
+     "bucket_terms": [
+      0.012571438415522818,
+      0.018041652128480048,
+      0.021299454340178204,
+      0.02257485314090926,
+      0.0221779910749469,
+      0.020376754094997233,
+      0.017428314835852,
+      0.013632180529115221,
+      0.009422193203215372,
+      0.005445788555258483
+     ],
+     "wwr_factor": [
+      1.5764515051171006,
+      1.3557444491878836,
+      1.2846878640832893,
+      1.252159191378802,
+      1.2386821468248246,
+      1.2381123262939164,
+      1.248130535826398,
+      1.2665461763624415,
+      1.2876860235086145,
+      1.2982953064413556
+     ],
+     "cva_independent": 0.12649124841124626
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-12,
+    "reason": "spec A1 (special_function; Phi_2 dominates)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "ten annual buckets"
+  }
+ ]
+}

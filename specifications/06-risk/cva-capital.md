@@ -15,7 +15,7 @@ Every output carries `label`: "regulatory formula on caller inputs; not a regula
 | [CRE53] | CRE53.20-53.21, p. 467 | read 2026-11-19 | effective maturity for IMM banks (no five-year cap here) |
 | [CRE99] | SA-CCR examples, pp. 524-540 | read 2026-11-19 | EAD inputs for an illustrative BA-CVA chain (not a check) |
 | [SciPy] | SciPy 1.17.1 `integrate.quad` | measured 2026-11-19 | DF as the time average of exp(-0.05 t) (footnote 357's own definition) |
-| [ORE] | Open Source Risk Engine (Apache 2.0) | recalled, UNVERIFIED: whether ORE ships BA-CVA or SA-CVA example inputs and outputs was not checked in this lane | possible independent check, to be confirmed by the ORE lane (K-8b) |
+| [ORE] | Open Source Risk Engine (Modified BSD, `license.txt` at tag 1.8.17.0, as recorded in `oracle/LICENCES.md`; evidence class: read) | recalled, UNVERIFIED: whether ORE ships BA-CVA or SA-CVA example inputs and outputs was not checked in this lane | possible independent check, to be confirmed by the ORE lane (K-8b) |
 
 ## Formal statement
 

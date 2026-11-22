@@ -1,0 +1,200 @@
+{
+ "schema_version": "1.0",
+ "suite": "mpor_k",
+ "status": "PENDING implementation (candidate golden; K-8b specs PROPOSED)",
+ "spec": "specifications/06-risk/xva-mpor-closeout.md",
+ "generator": "oracle/python/gen_stage_k_xva_k8b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "survival_convention": "KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA",
+ "cases": [
+  {
+   "case_id": "mpor_k-0001",
+   "operation": "xva.mpor.days",
+   "inputs": {
+    "repo_only": true,
+    "max_trades_last_quarter": 10,
+    "illiquid": false,
+    "long_disputes_last_two_quarters": 0,
+    "remargin_days": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "floor_days": 5
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "spec A1"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "CRE53 floor"
+  },
+  {
+   "case_id": "mpor_k-0002",
+   "operation": "xva.mpor.days",
+   "inputs": {
+    "repo_only": false,
+    "max_trades_last_quarter": 10,
+    "illiquid": false,
+    "long_disputes_last_two_quarters": 0,
+    "remargin_days": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "floor_days": 10
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "spec A1"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "CRE53 floor"
+  },
+  {
+   "case_id": "mpor_k-0003",
+   "operation": "xva.mpor.days",
+   "inputs": {
+    "repo_only": false,
+    "max_trades_last_quarter": 10,
+    "illiquid": false,
+    "long_disputes_last_two_quarters": 0,
+    "remargin_days": 5
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "floor_days": 14
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "spec A1"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "CRE53 floor"
+  },
+  {
+   "case_id": "mpor_k-0004",
+   "operation": "xva.mpor.days",
+   "inputs": {
+    "repo_only": false,
+    "max_trades_last_quarter": 6000,
+    "illiquid": false,
+    "long_disputes_last_two_quarters": 0,
+    "remargin_days": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "floor_days": 20
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "spec A1"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "CRE53 floor"
+  },
+  {
+   "case_id": "mpor_k-0005",
+   "operation": "xva.mpor.days",
+   "inputs": {
+    "repo_only": false,
+    "max_trades_last_quarter": 10,
+    "illiquid": false,
+    "long_disputes_last_two_quarters": 3,
+    "remargin_days": 1
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "floor_days": 20
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "spec A1"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "CRE53 floor"
+  },
+  {
+   "case_id": "mpor_k-0006",
+   "operation": "xva.mpor.days",
+   "inputs": {
+    "repo_only": false,
+    "max_trades_last_quarter": 10,
+    "illiquid": true,
+    "long_disputes_last_two_quarters": 3,
+    "remargin_days": 3,
+    "model_mpor_days": 15
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "floor_days": 42,
+     "mpor_days": 42,
+     "binding": true
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-09,
+    "relative": 1e-12,
+    "reason": "spec A1"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "CRE53 floor"
+  }
+ ]
+}

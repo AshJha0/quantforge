@@ -46,8 +46,8 @@ Operations (6; every operation whose name-map spec is the model's spec (shared s
 | `infl.cap.zc_price` | 6 | 20 | 6 | 6 | `e1_infl`, `ratesvol_e`, `rulings_e_b` | 0 of 6 (stage E) | 1, 0, 0, 0 |
 | `rates.bondfut.implied_vol` | 5 | 24 | 7 | 7 | `e1_rates_1`, `ratesvol_e`, `rulings_e_b` | 5 of 5 (stage E) | 1, 0, 3, 0 |
 | `rates.bondfut.option_price` | 6 | 20 | 6 | 6 | `e1_rates_1`, `ratesvol_e`, `rulings_e_b` | 6 of 6 (stage E) | 1, 0, 3, 0 |
-| `rates.cap.strip` | 8 | 33 | 8 | 8 | `e1_rates_1`, `fuzzfix_k`, `ratesvol_e`, `rulings_e_b` | 8 of 8 (stage E) | 2, 0, 3, 0 |
-| `rates.swaption.price_cube` | 42 | 81 | 22 | 22 | `e1_rates_2`, `fuzzfix_j`, `fuzzfix_k`, `ratesvol_e` | 42 of 42 (stage E) | 2, 0, 3, 0 |
+| `rates.cap.strip` | 8 | 33 | 8 | 8 | `e1_rates_1`, `fuzzfix_k`, `ratesvol_e`, `rulings_e_b` | 8 of 8 (stage E) | 3, 0, 3, 0 |
+| `rates.swaption.price_cube` | 42 | 81 | 22 | 22 | `e1_rates_2`, `fuzzfix_j`, `fuzzfix_k`, `ratesvol_e` | 42 of 42 (stage E) | 3, 0, 3, 0 |
 
 Totals: 74 value-checked, 215 error, 118 invariance cases (measured from `datasets/golden` at generation).
 Outside-checked: 66 of 72 value cases (91.7%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
