@@ -41,7 +41,7 @@
 
 ### Changed (stage K v1, lane `k-v1-eparse`; ruling KR-344, 2026-11-22)
 
-- **A malformed decimal string in a paper-trading input is `E_SCHEMA`, not `E_PARSE`.** Inside valid JSON, a decimal string such as `"é"` in any `paper.*` input now gives `E_SCHEMA` with the same message (`<name> is not a decimal`) in all four builds; `E_PARSE` stays reserved for input that is not valid JSON or has a duplicate key (`specifications/cli-contract.md`). Goldens `eparse_k` (6 error cases, 2 with two errors). Known and not changed: a scalar such as `cash` outside the HR-77 range still reports `E_LIMIT` before a malformed fill decimal (the same as for a non-finite token before this change).
+- **A malformed decimal string in a paper-trading input is `E_SCHEMA`, not `E_PARSE`.** Inside valid JSON, a decimal string such as `"é"` in any `paper.*` input now gives `E_SCHEMA` with the same message (`<name> is not a decimal`) in all four builds; `E_PARSE` stays reserved for input that is not valid JSON or has a duplicate key (`specifications/cli-contract.md`). Error order fixed at the same time (KR-230, HR-66): in all four paper operations every schema check, including the malformed or non-finite decimal check of every input and every session script decimal, now comes before any `E_LIMIT`, `E_INPUT` or `E_DOMAIN`; before, `cash` outside the HR-77 range reported `E_LIMIT` ahead of a malformed fill decimal, and a fill `E_DOMAIN` hid a missing `prev_close` in `paper.book.end_of_day`. Goldens `eparse_k` (13 error cases, 9 with two errors).
 
 ### Fixed (stage K v1, lane `k-v1-fuzz3`; fuzz run 44937631714 on `k-v1`, 2026-11-21)
 

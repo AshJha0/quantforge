@@ -394,3 +394,7 @@ TOTALS: 16652 value 8143 error 5955 invariance 2554
 Stage K lane `k-v1-eparse` (2026-11-22, counted by `tools/check_case_total.py`, measured): new golden set `eparse_k` adds 6 error cases (ruling KR-344: a decimal string that is not a decimal is `E_SCHEMA`, was `E_PARSE`; `oracle/python/gen_stage_k_eparse.py`).
 
 TOTALS: 16658 value 8143 error 5961 invariance 2554
+
+Lane `k-v1-eparse`, second step (2026-11-22, coordinator: fix the KR-230/HR-66 order in the paper operations; counted by `tools/check_case_total.py`, measured): `eparse_k` grows from 6 to 13 error cases (7 more two-error cases).
+
+TOTALS: 16665 value 8143 error 5968 invariance 2554

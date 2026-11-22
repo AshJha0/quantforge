@@ -12,7 +12,7 @@ Two ways in:
 - **Test yourself.** The [question bank](docs/question-bank/README.md) has 500 questions with worked answers, at foundation, practitioner and advanced level, across all the topics below; set 14 (82 questions) covers stage K work, merged to main and not yet tagged.
 - **Practitioner.** Jump to a topic. Each worked example names its golden case, so you can rerun it as `COOKBOOK.md` shows and check the number yourself.
 
-**What the tests check.** 8,143 value-checked golden cases, where each build must return the oracle's numbers within a stated tolerance; 5,961 error cases, which check only that a bad input is refused with the right code; and 2,554 invariance cases (1,277 pairs), which check that two related inputs get the same answer. Counts are generated in [`docs/case-figures.md`](docs/case-figures.md). Outside-library shares per stage, under the tight rule D6, are in [`oracle/OUTSIDE_SHARES.md`](oracle/OUTSIDE_SHARES.md).
+**What the tests check.** 8,143 value-checked golden cases, where each build must return the oracle's numbers within a stated tolerance; 5,968 error cases, which check only that a bad input is refused with the right code; and 2,554 invariance cases (1,277 pairs), which check that two related inputs get the same answer. Counts are generated in [`docs/case-figures.md`](docs/case-figures.md). Outside-library shares per stage, under the tight rule D6, are in [`oracle/OUTSIDE_SHARES.md`](oracle/OUTSIDE_SHARES.md).
 
 Sources: every model and convention cites its papers, books and standards in the sources list of its spec. [References](docs/references.md) collects them all by topic, with each one's status (read, not opened, or paywalled) and the specs that rely on it.
 
