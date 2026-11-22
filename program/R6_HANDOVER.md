@@ -390,3 +390,7 @@ TOTALS: 16629 value 8143 error 5932 invariance 2554
 Merge of `k-v1-fuzz3` into `k-v1` (2026-11-21, after `k-v1-fix`; counted by `tools/check_case_total.py`, measured): 16,633 + 19 error goldens of `fuzzfix_k2`.
 
 TOTALS: 16652 value 8143 error 5955 invariance 2554
+
+Stage K lane `k-v1-eparse` (2026-11-22, counted by `tools/check_case_total.py`, measured): new golden set `eparse_k` adds 6 error cases (ruling KR-344: a decimal string that is not a decimal is `E_SCHEMA`, was `E_PARSE`; `oracle/python/gen_stage_k_eparse.py`).
+
+TOTALS: 16658 value 8143 error 5961 invariance 2554
