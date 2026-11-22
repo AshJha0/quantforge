@@ -402,3 +402,7 @@ TOTALS: 16689 value 8156 error 5979 invariance 2554
 Branch `k-v1-pt` (pre-tag audit PT-6, 2026-11-22), counted by `tools/check_case_total.py` (measured): 16,689 plus `g41tiny_k` (4 value cases, G-41 at h = 1e-9 and h = 0, mpmath-50, KR-350) = 16,693 (value 8,160, error 5,979, invariance 2,554).
 
 TOTALS: 16693 value 8160 error 5979 invariance 2554
+
+Branch `k-v1-aadg` (KR-350 follow-up, 2026-11-22), counted by `tools/check_case_total.py` (measured): 16,693 plus `aadtiny_k` (5 value cases, `xva.sens.aad` gradients at h = 1e-9 and h = 0, mpmath-50) = 16,698 (value 8,165, error 5,979, invariance 2,554).
+
+TOTALS: 16698 value 8165 error 5979 invariance 2554
