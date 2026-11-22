@@ -102,7 +102,7 @@ fn old_implied(o: &Option_, price: f64) -> Result<f64> {
     fail("E_NO_CONVERGENCE", "x")
 }
 
-/// SplitMix64, so the cases are fixed by the seed.
+/// `SplitMix64`, so the cases are fixed by the seed.
 struct Rng(u64);
 impl Rng {
     fn next(&mut self) -> u64 {
@@ -122,7 +122,11 @@ impl Rng {
 
 fn case(r: &mut Rng, i: usize) -> (Option_, f64) {
     let call = r.next() & 1 == 0;
-    let t = if i % 97 == 0 { 0.0 } else { r.range(0.01, 30.0) };
+    let t = if i.is_multiple_of(97) {
+        0.0
+    } else {
+        r.range(0.01, 30.0)
+    };
     let model = match i % 3 {
         0 => Model::BlackScholes {
             spot: r.range(1.0, 500.0),
