@@ -5025,32 +5025,32 @@
   },
   "K": {
    "without_sweeps": {
-    "cases": 236,
+    "cases": 241,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 184,
     "reimplementation": 0,
-    "none": 52,
+    "none": 57,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 184,
-    "share_with_rederivation": 0.779661,
+    "share_with_rederivation": 0.763485,
     "all_cases_share": 0.0,
     "error_and_invariance_cases": 370
    },
    "with_sweeps": {
-    "cases": 236,
+    "cases": 241,
     "library-object": 0,
     "library-primitive": 0,
     "independent-rederivation": 184,
     "reimplementation": 0,
-    "none": 52,
+    "none": 57,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
     "counted_with_rederivation": 184,
-    "share_with_rederivation": 0.779661,
+    "share_with_rederivation": 0.763485,
     "all_cases_share": 0.0,
     "error_and_invariance_cases": 370
    },
@@ -5719,17 +5719,17 @@
      "error_and_invariance_cases": 8
     },
     "xva.sens.aad": {
-     "cases": 13,
+     "cases": 18,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 13,
      "reimplementation": 0,
-     "none": 0,
+     "none": 5,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 13,
-     "share_with_rederivation": 1.0,
+     "share_with_rederivation": 0.722222,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 24
     },
@@ -5866,21 +5866,22 @@
      "meets_item_floor": true
     },
     "K-8 AAD": {
-     "cases": 13,
+     "cases": 18,
      "library-object": 0,
      "library-primitive": 0,
      "independent-rederivation": 13,
      "reimplementation": 0,
-     "none": 0,
+     "none": 5,
      "counted": 0,
      "share": 0.0,
      "rederived_book_spec_only": 0,
      "counted_with_rederivation": 13,
-     "share_with_rederivation": 1.0,
+     "share_with_rederivation": 0.722222,
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 24,
      "suites": [
-      "aadadj_k"
+      "aadadj_k",
+      "aadtiny_k"
      ],
      "meets_item_floor": true
     },
