@@ -173,15 +173,32 @@ fn case(r: &mut Rng, i: usize) -> (Option_, f64) {
     (o, price)
 }
 
+/// The lognormal solve starts from the Corrado-Miller estimate rather than the bracket midpoint,
+/// so it takes another Newton path to the root. Where binary64 pins the vol to the last bit both
+/// paths agree; where it pins it only to the identification bound of KR-341 (1e-10 relative) the
+/// two can stop at different vols inside that bound. Checked here: every error code is the same,
+/// every Bachelier result (start unchanged) is bitwise the same, and every lognormal result is
+/// within 1e-10 relative of the old one. The count of differing results is pinned so that any
+/// change to it is seen.
+/// Lognormal results that differ from the old solver on the 4000 cases (measured 2026-11-22).
+const DIFFER_4000: usize = 0;
+
 #[test]
-fn fused_solver_is_bitwise_identical_to_the_old_one() {
+fn solver_matches_the_old_one() {
     let mut r = Rng(0x5EED_2026_1122);
-    let (mut ok, mut errs) = (0, 0);
+    let (mut ok, mut errs, mut differ, mut max_rel, mut max_ulp) = (0, 0, 0, 0f64, 0u64);
     for i in 0..4000 {
         let (o, price) = case(&mut r, i);
         match (o.implied(price), old_implied(&o, price)) {
             (Ok(a), Ok(b)) => {
-                assert_eq!(a.to_bits(), b.to_bits(), "case {i}: {o:?} {price}");
+                if a.to_bits() != b.to_bits() {
+                    assert!(!o.is_normal(), "case {i}: {o:?} {price}: {a} vs {b}");
+                    let rel = (a - b).abs() / b;
+                    assert!(rel <= 1e-10, "case {i}: {o:?} {price}: {a} vs {b}");
+                    max_rel = max_rel.max(rel);
+                    differ += 1;
+                    max_ulp = max_ulp.max(a.to_bits().abs_diff(b.to_bits()));
+                }
                 ok += 1;
             }
             (Err(a), Err(b)) => {
@@ -191,29 +208,8 @@ fn fused_solver_is_bitwise_identical_to_the_old_one() {
             (a, b) => panic!("case {i}: {o:?} {price}: new {a:?} old {b:?}"),
         }
     }
+    eprintln!("ok {ok} errs {errs} differ {differ} max_rel {max_rel:e} max_ulp {max_ulp}");
     // Both paths are exercised in quantity.
     assert!(ok > 2000 && errs > 500, "ok {ok} errs {errs}");
-}
-
-#[test]
-fn diag_count_differences() {
-    let mut r = Rng(0x5EED_2026_1122);
-    let (mut diff, mut maxu, mut code, mut maxr, mut small) = (0, 0u64, 0, 0f64, 0);
-    for i in 0..200_000 {
-        let (o, price) = case(&mut r, i);
-        match (o.implied(price), old_implied(&o, price)) {
-            (Ok(a), Ok(b)) if a.to_bits() != b.to_bits() => {
-                diff += 1;
-                maxu = maxu.max(a.to_bits().abs_diff(b.to_bits()));
-                maxr = maxr.max((a - b).abs() / b);
-                if a.to_bits().abs_diff(b.to_bits()) <= 4 {
-                    small += 1;
-                }
-            }
-            (Err(a), Err(b)) if a.code != b.code => code += 1,
-            (Ok(_), Err(_)) | (Err(_), Ok(_)) => code += 1,
-            _ => {}
-        }
-    }
-    eprintln!("DIAG diff {diff} le4ulp {small} maxulp {maxu} maxrel {maxr:e} codediff {code}");
+    assert_eq!(differ, DIFFER_4000, "max_rel {max_rel:e}");
 }
