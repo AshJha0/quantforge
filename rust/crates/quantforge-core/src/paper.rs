@@ -909,7 +909,8 @@ pub fn pretrade_case(
             return Err(e("E_SCHEMA", format!("limits/{k} must be a boolean")));
         }
     }
-    let mut scalars: Vec<(&Json, String)> = vec![(req(order, "quantity", "order/")?, "order/quantity".into())];
+    let mut scalars: Vec<(&Json, String)> =
+        vec![(req(order, "quantity", "order/")?, "order/quantity".into())];
     if let Some(l) = order.get("limit_price").filter(|v| **v != Json::Null) {
         scalars.push((l, "order/limit_price".into()));
     }
