@@ -31,7 +31,7 @@ Classes: `ok` is value-checked (numbers within a stated tolerance); `error` chec
 
 ## Outside-checked share per stage
 
-One definition on every page: value-checked cases counted under rule D6 (an outside library, or a blind re-derivation by a second AI lane where the rule allows it; never a person), over the share table's value-checked cases without generated sweeps, read from `oracle/OUTSIDE_SHARES.json` by `outside_pair()`: D 451 of 526 (85.7%), E 557 of 710 (78.5%), F 355 of 417 (85.1%), G 359 of 456 (78.7%), I 102 of 153 (66.7%), J 143 of 215 (66.5%), H 160 of 205 (78.0%), K 171 of 231 (74.0%). Stages A to C, R2 and R6 are not in the share table.
+One definition on every page: value-checked cases counted under rule D6 (an outside library, or a blind re-derivation by a second AI lane where the rule allows it; never a person), over the share table's value-checked cases without generated sweeps, read from `oracle/OUTSIDE_SHARES.json` by `outside_pair()`: D 451 of 526 (85.7%), E 557 of 710 (78.5%), F 355 of 417 (85.1%), G 359 of 456 (78.7%), I 102 of 153 (66.7%), J 143 of 215 (66.5%), H 160 of 205 (78.0%), K 184 of 231 (79.7%). Stages A to C, R2 and R6 are not in the share table.
 
 ## Evidence classes per stage
 
@@ -60,7 +60,7 @@ Read from each value-checked case's `verified_by` labels; a case counts once, in
 | R6 | 0 | 13 | 0 | 0 | 7 | 23 | 0 | 0 | 43 |
 | J | 0 | 56 | 7 | 0 | 0 | 28 | 124 | 0 | 215 |
 | H | 2 | 4 | 5 | 156 | 5 | 5 | 0 | 28 | 205 |
-| K | 7 | 69 | 14 | 98 | 38 | 5 | 0 | 0 | 231 |
-| all | 9 | 5,069 | 81 | 254 | 1,556 | 884 | 134 | 168 | 8,155 |
+| K | 7 | 69 | 14 | 111 | 25 | 5 | 0 | 0 | 231 |
+| all | 9 | 5,069 | 81 | 267 | 1,543 | 884 | 134 | 168 | 8,155 |
 
 Exceptions to design principle 5 (expected results never come from an implementation): `sorx_h-0001`, `sorx_h-0002`, `k8_k-0001`, `k8_k-0002`, `k8_k-0003`, `k8_k-0004`, `k8_k-0005`, `k8_k-0006`, `k8_k-0007`. The `k8_k` values are the Python build's output under the pinned reference scheme (`oracle/python/gen_stage_k_k8.py` imports the build); the `sorx_h` values are the Python build's output, kept as an agreement check across the builds and not counted as outside-checked. 168 value-checked cases rest on hand derivation only.

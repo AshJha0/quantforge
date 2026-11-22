@@ -49,7 +49,7 @@ On the kink (`aadadj_k-0009`: `s_l = 0.005`, `h_b = 1%`, `R_b = 50%`, so `s_l - 
 
 ## Tolerances and outside share
 
-Every output, value and gradient, `|a - e| <= 1e-12 + 1e-10 max(|a|, |e|)` (class `aad_sensitivity` with the golden's `tolerance_limit`, KR-265). That is the acceptance A1: it implies `|AAD - bump| <= 1e-8 max(1, |bump|)`. Outside: none (KR-268); the 50-digit bump is our own reference. Plan item K-8 AAD is under the 60% per-item outside-check floor: a recorded miss.
+Every output, value and gradient, `|a - e| <= 1e-12 + 1e-10 max(|a|, |e|)` (class `aad_sensitivity` with the golden's `tolerance_limit`, KR-265). That is the acceptance A1: it implies `|AAD - bump| <= 1e-8 max(1, |bump|)`. Outside: the 50-digit bump is our own reference and does not count (KR-268); the DR-H2 blind re-derivation of 2026-11-22 matched all 13 value cases (`program/STAGE_K_BLIND_AADADJ.md`), so plan item K-8 AAD meets the 60% per-item floor through it.
 
 <!-- strip:begin -->
 ## Acceptance (fixed before any build ran; proposed, frozen on confirmation)

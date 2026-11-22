@@ -33,4 +33,15 @@ Known limits, stated before the run: the deriver reads the same rules this lane 
 
 ## Results
 
-Not run yet.
+Run 2026-11-22, the first and only compare run (evidence class: measured).
+
+- Order: packet, compare and tolerances pushed in 2996d142; the deriver ran after; its files copied unchanged to `stage_k_blind/aadadj/` (`answers.json`, `derive.py`, `notes.md`) and committed in 1b391b88; the compare ran once after that commit. `answers.json` SHA-256 as handed back `60e951d5ba64f66e8ec5d638025a74e7bb1e20f3fcf7f3020997b85b5c90dea8`, verified before the copy (git stores LF, so a checkout may hash differently, as KF-25).
+- Deriver: a separate subagent on Claude Sonnet 5.5, given only the packet folder (its own statement, not logged). MANIFEST matched on all five files (its `notes.md`).
+- Output `stage_k_blind/aadadj/compare_output.txt`: **13 MATCH of 13**, no mismatch, no missing or extra leaf.
+- Credit: `oracle/python/gen_stage_k_aadadj.py` adds `blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH` to the `verified_by` of the 13 value goldens (only that label changed in `aadadj_k.json`). `tools/outside_shares.py --check` passes; K-8 AAD 13 of 13 (100.0%), stage K 184 of 231 (79.7%) (`oracle/OUTSIDE_SHARES.md`).
+
+**Method, and what it makes independent.** The deriver used finite differences, not an adjoint: the G-41 formulas in mpmath at 60 digits and, for every gradient entry, the KR-265 Richardson central bump with the overlap branch fixed in binary64. No closed-form adjoint was written on its side. So the check is independent in code and in model (Sonnet 5.5 against Opus 5.5 for the goldens), but it uses the same bump definition as the golden check (KR-265). It does not test the backward pass text in the spec; it tests the values the goldens hold.
+
+Deriver ambiguities (`notes.md`): the flat hazard entry moves every bucket together, with the floor; a bucket entry moves that bucket's floor too; the `wrt` case follows the template's reduced keys; at `h = 0` the central bump steps into negative hazard (the analytic formula's derivative, as KR-264 (b)).
+
+What this does not show: same model family as the author; the deriver read the rules this lane wrote, so the match shows the rules are unambiguous and the arithmetic agrees, not that they read their sources correctly (KF-26). No second review (owner decision 2026-11-18).

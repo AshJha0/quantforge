@@ -252,7 +252,7 @@ def load_stage_h():
 # The 28 printed-figure cases count through the blind pub packet (program/STAGE_K_BLIND_PUB.md, 28 of 28 MATCH at
 # full tolerance), not through the printed figure (KR-250).
 STAGE_K_ITEMS = {"bt_k": "K-4a", "inc_k": "K-4b", "trig_k": "K-4c", "idr_k": "K-5a", "rich_k": "K-8 guard",
-                 "k8_k": "K-8", "aadadj_k": "K-8 AAD",  # KR-268: no outside check, recorded miss
+                 "k8_k": "K-8", "aadadj_k": "K-8 AAD",  # KR-268 bump not outside; blind packet 13 of 13 MATCH (STAGE_K_BLIND_AADADJ.md)
                  "e1_k": None, "e2_k": None,  # e1_k, e2_k: error cases only
                  "saccr_k": "K-8d", "btk_k": "K-8e", "tlk_k": "F (existing traffic_light)",
                  "sbim_alias_k": None,  # KR-153: the deprecated alias's invariance and error cases; no value case

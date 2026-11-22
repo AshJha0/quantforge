@@ -256,7 +256,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -522,7 +523,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -978,7 +980,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1244,7 +1247,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1510,7 +1514,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1776,7 +1781,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -1955,7 +1961,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2221,7 +2228,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2487,7 +2495,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2753,7 +2762,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -2878,7 +2888,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -3314,7 +3325,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",
@@ -4624,7 +4636,8 @@
    "tolerance_class": "aad_sensitivity",
    "verified_by": [
     "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)",
-    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+    "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale",
+    "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
    ],
    "tags": [
     "stage_k",

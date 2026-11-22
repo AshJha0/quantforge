@@ -28,6 +28,9 @@ OP = "xva.sens.aad"
 WRAPPED = "xva.adjustments.value"
 ORACLE = "mpmath-50 Richardson central bump of the 50-digit forward (KR-265)"
 ADJOINT = "mpmath-50 closed-form adjoint (hand-derived), agrees with the bump to 1e-30 of the scale"
+# Blind lane (program/STAGE_K_BLIND_AADADJ.md, packet manifest 5815ae65, compare fixed at 2996d142, frozen results
+# 1b391b88): 13 of 13 MATCH, all counted (class B, KR-173: our own bump is not an outside check; the blind lane is).
+BLIND = "blind re-derivation DR-H2 2026-11-22 (program/STAGE_K_BLIND_AADADJ.md): MATCH"
 HAND = "hand: expected code decided from the rulings (KR-267, KR-230 order), not blind re-derived"
 LIMIT = {"absolute": 1e-12, "relative": 1e-10,
          "reason": "KR-265: a derivative exact to rounding; implies |AAD - bump| <= 1e-8 max(1, |bump|) (plan 14.8)"}
@@ -323,7 +326,7 @@ def build():
     s = Suite("aadadj_k", SPEC, G)
     g = g41()
     base = g["xvaadj_g-0001"]["inputs"]
-    vb = (ORACLE, ADJOINT)
+    vb = (ORACLE, ADJOINT, BLIND)
 
     def value(inp, desc, wrt=None, check_g=None):
         out = gradient(inp, wrt)
