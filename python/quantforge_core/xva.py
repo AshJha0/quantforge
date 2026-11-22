@@ -206,8 +206,7 @@ def adjustments(
         d * e * qc(t, p) * sb(p) for d, e, t, p in zip(dfs, ee, times, prev, strict=True)
     )
     dva = (1 - own.recovery) * ordered_sum(
-        d * abs(e) * qb(t, p) * sc(p)
-        for d, e, t, p in zip(dfs, ene, times, prev, strict=True)
+        d * abs(e) * qb(t, p) * sc(p) for d, e, t, p in zip(dfs, ene, times, prev, strict=True)
     )
     s_l = (
         max(lend_spread - own.hazard_rate * (1 - own.recovery), 0.0)
