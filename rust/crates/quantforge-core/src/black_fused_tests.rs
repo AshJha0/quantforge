@@ -198,18 +198,22 @@ fn fused_solver_is_bitwise_identical_to_the_old_one() {
 #[test]
 fn diag_count_differences() {
     let mut r = Rng(0x5EED_2026_1122);
-    let (mut diff, mut maxu, mut code) = (0, 0u64, 0);
+    let (mut diff, mut maxu, mut code, mut maxr, mut small) = (0, 0u64, 0, 0f64, 0);
     for i in 0..200_000 {
         let (o, price) = case(&mut r, i);
         match (o.implied(price), old_implied(&o, price)) {
             (Ok(a), Ok(b)) if a.to_bits() != b.to_bits() => {
                 diff += 1;
                 maxu = maxu.max(a.to_bits().abs_diff(b.to_bits()));
+                maxr = maxr.max((a - b).abs() / b);
+                if a.to_bits().abs_diff(b.to_bits()) <= 4 {
+                    small += 1;
+                }
             }
             (Err(a), Err(b)) if a.code != b.code => code += 1,
             (Ok(_), Err(_)) | (Err(_), Ok(_)) => code += 1,
             _ => {}
         }
     }
-    eprintln!("DIAG diff {diff} maxulp {maxu} codediff {code}");
+    eprintln!("DIAG diff {diff} le4ulp {small} maxulp {maxu} maxrel {maxr:e} codediff {code}");
 }

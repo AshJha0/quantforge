@@ -229,6 +229,8 @@ impl Option_ {
         let r = self.t.sqrt();
         let mut v = (lo + hi) / 2.0;
         if !self.is_normal() {
+            // A start near the root (Corrado-Miller) instead of the midpoint: from the midpoint
+            // the ln V step overshoots towards zero near the money and then climbs back slowly.
             let g = corrado_miller(self.call, f, k, price / d) / r;
             if g > lo && g < hi {
                 v = g;
@@ -290,9 +292,9 @@ impl Option_ {
     }
 }
 
-/// Corrado-Miller start for the lognormal solve: an estimate of `v sqrt(T)` from the undiscounted
-/// price `c` (a put is turned into a call by parity). Only a starting point; NaN when the formula
-/// does not apply, and the caller then keeps the bracket midpoint.
+/// Corrado-Miller estimate of `v sqrt(T)` from the undiscounted lognormal price `c` (a put is
+/// turned into a call by parity). Only a starting point for the Newton solve; the caller keeps the
+/// bracket midpoint when it is not finite or falls outside the bracket.
 fn corrado_miller(call: bool, f: f64, k: f64, c: f64) -> f64 {
     let c = if call { c } else { c + (f - k) };
     let a = c - (f - k) / 2.0;
