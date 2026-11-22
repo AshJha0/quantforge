@@ -1,4 +1,4 @@
-//! The fused implied-vol solver against the previous one (value, then vega, then `identified`
+//! The implied-vol solver against the previous one (value, then vega, then `identified`
 //! recomputing every term), kept here verbatim: outputs must agree to the bit and error codes
 //! must agree, on 4000 seeded cases over Black-Scholes, Black-76 (shifted) and Bachelier,
 //! including deep out of the money prices and the error paths. Mirrors Java `BlackSolveFusedTest`.
@@ -173,15 +173,38 @@ fn case(r: &mut Rng, i: usize) -> (Option_, f64) {
     (o, price)
 }
 
+/// Lognormal results that differ from the old solver on the 4000 cases (measured 2026-11-22).
+const DIFFER_4000: usize = 326;
+
+/// The lognormal solve starts from the Corrado-Miller estimate rather than the bracket midpoint,
+/// so it takes another Newton path to the root. Where binary64 pins the vol to the last bit both
+/// paths agree; where the binary64 price is flat over many ulps of v, the two can stop at
+/// different vols that both pass the KR-341 identification check (1e-10 relative). Checked here:
+/// every error code is the same, every Bachelier result (start unchanged) is bitwise the same,
+/// every lognormal result is within 1e-10 relative of the old one, and the count and the largest
+/// difference on these seeded cases are pinned. Against a 60-digit root, on the 326 cases plus
+/// 2000 of a 200k-case run, old and new have the same median error (4 ulps) and the new maximum
+/// is lower (254,110 vs 294,934 ulps).
 #[test]
-fn fused_solver_is_bitwise_identical_to_the_old_one() {
+fn solver_matches_the_old_one() {
     let mut r = Rng(0x5EED_2026_1122);
-    let (mut ok, mut errs) = (0, 0);
+    let (mut ok, mut errs, mut differ, mut max_rel, mut max_ulp) = (0, 0, 0, 0f64, 0u64);
     for i in 0..4000 {
         let (o, price) = case(&mut r, i);
         match (o.implied(price), old_implied(&o, price)) {
             (Ok(a), Ok(b)) => {
-                assert_eq!(a.to_bits(), b.to_bits(), "case {i}: {o:?} {price}");
+                if a.to_bits() != b.to_bits() {
+                    assert!(!o.is_normal(), "case {i}: {o:?} {price}: {a} vs {b}");
+                    // Both pass the identification check. The KR-341 estimate is not a strict
+                    // bound to the ulp (case 28: old +9, new -4 ulps from the 60-digit root,
+                    // estimate about 1 ulp), so the pair is held to the 1e-10 acceptance and the
+                    // seeded maximum is pinned below.
+                    let rel = (a - b).abs() / b;
+                    assert!(rel <= 1e-10, "case {i}: {o:?} {price}: {a} vs {b}");
+                    max_rel = max_rel.max(rel);
+                    differ += 1;
+                    max_ulp = max_ulp.max(a.to_bits().abs_diff(b.to_bits()));
+                }
                 ok += 1;
             }
             (Err(a), Err(b)) => {
@@ -191,6 +214,9 @@ fn fused_solver_is_bitwise_identical_to_the_old_one() {
             (a, b) => panic!("case {i}: {o:?} {price}: new {a:?} old {b:?}"),
         }
     }
+    eprintln!("ok {ok} errs {errs} differ {differ} max_rel {max_rel:e} max_ulp {max_ulp}");
     // Both paths are exercised in quantity.
     assert!(ok > 2000 && errs > 500, "ok {ok} errs {errs}");
+    assert_eq!(differ, DIFFER_4000, "max_rel {max_rel:e}");
+    assert!(max_rel <= 2.25e-11, "max_rel {max_rel:e}"); // measured 2.237e-11
 }

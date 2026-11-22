@@ -145,9 +145,10 @@ impl Option_ {
 
     /// Value, vega and the magnitude sum M at `v`, each term evaluated once (shared `d1`, `d2`,
     /// cdf and pdf); bitwise identical to `value`, `vega` and the M of `identified` taken apart.
-    fn eval(&self, f: f64, d: f64, k: f64, v: f64) -> Eval {
+    /// `lfk` is `(f / k).ln()` and `r` is `sqrt(t)`, hoisted by the caller (the same values, so
+    /// the same bits).
+    fn eval(&self, f: f64, d: f64, k: f64, v: f64, lfk: f64, r: f64) -> Eval {
         let p = phi(self.call);
-        let r = self.t.sqrt();
         let s = v * r;
         if self.is_normal() {
             let x = (f - k) / s;
@@ -164,7 +165,7 @@ impl Option_ {
                 mag: d * ((f - k).abs() * cx + s * px),
             }
         } else {
-            let d1 = ((f / k).ln() + v * v * self.t / 2.0) / s;
+            let d1 = (lfk + v * v * self.t / 2.0) / s;
             let d2 = d1 - s;
             let c1 = normal_cdf(p * d1);
             let c2 = normal_cdf(p * d2);
@@ -207,8 +208,11 @@ impl Option_ {
         if price == intrinsic {
             return Ok(0.0);
         }
-        // Bracket, then Newton held inside it. The result is polished to rounding, as a stop at
-        // the spec's price tolerance would cost too much in vol where vega is small.
+        // Bracket, then Newton held inside it, stepped until the step is below rounding in v (a
+        // stop at the spec's price tolerance would cost too much in vol where vega is small).
+        // Where vega is small the binary64 price is flat over many ulps of v, so the vol is
+        // fixed only to the KR-341 estimated error that `identified` checks, and two start
+        // points can stop at different vols inside it.
         let mut hi = if self.is_normal() {
             (f - k).abs().max(price).max(1e-8)
         } else {
@@ -224,9 +228,19 @@ impl Option_ {
                 return fail("E_NO_CONVERGENCE", "no bracket for the implied vol");
             }
         }
+        let lfk = if self.is_normal() { 0.0 } else { (f / k).ln() };
+        let r = self.t.sqrt();
         let mut v = (lo + hi) / 2.0;
+        if !self.is_normal() {
+            // A start near the root (Corrado-Miller) instead of the midpoint: from the midpoint
+            // the ln V step overshoots towards zero near the money and then climbs back slowly.
+            let g = corrado_miller(self.call, f, k, price / d) / r;
+            if g > lo && g < hi {
+                v = g;
+            }
+        }
         for _ in 0..300 {
-            let ev = self.eval(f, d, k, v);
+            let ev = self.eval(f, d, k, v, lfk, r);
             let val = ev.value;
             let e = val - price;
             if e == 0.0 {
@@ -249,12 +263,12 @@ impl Option_ {
                 next = (lo + hi) / 2.0;
             }
             if (next - v).abs() <= 2e-16 * v {
-                let en = self.eval(f, d, k, next);
+                let en = self.eval(f, d, k, next, lfk, r);
                 return self.identified(f, d, k, next, price, &en);
             }
             v = next;
         }
-        let ev = self.eval(f, d, k, v);
+        let ev = self.eval(f, d, k, v, lfk, r);
         if (ev.value - price).abs() <= 1e-13 * price.max(1.0) {
             return self.identified(f, d, k, v, price, &ev);
         }
@@ -279,6 +293,16 @@ impl Option_ {
         }
         Ok(v)
     }
+}
+
+/// Corrado-Miller estimate of `v sqrt(T)` from the undiscounted lognormal price `c` (a put is
+/// turned into a call by parity). Only a starting point for the Newton solve; the caller keeps the
+/// bracket midpoint when it is not finite or falls outside the bracket.
+fn corrado_miller(call: bool, f: f64, k: f64, c: f64) -> f64 {
+    let c = if call { c } else { c + (f - k) };
+    let a = c - (f - k) / 2.0;
+    let q = a * a - (f - k) * (f - k) / std::f64::consts::PI;
+    (2.0 * std::f64::consts::PI).sqrt() / (f + k) * (a + q.max(0.0).sqrt())
 }
 
 /// One evaluation of the price terms at a vol: value, vega and the magnitude sum M.
