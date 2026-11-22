@@ -390,3 +390,11 @@ TOTALS: 16629 value 8143 error 5932 invariance 2554
 Merge of `k-v1-fuzz3` into `k-v1` (2026-11-21, after `k-v1-fix`; counted by `tools/check_case_total.py`, measured): 16,633 + 19 error goldens of `fuzzfix_k2`.
 
 TOTALS: 16652 value 8143 error 5955 invariance 2554
+
+Branch `k-v1-aad` after merging `k-xva-spec` (c7a036cc), local `k-v1` (47072365) and `origin/k-v1` (5e4facc9), counted 2026-11-21 by `tools/check_case_total.py` (measured): the 16,609 above plus `aadadj_k` (K-8 AAD, 37 cases: 13 value, 24 error). The K-8b candidates under `oracle/xva_k8b_candidates/` are not goldens (KR-299) and are not counted.
+
+TOTALS: 16646 value 8155 error 5937 invariance 2554
+
+Branch `k-v1-aad` after merging `origin/k-v1` (990ddd45), counted 2026-11-22 by `tools/check_case_total.py` (measured): `k-v1`'s 16,652 (value 8,143, error 5,955) plus `aadadj_k` (37: 13 value, 24 error) = 16,689 (value 8,156, error 5,979, invariance 2,554).
+
+TOTALS: 16689 value 8156 error 5979 invariance 2554

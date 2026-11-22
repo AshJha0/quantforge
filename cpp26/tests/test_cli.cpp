@@ -51,7 +51,7 @@ TEST_CASE("nulls, and diagnostics") {
 
 TEST_CASE("operations are sorted and all answer") {
     const auto ops = quantforge::cli::operations();
-    CHECK(ops.size() == 387);  // stage K wave 2 (+18: 14 FRTB DRC, RRAO and IMA operations, risk.cva.ba, risk.cva.sa, risk.capital.leverage, risk.capital.large_exposures), stage K margin rename (+1: xva.sbim.ir_delta; xva.simm.ir_delta stays as its deprecated alias, KR-152), R6-4.1 sbm_total, R6-11.20 usecase.option_hedge_lots, stage J wave 1 (+8), wave 2 (+7), wave 3 (+8), curves lane (+3), stage H wave 1 (+10), wave 2 (+2, +3 dark pool and router), H-4b/H-16 (+8), wave 2 execution (+7), H-21 paper trading (+6) Stage H multi-asset (+20: 19 operations plus exec.sim.fut.run), stage K wave 1 (+6), stage K wave 1b (+4: risk.saccr.ead, risk.frtb.backtest.zone, .desk, .count).
+    CHECK(ops.size() == 388);  // K-8 AAD (+1: xva.sens.aad), stage K wave 2 (+18: 14 FRTB DRC, RRAO and IMA operations, risk.cva.ba, risk.cva.sa, risk.capital.leverage, risk.capital.large_exposures), stage K margin rename (+1: xva.sbim.ir_delta; xva.simm.ir_delta stays as its deprecated alias, KR-152), R6-4.1 sbm_total, R6-11.20 usecase.option_hedge_lots, stage J wave 1 (+8), wave 2 (+7), wave 3 (+8), curves lane (+3), stage H wave 1 (+10), wave 2 (+2, +3 dark pool and router), H-4b/H-16 (+8), wave 2 execution (+7), H-21 paper trading (+6) Stage H multi-asset (+20: 19 operations plus exec.sim.fut.run), stage K wave 1 (+6), stage K wave 1b (+4: risk.saccr.ead, risk.frtb.backtest.zone, .desk, .count).
     CHECK(std::is_sorted(ops.begin(), ops.end()));
     for (const auto& op : ops) CHECK_FALSE(has(run_case(wrap(op, "{}")).json, "E_UNSUPPORTED_OPERATION"));
 }

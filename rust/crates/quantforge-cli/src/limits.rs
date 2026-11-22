@@ -230,6 +230,12 @@ fn stage_k_sizes_above(op: &str, i: &Json) -> bool {
         "curve.incremental.update" => {
             over("previous_quotes") || over("previous_discount_factors") || over("new_quotes")
         }
+        // KR-266: at most 10,000 buckets in each profile of the wrapped request.
+        "xva.sens.aad" => i.get("inputs").is_some_and(|inner| {
+            ["times", "discount_factors", "ee", "ene", "im", "capital"]
+                .iter()
+                .any(|k| len(inner, k).is_some_and(|n| n > 10_000))
+        }),
         _ => false,
     }
 }

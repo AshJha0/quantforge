@@ -1,0 +1,22 @@
+{"_source": "copied from the strip blocks 'Golden cases' of specifications/06-risk/xva-*.md at b662dd2b; tolerances from each spec's Acceptance A1 (AAD: A2)",
+ "_tol": {"aadx": [1e-10, 1e-12], "colva": [1e-12, 1e-12], "mva": [1e-12, 1e-12], "str": [1e-12, 1e-12], "mpor": [1e-12, 1e-9], "fva": [1e-12, 1e-12]},
+ "cases": {
+ "aadx_k-0001": {"d_cva_d_h_c": 133.0258166316599, "d_cva_d_r_c": -4.516436290005047, "d_cva_d_h_b": -1.790935732181199, "d_fca_d_s_b": 226.95280541807102, "d_cva_d_ee[1]": 0.005704780048492915},
+ "colva_k-0001": {"colva": -0.12139100070376345},
+ "colva_k-0002": {"colva": -0.11791034201974765},
+ "colva_k-0003": {"colva": -0.12139100070376345, "collateral_floor": -0.2651132755724506},
+ "mva_k-0001": {"mva": 0.9837526973854892},
+ "mva_k-0002": {"mva": 5.478479731127988},
+ "mva_k-0003": {"expected_im": 5.541509073311709},
+ "str_k-0001": {"eepe_current_A": 14.5, "eepe_stressed_A": 23, "eepe_current_B": 21.5, "eepe_stressed_B": 20, "ead_used_A": 32.2, "ead_used_B": 28, "k_current": 2.828, "k_stressed": 3.696, "calibration": "stressed"},
+ "str_k-0002": {"k_current": 1.2852, "k_stressed": 1.2488, "calibration": "current", "ead_used_A": 20.3, "ead_used_B": 30.1},
+ "str_k-0003": {"calibration": "current"},
+ "str_k-0004": {"eepe_current": 12, "eepe_stressed": 15},
+ "mpor_k-0001": {"floor": 5}, "mpor_k-0002": {"floor": 10}, "mpor_k-0003": {"floor": 14},
+ "mpor_k-0004": {"floor": 20}, "mpor_k-0005": {"floor": 20},
+ "mpor_k-0006": {"floor": 42, "mpor_days": 42, "binding": true},
+ "fva_k-0001": {"fca": 0.17381477291763398, "fba": 0.05939582542979509, "fva": 0.11441894748783889},
+ "fva_k-0002": {"fba": 0.01462289896433965},
+ "fva_k-0003": {"fca": 1.815622443344568, "fba": 1.2027298203433914},
+ "fva_k-0006": {"fca": 0}
+}}

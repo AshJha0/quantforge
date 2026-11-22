@@ -5025,34 +5025,34 @@
   },
   "K": {
    "without_sweeps": {
-    "cases": 219,
+    "cases": 232,
     "library-object": 0,
     "library-primitive": 0,
-    "independent-rederivation": 171,
+    "independent-rederivation": 184,
     "reimplementation": 0,
     "none": 48,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
-    "counted_with_rederivation": 171,
-    "share_with_rederivation": 0.780822,
+    "counted_with_rederivation": 184,
+    "share_with_rederivation": 0.793103,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 346
+    "error_and_invariance_cases": 370
    },
    "with_sweeps": {
-    "cases": 219,
+    "cases": 232,
     "library-object": 0,
     "library-primitive": 0,
-    "independent-rederivation": 171,
+    "independent-rederivation": 184,
     "reimplementation": 0,
     "none": 48,
     "counted": 0,
     "share": 0.0,
     "rederived_book_spec_only": 0,
-    "counted_with_rederivation": 171,
-    "share_with_rederivation": 0.780822,
+    "counted_with_rederivation": 184,
+    "share_with_rederivation": 0.793103,
     "all_cases_share": 0.0,
-    "error_and_invariance_cases": 346
+    "error_and_invariance_cases": 370
    },
    "sweeps": null,
    "libraries": {},
@@ -5703,6 +5703,21 @@
      "all_cases_share": 0.0,
      "error_and_invariance_cases": 8
     },
+    "xva.sens.aad": {
+     "cases": 13,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 13,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 13,
+     "share_with_rederivation": 1.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 24
+    },
     "xva.simm.ir_delta": {
      "cases": 0,
      "library-object": 0,
@@ -5832,6 +5847,25 @@
      "error_and_invariance_cases": 7,
      "suites": [
       "k8_k"
+     ],
+     "meets_item_floor": true
+    },
+    "K-8 AAD": {
+     "cases": 13,
+     "library-object": 0,
+     "library-primitive": 0,
+     "independent-rederivation": 13,
+     "reimplementation": 0,
+     "none": 0,
+     "counted": 0,
+     "share": 0.0,
+     "rederived_book_spec_only": 0,
+     "counted_with_rederivation": 13,
+     "share_with_rederivation": 1.0,
+     "all_cases_share": 0.0,
+     "error_and_invariance_cases": 24,
+     "suites": [
+      "aadadj_k"
      ],
      "meets_item_floor": true
     },

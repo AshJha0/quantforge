@@ -1,0 +1,311 @@
+{
+ "schema_version": "1.0",
+ "suite": "mva_k",
+ "status": "PENDING implementation (candidate golden; K-8b specs PROPOSED)",
+ "spec": "specifications/06-risk/xva-mva-im.md",
+ "generator": "oracle/python/gen_stage_k_xva_k8b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "survival_convention": "KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA",
+ "cases": [
+  {
+   "case_id": "mva_k-0001",
+   "operation": "xva.mva.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02
+    },
+    "own": {
+     "hazard_rate": 0.01
+    },
+    "borrow_spread": 0.008,
+    "im_spread": 0.001,
+    "expected_im": [
+     100.0,
+     90.0,
+     70.0,
+     40.0
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mva": 0.9986202154669639,
+     "terms": [
+      0.34475,
+      0.3010009531457158,
+      0.2270599937120122,
+      0.12580926860923594
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "given IM"
+  },
+  {
+   "case_id": "mva_k-0002",
+   "operation": "xva.mva.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02
+    },
+    "own": {
+     "hazard_rate": 0.01
+    },
+    "borrow_spread": 0.008,
+    "im_spread": 0.001,
+    "expected_im": {
+     "method": "NORMAL_MPOR",
+     "stdev": [
+      1000.0,
+      1200.0,
+      900.0,
+      500.0
+     ],
+     "mpor_days": 10,
+     "quantile": 0.99
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mva": 5.561276349300432,
+     "terms": [
+      1.6040168591511597,
+      1.8672878064928071,
+      1.3582813722471418,
+      0.7316903114093228
+     ],
+     "expected_im": [
+      465.26957480816816,
+      558.3234897698018,
+      418.74261732735135,
+      232.63478740408408
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "normal MPoR IM"
+  },
+  {
+   "case_id": "mva_k-0003",
+   "operation": "xva.im.project",
+   "inputs": {
+    "method": "REGRESSION",
+    "regressor": [
+     -1.0,
+     -0.5,
+     0.0,
+     0.5,
+     1.0,
+     1.5
+    ],
+    "increment": [
+     3.0,
+     -2.0,
+     1.0,
+     -1.0,
+     2.0,
+     -4.0
+    ],
+    "order": 1,
+    "quantile": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "im": [
+      4.22957653940106,
+      4.8271329103005005,
+      5.358461212396757,
+      5.841660808007845,
+      6.287837102443828,
+      6.704385867320253
+     ],
+     "expected_im": 5.541509073311707
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1: regression cases (least squares conditioning)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "regression IM, order 1"
+  },
+  {
+   "case_id": "mva_k-0004",
+   "operation": "xva.im.project",
+   "inputs": {
+    "method": "REGRESSION",
+    "regressor": [
+     -1.0,
+     -0.5,
+     0.0,
+     0.5,
+     1.0,
+     1.5
+    ],
+    "increment": [
+     3.0,
+     -2.0,
+     1.0,
+     -1.0,
+     2.0,
+     -4.0
+    ],
+    "order": 0,
+    "quantile": 0.99
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "im": [
+      5.605270179062531,
+      5.605270179062531,
+      5.605270179062531,
+      5.605270179062531,
+      5.605270179062531,
+      5.605270179062531
+     ],
+     "expected_im": 5.605270179062531
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1: regression cases (least squares conditioning)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "regression IM, order 0"
+  },
+  {
+   "case_id": "mva_k-0005",
+   "operation": "xva.mva.value",
+   "inputs": {
+    "times": [
+     0.5,
+     1.0,
+     1.5,
+     2.0
+    ],
+    "discount_factors": [
+     0.985,
+     0.97,
+     0.955,
+     0.94
+    ],
+    "counterparty": {
+     "hazard_rate": 0.02
+    },
+    "own": {
+     "hazard_rate": 0.01
+    },
+    "im_spread": 0.001,
+    "expected_im": [
+     100.0,
+     90.0,
+     70.0,
+     40.0
+    ],
+    "borrow_curve": {
+     "tenors": [
+      0.75,
+      3.0
+     ],
+     "zero_spreads": [
+      0.009,
+      0.015
+     ]
+    }
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mva": 1.7165599478412228,
+     "terms": [
+      0.39399999999999996,
+      0.5160016339640842,
+      0.5189942713417421,
+      0.2875640425353964
+     ]
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-12,
+    "reason": "spec Acceptance A1: exact arithmetic on given inputs"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "given IM, borrow curve"
+  }
+ ]
+}

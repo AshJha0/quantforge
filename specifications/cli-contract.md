@@ -590,3 +590,11 @@ Rulings `stage-k-rulings-w2.md` KR-50 to KR-69 and KR-300 to KR-327 (KR-312, KR-
 | `risk.cva.sa` | same | `classes` (risk class and kind to sensitivity lists), `m_cva`, `reporting_currency` | per class and kind `buckets` and `k`; `total`; `rwa` |
 | `risk.capital.leverage` | `06-risk/leverage-large-exposures.md` (K-8i) | `tier1`, `on_balance`, `derivatives`, `written_credit_derivatives`, `sfts`, `off_balance` | each part, `exposure`, `ratio`, `meets_minimum`, `label` |
 | `risk.capital.large_exposures` | same | `tier1`, optional `bank_gsib`, `counterparties` (group, G-SIB and exempt flags), `banking_book`, `off_balance` | per group `exposure`, `share`, `large`, `limit`, `breach`; `report`; `label` |
+
+### Stage K AAD of the valuation adjustments (contract 1.17.0; rulings `stage-k-rulings-xva-aad.md` KR-262 to KR-268, PROPOSED)
+
+`xva.sens.aad` returns the outputs of the wrapped operation and their derivatives by reverse-mode AAD, written by hand in each build (`06-risk/xva-aad-adjustments.md`, plan item K-8). In this version the wrapped operation is `xva.adjustments.value` only; any other `operation` is `E_SCHEMA` (KR-262). Adding the operation is a minor change and KR-1 keeps the one number 1.17.0. No new error code. Error order KR-230 / HR-122: `E_SCHEMA`, `E_LIMIT` (at most 10,000 buckets, KR-266), the F-2 finite rule, structural `E_INPUT` (`wrt` rules, then G-41's), `E_DOMAIN` (G-41's). Gradient entries are per unit absolute change of each input (KR-263). Goldens `datasets/golden/stage_k/aadadj_k.json` (`oracle/python/gen_stage_k_aadadj.py`), class `aad_sensitivity` with the golden's tighter limit, 1e-12 absolute plus 1e-10 relative (KR-265).
+
+| Operation | Spec | Inputs | Outputs |
+|---|---|---|---|
+| `xva.sens.aad` | `06-risk/xva-aad-adjustments.md` (K-8) | `operation` (`"xva.adjustments.value"`), `inputs` (the G-41 request), optional `wrt` (keys of KR-263) | `cva`, `dva`, `fca`, `fba`, `fva`, optional `mva`, `kva`; `gradient` (output name to input key to derivative; profile keys and `hazard_buckets` as arrays) |
