@@ -102,7 +102,7 @@ def render(root=ROOT):
          "built stage: Implemented; nothing is Validated, Benchmarked or Operationally tested "
          "([status ladder](validation/status-ladder.md)).", "",
          f"**Release state (from `tools/site_facts.json`).** Latest release {facts['release']}, released {facts['released']}. "
-         f"On main, unreleased: {facts['main_state']}.", "",
+         f"On main: {facts['main_state']}.", "",
          "## Recorded misses, moves to a later release and release gaps", "",
          "Read from the register table in [known issues](known-issues.md); a miss stays a miss and no threshold was moved.", "",
          "| Id | Kind | What | Source | Status |", "|---|---|---|---|---|"]

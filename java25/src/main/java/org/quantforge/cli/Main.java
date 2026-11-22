@@ -24,7 +24,7 @@ public final class Main {
     private Main() {}
 
     private static final String CONTRACT = "1.17.0"; // stage K, owner decision K-QC (KR-1); was 1.16.0 (stage H, DR-H8)
-    private static final String VERSION = "0.10.1"; // keep equal to <version> in java25/pom.xml
+    private static final String VERSION = "1.0.0"; // keep equal to <version> in java25/pom.xml
     private static final int MAX_CASE_DEPTH = 80;
     private static final Set<String> ENVELOPE = Set.of("schema_version", "case_id", "operation", "inputs");
     private static final Pattern SCHEMA_VERSION = Pattern.compile("[0-9]+\\.[0-9]+");
