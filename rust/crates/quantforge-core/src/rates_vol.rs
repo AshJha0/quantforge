@@ -751,4 +751,141 @@ mod tests {
             "E_DOMAIN"
         );
     }
+
+    // Kills for mutation run 44952400895 (PR #65): see the comment on each test.
+
+    #[test]
+    fn single_tenor_column_cube_matches_the_node_column() {
+        // bilinear `m[0].len() - 1` to `+ 1` reads a column a one-column cube does not have.
+        let (d, p) = (curve(0.035), curve(0.037));
+        let full = price_cube(&d, &p, &cube(), &trade(18, 60, 0.037)).unwrap();
+        let c = cube();
+        let col = |m: &Vec<Vec<f64>>| m.iter().map(|r| vec![r[1]]).collect::<Vec<_>>();
+        let one = Cube {
+            expiries_months: c.expiries_months.clone(),
+            tenors_months: vec![60],
+            alpha: col(&c.alpha),
+            beta: col(&c.beta),
+            rho: col(&c.rho),
+            nu: col(&c.nu),
+        };
+        let single = price_cube(&d, &p, &one, &trade(18, 60, 0.037)).unwrap();
+        assert!((single.sabr.rho - full.sabr.rho).abs() < 1e-15);
+        assert!((single.price - full.price).abs() <= 1e-12 * full.price.abs());
+    }
+
+    #[test]
+    fn cube_zero_strike_is_refused_with_a_positive_forward() {
+        // price_cube `strike <= 0 || f <= 0` to `&&`: a zero strike with a positive forward.
+        let (d, p) = (curve(0.035), curve(0.037));
+        // The SABR expansion refuses such a strike too, so the message tells which check fired.
+        for k in [0.0, -0.01] {
+            let e = price_cube(&d, &p, &cube(), &trade(12, 60, k)).unwrap_err();
+            assert_eq!(
+                (e.code, e.message.as_str()),
+                ("E_DOMAIN", "strike and forward must be positive")
+            );
+        }
+    }
+
+    #[test]
+    fn futures_implied_vol_above_one_is_bracketed() {
+        // futures_implied_vol `hi *= 2.0` to `/=` and `hi > 1e6` to `<`: a premium that needs a
+        // vol above the first bracket end of 1.0.
+        let o = FuturesOption {
+            call: true,
+            futures_price: 100.0,
+            strike: 100.0,
+            expiry_years: 1.0,
+            discount_factor: 1.0,
+        };
+        let (v, _) = futures_implied_vol(&o, 60.0, 0.04, 6.0).unwrap();
+        assert!(v > 1.0, "{v}");
+        let (price, _) = futures_option_price(&o, v, 100.0).unwrap();
+        assert!((price - 60.0).abs() < 1e-9, "{price}");
+    }
+
+    #[test]
+    fn finite_checks_see_every_field() {
+        use crate::error::Finite;
+        let nan = f64::NAN;
+        let sabr = SabrParams {
+            alpha: 0.05,
+            beta: 0.5,
+            rho: -0.2,
+            nu: 0.4,
+        };
+        let cp = CubePrice {
+            price: 1.0,
+            forward_rate: 0.03,
+            annuity: 4.0,
+            vol: 0.2,
+            sabr,
+        };
+        assert!(cp.is_all_finite());
+        for k in 0..4 {
+            let mut x = cp;
+            *[
+                &mut x.price,
+                &mut x.forward_rate,
+                &mut x.annuity,
+                &mut x.vol,
+            ][k] = nan;
+            assert!(!x.is_all_finite(), "CubePrice field {k}");
+        }
+        let fo = |k: usize| {
+            let mut v = [100.0, 100.0, 1.0, 0.99];
+            if k < 4 {
+                v[k] = nan;
+            }
+            FuturesOption {
+                call: true,
+                futures_price: v[0],
+                strike: v[1],
+                expiry_years: v[2],
+                discount_factor: v[3],
+            }
+        };
+        assert!(fo(4).is_all_finite());
+        for k in 0..4 {
+            assert!(!fo(k).is_all_finite(), "FuturesOption field {k}");
+        }
+        let yoy = |k: usize| {
+            let mut v = [1.0, 0.95, 0.02, 1.0, 0.01];
+            if k < 5 {
+                v[k] = nan;
+            }
+            YoyPeriod {
+                accrual: v[0],
+                discount_factor: v[1],
+                yoy_forward: v[2],
+                expiry_years: v[3],
+                vol: v[4],
+            }
+        };
+        assert!(yoy(5).is_all_finite());
+        for k in 0..5 {
+            assert!(!yoy(k).is_all_finite(), "YoyPeriod field {k}");
+        }
+        let zc = |k: usize| {
+            let mut v = [1.1, 5.0, 0.02, 0.9, 0.03, 1e6];
+            if k < 6 {
+                v[k] = nan;
+            }
+            ZeroCoupon {
+                normal: false,
+                cap: true,
+                forward_index_ratio: v[0],
+                years: v[1],
+                strike: v[2],
+                discount_factor: v[3],
+                vol: v[4],
+                notional: v[5],
+            }
+        };
+        assert!(zc(6).is_all_finite());
+        for k in 0..6 {
+            assert!(!zc(k).is_all_finite(), "ZeroCoupon field {k}");
+        }
+    }
 }
