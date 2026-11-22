@@ -103,7 +103,7 @@ Stage K per plan item:
 | K-4c | 14 | 13 | 92.9% | met |
 | K-5a | 12 | 9 | 75.0% | met |
 | K-8 | 7 | 7 | 100.0% | met |
-| K-8 AAD | 13 | 0 | 0.0% | NOT MET |
+| K-8 AAD | 13 | 13 | 100.0% | met |
 | K-8 guard | 6 | 6 | 100.0% | met |
 | K-8a | 18 | 15 | 83.3% | met |
 | K-8d | 19 | 12 | 63.2% | met |

@@ -31,7 +31,7 @@ Classes: `ok` is value-checked (numbers within a stated tolerance); `error` chec
 
 ## Outside-checked share per stage
 
-One definition on every page: value-checked cases counted under rule D6 (an outside library, or a blind re-derivation by a second AI lane where the rule allows it; never a person), over the share table's value-checked cases without generated sweeps, read from `oracle/OUTSIDE_SHARES.json` by `outside_pair()`: D 451 of 526 (85.7%), E 557 of 710 (78.5%), F 355 of 417 (85.1%), G 359 of 456 (78.7%), I 102 of 153 (66.7%), J 143 of 215 (66.5%), H 160 of 205 (78.0%), K 171 of 219 (78.1%). Stages A to C, R2 and R6 are not in the share table.
+One definition on every page: value-checked cases counted under rule D6 (an outside library, or a blind re-derivation by a second AI lane where the rule allows it; never a person), over the share table's value-checked cases without generated sweeps, read from `oracle/OUTSIDE_SHARES.json` by `outside_pair()`: D 451 of 526 (85.7%), E 557 of 710 (78.5%), F 355 of 417 (85.1%), G 359 of 456 (78.7%), I 102 of 153 (66.7%), J 143 of 215 (66.5%), H 160 of 205 (78.0%), K 184 of 232 (79.3%). Stages A to C, R2 and R6 are not in the share table.
 
 ## Evidence classes per stage
 
