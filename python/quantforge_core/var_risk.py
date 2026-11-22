@@ -9,6 +9,7 @@ from . import rng
 from .errors import QfError
 from .finite import guard
 from .frtb_backtest import traffic_light_cdf
+from .frtb_scenarios import SCENARIOS, scale_correlation
 
 LR_ZERO = 1e-12  # ruling F-32
 _PLUS = {5: 0.40, 6: 0.50, 7: 0.65, 8: 0.75, 9: 0.85}
@@ -208,7 +209,6 @@ TENORS = {
 GIRR_FACTORS = (*TENORS, "INFLATION", "XCCY_BASIS")
 _WEIGHT = {0.25: 0.017, 0.5: 0.017, 1.0: 0.016, 2.0: 0.013, 3.0: 0.012}
 _REDUCED = ("EUR", "USD", "GBP", "AUD", "JPY", "SEK", "CAD")
-_SCENARIOS = ("high", "medium", "low")
 
 
 def _risk_weight(factor: str) -> float:
@@ -231,14 +231,6 @@ def _rho(a: tuple[str, str], b: tuple[str, str]) -> float:
     return rho if ca == cb else rho * 0.999
 
 
-def _scaled(x: float, scenario: str) -> float:
-    if scenario == "high":
-        return min(1.25 * x, 1.0)
-    if scenario == "low":
-        return max(2 * x - 1, 0.75 * x)
-    return x
-
-
 def girr_delta(
     sensitivities: Sequence[tuple[str, str, str, float]], reduction: bool, reporting: str | None
 ) -> dict[str, object]:
@@ -258,7 +250,7 @@ def girr_delta(
     order = sorted(buckets)
     scenarios: dict[str, object] = {}
     deltas: dict[str, float] = {}
-    for sc in _SCENARIOS:
+    for sc in SCENARIOS:
         ks, ss = [], []
         for ccy in order:
             items = buckets[ccy]
@@ -266,10 +258,10 @@ def girr_delta(
             for i, (fi, wi) in enumerate(items):
                 for j, (fj, wj) in enumerate(items):
                     if i != j:
-                        total += _scaled(_rho(fi, fj), sc) * wi * wj
+                        total += scale_correlation(_rho(fi, fj), sc) * wi * wj
             ks.append(math.sqrt(max(0.0, total)))
             ss.append(sum(w for _, w in items))
-        gamma = _scaled(0.5, sc)
+        gamma = scale_correlation(0.5, sc)
 
         def under(s: Sequence[float], ks: Sequence[float] = ks, gamma: float = gamma) -> float:
             total = sum(k * k for k in ks)
@@ -296,7 +288,7 @@ def girr_delta(
             "delta": delta,
             "alternative_used": alternative,
         }
-    binding = max(_SCENARIOS, key=lambda sc: (deltas[sc], -_SCENARIOS.index(sc)))
+    binding = max(SCENARIOS, key=lambda sc: (deltas[sc], -SCENARIOS.index(sc)))
     return {"scenarios": scenarios, "capital": deltas[binding], "binding_scenario": binding}
 
 

@@ -1,6 +1,7 @@
 package org.quantforge.cli;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.function.Function;
 import org.quantforge.cli.Operations.Out;
 import org.quantforge.core.QfError;
 import org.quantforge.risk.Xva;
+import org.quantforge.risk.XvaAad;
 
 /** Stage G wave 4b: the deterministic xVA layer (xva-framework.md). */
 final class OpsXva {
@@ -38,6 +40,7 @@ final class OpsXva {
     static void register(Map<String, Function<In, Out>> table) {
         table.put("xva.exposure.collateralised", OpsXva::collateralised);
         table.put("xva.adjustments.value", OpsXva::adjustments);
+        table.put("xva.sens.aad", OpsXva::sensAad);
         Function<In, Out> sbim = in -> {
             double[] s = in.reals("sensitivities");
             double[] rw = in.reals("risk_weights");
@@ -86,7 +89,7 @@ final class OpsXva {
             in.gate();
             Xva.checkGrid("times", t, 1);
             if (!(t[0] > 0.0)) {
-                throw domain("times");
+                throw input("times"); // KR-258: ordering against the implied t_0 = 0, structural
             }
             sameLength("discount_factors", t.length, df);
             if (v.length == 0) {
@@ -183,7 +186,11 @@ final class OpsXva {
         return Operations.out("netting_sets", sets, "total_ee", total);
     }
 
-    private static Out adjustments(In in) {
+    /** The G-41 request as read; {@code imPaired} and {@code capPaired}: both or neither of each pair given. */
+    private record Read(XvaAad.Request r, boolean imPaired, boolean capPaired) {}
+
+    /** The G-41 request as read (schema stage), with the limits held on {@code in} (all six: KR-266). */
+    private static Read readAdjustments(In in, boolean allLimits) {
         double[] t = in.reals("times");
         double[] df = in.reals("discount_factors");
         double[] ee = in.reals("ee");
@@ -207,46 +214,96 @@ final class OpsXva {
         double[] cap = hasCap ? in.reals("capital") : null;
         double hur = hasHur ? in.real("hurdle_rate") : 0.0;
         in.limit(t.length > MAX, "times");
-        in.gate();
+        if (allLimits) {
+            in.limit(df.length > MAX, "discount_factors");
+            in.limit(ee.length > MAX, "ee");
+            in.limit(ene.length > MAX, "ene");
+            in.limit(im != null && im.length > MAX, "im");
+            in.limit(cap != null && cap.length > MAX, "capital");
+        }
+        XvaAad.Request r = new XvaAad.Request(t, df, ee, ene, hc, rc, hb, rb, sb, sl, excl, im, ims, cap, hur);
+        return new Read(r, hasIm == hasImS, hasCap == hasHur);
+    }
+
+    /** G-41 structural and domain checks, after the gate. */
+    private static void checkAdjustments(Read read) {
+        XvaAad.Request r = read.r();
+        double[] t = r.t();
         Xva.checkGrid("times", t, 1);
         if (!(t[0] > 0.0)) {
-            throw domain("times");
+            throw input("times"); // KR-258: ordering against the implied t_0 = 0, structural
         }
-        sameLength("ee", t.length, df, ee, ene);
-        if (hasIm != hasImS) {
+        sameLength("ee", t.length, r.df(), r.ee(), r.ene());
+        if (!read.imPaired()) {
             throw input("im_spread");
         }
-        if (hasCap != hasHur) {
+        if (!read.capPaired()) {
             throw input("hurdle_rate");
         }
-        if (hasIm) {
-            sameLength("im", t.length, im);
+        if (r.im() != null) {
+            sameLength("im", t.length, r.im());
         }
-        if (hasCap) {
-            sameLength("capital", t.length, cap);
+        if (r.capital() != null) {
+            sameLength("capital", t.length, r.capital());
         }
         for (int i = 0; i < t.length; i++) {
-            if (!(ee[i] >= 0.0)) {
+            if (!(r.ee()[i] >= 0.0)) {
                 throw domain("ee");
             }
-            if (!(ene[i] <= 0.0)) {
+            if (!(r.ene()[i] <= 0.0)) {
                 throw domain("ene");
             }
         }
-        if (!(hc >= 0.0) || !(hb >= 0.0)) {
+        if (!(r.hc() >= 0.0) || !(r.hb() >= 0.0)) {
             throw domain("hazard_rate");
         }
-        if (!(rc >= 0.0 && rc < 1.0) || !(rb >= 0.0 && rb < 1.0)) {
+        if (!(r.rc() >= 0.0 && r.rc() < 1.0) || !(r.rb() >= 0.0 && r.rb() < 1.0)) {
             throw domain("recovery");
         }
-        double[] r = Xva.adjustments(t, df, ee, ene, hc, rc, hb, rb, sb, sl, excl, im, ims, cap, hur);
-        Out o = Operations.out("cva", r[0], "dva", r[1], "fca", r[2], "fba", r[3], "fva", r[4]);
-        if (hasIm) {
-            o.outputs().put("mva", r[5]);
+    }
+
+    private static Out adjustmentValues(XvaAad.Request r) {
+        double[] v = Xva.adjustments(r.t(), r.df(), r.ee(), r.ene(), r.hc(), r.rc(), r.hb(), r.rb(), r.sb(), r.sl(),
+                r.excludeOverlap(), r.im(), r.imSpread(), r.capital(), r.hurdle());
+        Out o = Operations.out("cva", v[0], "dva", v[1], "fca", v[2], "fba", v[3], "fva", v[4]);
+        if (r.im() != null) {
+            o.outputs().put("mva", v[5]);
         }
-        if (hasCap) {
-            o.outputs().put("kva", r[6]);
+        if (r.capital() != null) {
+            o.outputs().put("kva", v[6]);
         }
+        return o;
+    }
+
+    private static Out adjustments(In in) {
+        Read read = readAdjustments(in, false);
+        in.gate();
+        checkAdjustments(read);
+        return adjustmentValues(read.r());
+    }
+
+    /** {@code xva.sens.aad} (KR-262 to KR-267): the wrapped outputs and their gradient. */
+    static Out sensAad(In in) {
+        if (!"xva.adjustments.value".equals(in.string("operation"))) {
+            throw new QfError("E_SCHEMA", "operation is not supported", "operation");
+        }
+        Read read = readAdjustments(in.object("inputs"), true);
+        List<String> wrt = in.has("wrt") ? in.strings("wrt") : null;
+        in.gate();
+        XvaAad.Request r = read.r();
+        List<String> names = XvaAad.keys(r.im() != null, r.capital() != null);
+        if (wrt != null) {
+            if (wrt.isEmpty() || new HashSet<>(wrt).size() != wrt.size() || !names.containsAll(wrt)) {
+                throw input("wrt");
+            }
+            names = names.stream().filter(wrt::contains).toList();
+        }
+        if (r.t().length > 0 && !(r.t()[0] > 0.0)) {
+            throw input("times"); // KR-267: G-41's "increasing and above 0" is structural here
+        }
+        checkAdjustments(read);
+        Out o = adjustmentValues(r);
+        o.outputs().put("gradient", XvaAad.gradient(r, names));
         return o;
     }
 }

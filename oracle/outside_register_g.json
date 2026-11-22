@@ -86,12 +86,12 @@
  },
  "collexp_g": {
   "counted": 0,
-  "total": 17,
+  "total": 20,
   "rule": "own formulas on given inputs: not counted (G-40)"
  },
  "xvaadj_g": {
   "counted": 0,
-  "total": 12,
+  "total": 21,
   "rule": "own formulas on given inputs: not counted (G-40)"
  },
  "sbim_g": {
@@ -101,7 +101,7 @@
  },
  "wwr_g": {
   "counted": 0,
-  "total": 26,
+  "total": 37,
   "rule": "own formulas on given inputs: not counted (G-40)"
  },
  "expsim_g": {

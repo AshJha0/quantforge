@@ -5,4 +5,4 @@ try:  # the installed package's version (python/pyproject.toml), so the CLI cann
 
     __version__ = _version("quantforge-core")
 except Exception:  # noqa: BLE001 (not installed: running from a source tree)
-    __version__ = "0.10.1"
+    __version__ = "1.0.0"

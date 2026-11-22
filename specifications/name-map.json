@@ -11063,6 +11063,34 @@
     "weighted_sensitivities"
    ]
   },
+  "xva.sens.aad": {
+   "spec": "specifications/06-risk/xva-aad-adjustments.md",
+   "rust": "quantforge::xva::sens_aad",
+   "python": "quantforge.xva.sens_aad",
+   "java": "Xva.sensAad",
+   "cpp": "qf::xva::sens_aad",
+   "inputs": {
+    "inputs": {
+     "java": "inputs"
+    },
+    "operation": {
+     "java": "operation"
+    },
+    "wrt": {
+     "java": "wrt"
+    }
+   },
+   "outputs": [
+    "cva",
+    "dva",
+    "fba",
+    "fca",
+    "fva",
+    "gradient",
+    "kva",
+    "mva"
+   ]
+  },
   "xva.simm.ir_delta": {
    "spec": "specifications/06-risk/xva-framework.md",
    "rust": "quantforge::xva::sbim_ir_delta",
@@ -11164,6 +11192,17 @@
  "spec_only": [
   "paper.pnl.explain",
   "risk.ccr.sa_ccr",
-  "risk.sbim.placeholder"
+  "risk.sbim.placeholder",
+  "xva.colva.value",
+  "xva.exposure.amc",
+  "xva.exposure.closeout",
+  "xva.exposure.closeout_normal",
+  "xva.exposure.stressed_eepe",
+  "xva.funding.asymmetric",
+  "xva.im.project",
+  "xva.mpor.days",
+  "xva.mva.value",
+  "xva.stress.shocked",
+  "xva.wwr.cva_gaussian_copula"
  ]
 }

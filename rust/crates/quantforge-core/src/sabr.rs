@@ -15,6 +15,24 @@ pub struct Sabr {
     pub shift: f64,
 }
 
+/// chi(z) = ln((sqrt(1 - 2 rho z + z^2) + z - rho)/(1 - rho)) without cancellation (ruling KR-340): the direct form
+/// loses digits as eps/|z| for small z and cancels in s + z - rho for large negative z.
+fn sabr_chi(z: f64, rho: f64) -> f64 {
+    let d = z - rho;
+    let omr = 1.0 - rho;
+    let q = omr * (1.0 + rho);
+    let s = d.hypot(q.sqrt());
+    let w = if d >= 0.0 { s + d } else { q / (s - d) };
+    let u = z / (s + 1.0) * (w / omr + 1.0);
+    if u.abs() < 0.5 {
+        u.ln_1p()
+    } else if d >= 0.0 {
+        (s + d).ln() - (-rho).ln_1p()
+    } else {
+        rho.ln_1p() - (s - d).ln()
+    }
+}
+
 impl Sabr {
     pub fn check(&self, strikes: &[f64]) -> Result<()> {
         crate::error::finite("self", self)?;
@@ -51,8 +69,7 @@ impl Sabr {
         let m = if z.abs() < 1e-7 {
             1.0 - rho * z / 2.0 - (3.0 * rho * rho - 2.0) * z * z / 12.0
         } else {
-            let chi = (((1.0 - 2.0 * rho * z + z * z).sqrt() + z - rho) / (1.0 - rho)).ln();
-            z / chi
+            z / sabr_chi(z, rho)
         };
         let den = root * (1.0 + c / 24.0 + c * c / 1920.0);
         let b1 = (1.0 - beta) * (1.0 - beta);

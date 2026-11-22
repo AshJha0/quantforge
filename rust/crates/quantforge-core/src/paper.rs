@@ -57,7 +57,7 @@ fn set_key(o: &mut Json, k: &str, v: Json) {
 }
 
 fn parse_text(t: &str, name: &str) -> Result<PyDec> {
-    PyDec::parse(t).unwrap_or_else(|| Err(e("E_PARSE", format!("{name} is not a decimal"))))
+    PyDec::parse(t).unwrap_or_else(|| Err(e("E_SCHEMA", format!("{name} is not a decimal"))))
 }
 
 /// Python `dec`: a decimal given as a string (or integer); floats and booleans are `E_INPUT`.
@@ -71,7 +71,7 @@ fn dec(v: &Json, name: &str) -> Result<PyDec> {
         }
         Json::Int(n) => PyDec::int(*n).rng(name, 36),
         Json::Str(t) => parse_text(t, name)?.rng(name, 36),
-        _ => Err(e("E_PARSE", format!("{name} is not a decimal"))),
+        _ => Err(e("E_SCHEMA", format!("{name} is not a decimal"))),
     }
 }
 
@@ -84,6 +84,15 @@ fn dstr(v: &Json, name: &str) -> Result<PyDec> {
     }
 }
 
+/// The `E_SCHEMA` part of `dstr` alone (KR-344, HR-66): a JSON string that parses as a finite decimal,
+/// checked for every decimal of a case before any range (`E_LIMIT`) check.
+fn schema_dec(v: &Json, name: &str) -> Result<()> {
+    match v {
+        Json::Str(t) => parse_text(t, name).map(|_| ()),
+        _ => Err(e("E_SCHEMA", format!("{name} must be a decimal string"))),
+    }
+}
+
 /// A member that is present and not null (`E_SCHEMA` otherwise).
 fn req<'a>(m: &'a Json, k: &str, w: &str) -> Result<&'a Json> {
     m.get(k)
@@ -91,7 +100,14 @@ fn req<'a>(m: &'a Json, k: &str, w: &str) -> Result<&'a Json> {
         .ok_or_else(|| e("E_SCHEMA", format!("{w}{k} is missing")))
 }
 
+/// +1 BUY, -1 SELL. A present side that is not a JSON string is mistyped, `E_SCHEMA` (cli-contract.md,
+/// error table; fuzz run 44937631714); a string that is not listed (or no side) is `E_INPUT`
+/// (paper-trading.md, Errors; rule_h-0040).
 fn side_sign(v: &Json) -> Result<i64> {
+    match v {
+        Json::Null | Json::Str(_) => {}
+        _ => return Err(e("E_SCHEMA", "side must be a string")),
+    }
     match v.as_str() {
         Some("BUY") => Ok(1),
         Some("SELL") => Ok(-1),
@@ -610,6 +626,9 @@ fn pretrade_check(
         ));
     }
     let sg = side_sign(order.get("side").unwrap_or(&Json::Null))?;
+    if !matches!(order.get("type"), None | Some(Json::Null | Json::Str(_))) {
+        return Err(e("E_SCHEMA", "type must be a string"));
+    }
     let otype = order.get("type").and_then(Json::as_str).unwrap_or("");
     if !TYPES.contains(&otype) {
         return Err(e("E_INPUT", "unknown type"));
@@ -674,18 +693,51 @@ fn pretrade_check(
 
 // ---------------------------------------------------------------- CLI cases (one symbol)
 
-fn fill_list(fills: &[Json]) -> Result<Vec<DayFill>> {
-    let mut out = Vec::new();
+/// The `E_SCHEMA` checks of every fill, before any other check of the case (KR-230, HR-122): each fill an
+/// object, `side`, `quantity` and `price` present, and `side` and each decimal a JSON string (fuzz run
+/// 44937631714: a `side` that was an array crashed the Python side lookup).
+fn fill_schema(fills: &[Json]) -> Result<()> {
     for (k, f) in fills.iter().enumerate() {
         let w = format!("fills/{k}/");
         if !matches!(f, Json::Obj(_)) {
             return Err(e("E_SCHEMA", format!("{w} is not an object")));
         }
-        let sign = side_sign(req(f, "side", &w)?)?;
-        let q = dstr(req(f, "quantity", &w)?, "quantity")?;
-        let p = dstr(req(f, "price", &w)?, "price")?;
-        let zero = s("0");
+        for key in ["side", "quantity", "price"] {
+            if !matches!(req(f, key, &w)?, Json::Str(_)) {
+                return Err(e("E_SCHEMA", format!("{w}{key} must be a string")));
+            }
+        }
+        if !matches!(f.get("fee"), None | Some(Json::Str(_))) {
+            return Err(e("E_SCHEMA", format!("{w}fee must be a decimal string")));
+        }
+        // malformed or non-finite before any E_LIMIT (KR-344, HR-66)
+        for key in ["quantity", "price", "fee"] {
+            if let Some(v) = f.get(key) {
+                schema_dec(v, &format!("{w}{key}"))?;
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Fills in the KR-230 order over the whole list: schema, decimals (malformed, then `E_LIMIT`), unknown
+/// side (structural `E_INPUT`), then a non-positive quantity or price (`E_DOMAIN`).
+fn fill_list(fills: &[Json]) -> Result<Vec<DayFill>> {
+    fill_schema(fills)?;
+    let zero = s("0");
+    let mut parsed = Vec::new();
+    for f in fills {
+        let q = dstr(req(f, "quantity", "")?, "quantity")?;
+        let p = dstr(req(f, "price", "")?, "price")?;
         let fee = dstr(f.get("fee").unwrap_or(&zero), "fee")?;
+        parsed.push((q, p, fee));
+    }
+    let mut signs = Vec::new();
+    for f in fills {
+        signs.push(side_sign(req(f, "side", "")?)?);
+    }
+    let mut out = Vec::new();
+    for ((q, p, fee), sign) in parsed.into_iter().zip(signs) {
         if !q.is_pos() || !p.is_pos() {
             return Err(e("E_DOMAIN", "quantity and price must be positive"));
         }
@@ -702,6 +754,12 @@ fn fill_list(fills: &[Json]) -> Result<Vec<DayFill>> {
 
 /// `paper.book.apply_fill`: fills in order on one symbol; `cash_delta` when no `cash` is given.
 pub fn book_case(fills: &[Json], cash: Option<&Json>, position: &Json, avg: &Json) -> Result<Json> {
+    fill_schema(fills)?;
+    if let Some(c) = cash {
+        schema_dec(c, "cash")?;
+    }
+    schema_dec(position, "position")?;
+    schema_dec(avg, "avg_cost")?;
     let start = match cash {
         Some(c) => dstr(c, "cash")?,
         None => PyDec::zero(),
@@ -740,15 +798,34 @@ pub struct DayInputs<'a> {
 
 /// `paper.book.end_of_day` with `paper.pnl.explain` for one symbol (HR-51 to HR-53).
 pub fn day_case(d: &DayInputs) -> Result<Json> {
+    fill_schema(d.fills)?;
+    // every E_SCHEMA before any E_LIMIT or E_DOMAIN (HR-66, KR-344)
+    let scalars = [
+        (Some(d.cash_open), "cash_open"),
+        (Some(d.position_open), "position_open"),
+        (d.avg_cost_open, "avg_cost_open"),
+        (d.prev_close, "prev_close"),
+        (d.close, "close"),
+        (Some(d.rates[0]), "cash_rate"),
+        (Some(d.rates[1]), "debit_rate"),
+        (Some(d.rates[2]), "borrow_rate"),
+    ];
+    for (v, name) in scalars.into_iter().filter_map(|(v, n)| v.map(|v| (v, n))) {
+        schema_dec(v, name)?;
+    }
+    let open = match d.position_open {
+        Json::Str(t) => !parse_text(t, "position_open")?.is_zero(),
+        _ => unreachable!("checked by schema_dec"),
+    };
+    if open && d.prev_close.is_none() {
+        return Err(e("E_SCHEMA", "prev_close is missing (open position)"));
+    }
+    if (open || !d.fills.is_empty()) && d.close.is_none() {
+        return Err(e("E_SCHEMA", "close is missing (position or fills)"));
+    }
     let cash = dstr(d.cash_open, "cash_open")?;
     let n = dstr(d.position_open, "position_open")?;
     let fl = fill_list(d.fills)?;
-    if !n.is_zero() && d.prev_close.is_none() {
-        return Err(e("E_SCHEMA", "prev_close is missing (open position)"));
-    }
-    if (!n.is_zero() || !fl.is_empty()) && d.close.is_none() {
-        return Err(e("E_SCHEMA", "close is missing (position or fills)"));
-    }
     let prev = d.prev_close.map(|v| dstr(v, "prev_close")).transpose()?;
     let px = d.close.map(|v| dstr(v, "close")).transpose()?;
     for v in [&prev, &px].into_iter().flatten() {
@@ -815,17 +892,11 @@ pub fn pretrade_case(
     for k in ["side", "type", "quantity"] {
         req(order, k, "order/")?;
     }
-    dstr(req(order, "quantity", "order/")?, "order/quantity")?;
-    if let Some(l) = order.get("limit_price").filter(|v| **v != Json::Null) {
-        dstr(l, "order/limit_price")?;
-    }
-    for k in [
-        "max_order_qty",
-        "max_notional",
-        "max_abs_position",
-        "price_band",
-    ] {
-        dstr(req(limits, k, "limits/")?, k)?;
+    for k in ["side", "type"] {
+        // mistyped is E_SCHEMA; an unlisted string is E_INPUT later
+        if !matches!(req(order, k, "order/")?, Json::Str(_)) {
+            return Err(e("E_SCHEMA", format!("order/{k} must be a string")));
+        }
     }
     if !matches!(req(limits, "max_orders_per_day", "limits/")?, Json::Int(_)) {
         return Err(e(
@@ -837,6 +908,38 @@ pub fn pretrade_case(
         if limits.get(k).is_some_and(|v| !matches!(v, Json::Bool(_))) {
             return Err(e("E_SCHEMA", format!("limits/{k} must be a boolean")));
         }
+    }
+    let mut scalars: Vec<(&Json, String)> =
+        vec![(req(order, "quantity", "order/")?, "order/quantity".into())];
+    if let Some(l) = order.get("limit_price").filter(|v| **v != Json::Null) {
+        scalars.push((l, "order/limit_price".into()));
+    }
+    for k in [
+        "max_order_qty",
+        "max_notional",
+        "max_abs_position",
+        "price_band",
+    ] {
+        scalars.push((req(limits, k, "limits/")?, format!("limits/{k}")));
+    }
+    scalars.push((ref_price, "ref_price".into()));
+    scalars.push((position, "position".into()));
+    scalars.push((cash, "cash".into()));
+    for (v, name) in &scalars {
+        // every E_SCHEMA before any E_LIMIT (HR-66, KR-344)
+        schema_dec(v, name)?;
+    }
+    dstr(req(order, "quantity", "order/")?, "order/quantity")?;
+    if let Some(l) = order.get("limit_price").filter(|v| **v != Json::Null) {
+        dstr(l, "order/limit_price")?;
+    }
+    for k in [
+        "max_order_qty",
+        "max_notional",
+        "max_abs_position",
+        "price_band",
+    ] {
+        dstr(req(limits, k, "limits/")?, k)?;
     }
     let p_ref = dstr(ref_price, "ref_price")?;
     let pos = dstr(position, "position")?;
@@ -1359,6 +1462,43 @@ fn obj_or_empty(v: Option<&Json>, name: &str) -> Result<Json> {
 
 /// `paper.session.run`: replays SUBMIT and CLOSE steps through one paper account and returns
 /// every ledger record with its hash, the head, positions and cash. Simulated only (HR-42).
+/// A malformed or non-finite decimal string anywhere in the script is `E_SCHEMA` before the cash range
+/// check (KR-344, HR-66). Only string values are read; every other check of a step stays in step order.
+fn script_decimal_schema(script: &[Json]) -> Result<()> {
+    for (k, step) in script.iter().enumerate() {
+        if !matches!(step, Json::Obj(_)) {
+            continue;
+        }
+        let w = format!("script/{k}/");
+        let mut found: Vec<(&Json, String)> = Vec::new();
+        if let Some(order @ Json::Obj(_)) = step.get("order") {
+            for key in ["quantity", "limit_price"] {
+                if let Some(v) = order.get(key) {
+                    found.push((v, format!("{w}order/{key}")));
+                }
+            }
+        }
+        for r in ["cash_rate", "debit_rate", "borrow_rate"] {
+            if let Some(v) = step.get(r) {
+                found.push((v, format!("{w}{r}")));
+            }
+        }
+        for name in ["prev_marks", "marks"] {
+            if let Some(Json::Obj(m)) = step.get(name) {
+                for (sym, v) in m {
+                    found.push((v, format!("{w}{name}/{sym}")));
+                }
+            }
+        }
+        for (v, path) in found {
+            if let Json::Str(t) = v {
+                parse_text(t, &path)?;
+            }
+        }
+    }
+    Ok(())
+}
+
 pub fn session_case(
     cash: &Json,
     limits: &Json,
@@ -1366,10 +1506,12 @@ pub fn session_case(
     script: &[Json],
     dark: Option<&Json>,
 ) -> Result<Json> {
-    dstr(cash, "cash")?;
+    schema_dec(cash, "cash")?;
     for k in ["tick_size", "lot_size", "fee_schedule"] {
         req(lit, k, "lit/")?;
     }
+    script_decimal_schema(script)?; // malformed step decimals before the cash range (HR-66, KR-344)
+    dstr(cash, "cash")?;
     let mut ss = Session {
         ledger: Ledger {
             records: Vec::new(),
@@ -1402,6 +1544,12 @@ pub fn session_case(
             };
             for key in ["order_id", "symbol", "side", "type", "quantity"] {
                 req(order, key, &format!("{w}order/"))?;
+            }
+            // mistyped text fields are E_SCHEMA (fuzz run 44937631714 class); a null venue stays E_INPUT
+            for key in ["order_id", "symbol", "side", "type", "venue"] {
+                if !matches!(order.get(key), None | Some(Json::Null | Json::Str(_))) {
+                    return Err(e("E_SCHEMA", format!("{w}order/{key} must be a string")));
+                }
             }
             for key in ["quantity", "limit_price"] {
                 if let Some(v) = order.get(key).filter(|v| **v != Json::Null) {

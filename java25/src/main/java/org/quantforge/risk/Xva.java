@@ -129,12 +129,12 @@ public final class Xva {
         for (int i = 0; i < t.length; i++) {
             double scP = Math.exp(-hc * prev);
             double sbP = Math.exp(-hb * prev);
-            double scI = Math.exp(-hc * t[i]);
-            double sbI = Math.exp(-hb * t[i]);
             double dt = t[i] - prev;
+            double qcI = scP * -Math.expm1(-hc * dt); // cancellation free (PT-6)
+            double qbI = sbP * -Math.expm1(-hb * dt);
             double neg = Math.abs(ene[i]);
-            cva += df[i] * ee[i] * (scP - scI) * sbP;
-            dva += df[i] * neg * (sbP - sbI) * scP;
+            cva += df[i] * ee[i] * qcI * sbP;
+            dva += df[i] * neg * qbI * scP;
             double alive = scP * sbP * dt;
             fca += df[i] * ee[i] * alive;
             fba += df[i] * neg * alive;

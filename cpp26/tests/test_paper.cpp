@@ -116,7 +116,7 @@ TEST_CASE("HR-77 exact decimals: the stated division, the range, and duplicate k
     CHECK(has(r.json, R"("avg_cost":"100.666666666666666667")"));
     CHECK(has(r.json, R"("cash_delta":"-302")"));
     CHECK(has(run_case(wrap("paper.book.apply_fill", R"({"fills":[{"side":"BUY","quantity":"1","price":"1e2"}]})")).json, R"("avg_cost":"100")"));
-    CHECK(has(run_case(wrap("paper.book.apply_fill", R"({"fills":[{"side":"BUY","quantity":"1","price":"abc"}]})")).json, "E_PARSE"));
+    CHECK(has(run_case(wrap("paper.book.apply_fill", R"({"fills":[{"side":"BUY","quantity":"1","price":"abc"}]})")).json, "E_SCHEMA"));
     CHECK(has(run_case(wrap("paper.book.apply_fill", R"({"fills":[{"side":"BUY","quantity":"1","price":"nan"}]})")).json, "E_SCHEMA"));
     CHECK(has(run_case(wrap("paper.book.apply_fill", R"({"fills":[{"side":"BUY","quantity":"1","price":"1.0000000000000000001"}]})")).json, "E_LIMIT"));
     CHECK(paper::verify(R"({"a":{"b":"1","b":"1"},"hash":"x"})").reason == "PARSE");

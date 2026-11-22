@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """Tests for the recorder and forward log: python tools/test_tools.py"""
+import contextlib
+import email.message
 import hashlib
 import importlib.util
+import io
 import json
 import re
 import subprocess
 import sys
 import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -414,6 +418,105 @@ class Workflows(unittest.TestCase):
         self.assertEqual(c["operation"], "rates.ois.compound_dated")
 
 
+class WorkflowFetch(unittest.TestCase):
+    """K9-1b: common.fetch retries a transient bad answer and, when every try fails, names what came back. No network."""
+
+    @classmethod
+    def setUpClass(cls):
+        sys.path.insert(0, str(ROOT / "tools/workflows"))
+        import common
+        cls.c = common
+
+    class Resp:
+        def __init__(self, body, status=200, ctype="application/json"):
+            self.body, self.status, self.headers = body, status, {"Content-Type": ctype}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def read(self):
+            return self.body
+
+    def opener(self, answers):
+        """Fake urlopen: returns or raises the next planted answer, and records each request URL."""
+        self.urls, self.waits = [], []
+        it = iter(answers)
+
+        def op(req, timeout):
+            self.urls.append(req.full_url)
+            a = next(it)
+            if isinstance(a, BaseException):
+                raise a
+            return a
+        return op
+
+    def run_fetch(self, answers, **kw):
+        op = self.opener(answers)
+        with contextlib.redirect_stderr(io.StringIO()):
+            return self.c.fetch("https://example.test/x.json", opener=op, sleep=self.waits.append, **kw)
+
+    def http_error(self, code, body=b"", ctype="text/html"):
+        h = email.message.Message()
+        h["Content-Type"] = ctype
+        return urllib.error.HTTPError("https://example.test/x.json", code, "x", h, io.BytesIO(body))
+
+    def test_good_body_is_returned_unchanged_on_the_first_try(self):
+        body = b'{"refRates": [1]}'
+        self.assertEqual(self.run_fetch([self.Resp(body)], expect_json=True), body)
+        self.assertEqual(len(self.urls), 1)
+        self.assertEqual(self.waits, [])
+
+    def test_html_then_json_succeeds_after_one_retry(self):
+        body = b'{"refRates": []}'
+        got = self.run_fetch([self.Resp(b"<html>maintenance</html>", ctype="text/html"), self.Resp(body)], expect_json=True)
+        self.assertEqual(got, body)
+        self.assertEqual(self.waits, [30.0])
+
+    def test_non_json_is_accepted_when_json_is_not_expected(self):
+        csv = b"Date,1 Mo\n11/20/2026,4.1\n"
+        self.assertEqual(self.run_fetch([self.Resp(csv, ctype="text/csv")]), csv)
+
+    def test_three_bad_answers_raise_a_self_describing_error(self):
+        page = b"<html>" + b"x" * 400
+        with self.assertRaises(self.c.FetchError) as cm:
+            self.run_fetch([self.Resp(page, ctype="text/html")] * 3, expect_json=True)
+        msg = str(cm.exception)
+        for part in ("after 3 attempts", "https://example.test/x.json", "HTTP 200", "'text/html'", "first 200 bytes",
+                     "not JSON", "<html>"):
+            self.assertIn(part, msg)
+        self.assertNotIn("x" * 250, msg)  # only the first 200 bytes are quoted
+        self.assertEqual(self.waits, [30.0, 60.0])
+        self.assertEqual(len(self.urls), 3)
+
+    def test_empty_body_5xx_and_network_errors_are_retried(self):
+        body = b"[1]"
+        got = self.run_fetch([self.Resp(b"  "), self.http_error(503, b"busy"), urllib.error.URLError("reset"), self.Resp(body)],
+                             expect_json=True, attempts=4)
+        self.assertEqual(got, body)
+        self.assertEqual(len(self.urls), 4)
+        with self.assertRaises(self.c.FetchError) as cm:
+            self.run_fetch([self.Resp(b"")] * 3)
+        self.assertIn("empty body", str(cm.exception))
+
+    def test_other_4xx_fails_at_once_with_status_and_body(self):
+        with self.assertRaises(self.c.FetchError) as cm:
+            self.run_fetch([self.http_error(404, b"<html>not found</html>")], expect_json=True)
+        msg = str(cm.exception)
+        self.assertEqual(len(self.urls), 1)
+        self.assertEqual(self.waits, [])
+        for part in ("not retried", "HTTP 404", "'text/html'", "not found"):
+            self.assertIn(part, msg)
+
+    def test_last_failure_is_a_network_error(self):
+        with self.assertRaises(self.c.FetchError) as cm:
+            self.run_fetch([TimeoutError("timed out")] * 3)
+        self.assertIn("TimeoutError", str(cm.exception))
+        self.assertIn("https://example.test/x.json", str(cm.exception))
+
+
 class GalleryVol(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -517,7 +620,7 @@ class GalleryVol(unittest.TestCase):
     def test_planned_page_has_no_numbers(self):
         spec = {"title": "T", "shows": "Something.", "kind": "none"}
         text = self.bg.planned_page("x", spec)
-        self.assertIn("Planned, stage D", text)
+        self.assertIn("Status: Planned. No CLI operation exists yet", text)
         self.assertNotIn("<svg", text)
 
     def test_stage_d_renderer_hook_routes_live_entries(self):
@@ -970,6 +1073,12 @@ class SiteHome(unittest.TestCase):
         for needle in ('class="skip"', '<main id="main"', "search.js"):
             self.assertIn(needle, bs.PAGE)
         self.assertIn(":focus-visible", bs.CSS)
+        # KR-227, run 44805977858: a multi-line inline <code> in a <pre> that scrolls made axe-core 4.2.4 color-contrast
+        # throw; as one block box its middle is on its own grid cells. Not wider than the visible <pre> (run 44920662025:
+        # width:max-content put the middle of long blocks out of view and axe could not measure them)
+        rule = bs.CSS.split("pre code{", 1)[1].split("}", 1)[0]
+        self.assertIn("display:block", rule)
+        self.assertNotIn("max-content", rule)
 
 
 class DoctorAndQuickstart(unittest.TestCase):
@@ -1094,6 +1203,37 @@ class StageFInfra(unittest.TestCase):
             killed, survived, note = sr.score_file("rust", base)
             self.assertEqual((killed, survived), (33, 7))
             self.assertIn("sample 40 of 100", note)
+
+    def test_mutation_report_flags_a_missing_rust_shard(self):
+        """K9-1c: a module scored on fewer shards than configured is reported incomplete and fails the gate."""
+        sr = load("stage_report", "conformance/mutation/stage_report.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            res = Path(tmp) / "res"
+            res.mkdir()
+            stages = Path(tmp) / "stages.json"
+            stages.write_text(json.dumps({"target": {"T": 0.8}, "stages": {"T": [{"module": "m", "suite": "s", "rust": "**/m.rs"}]}}),
+                              encoding="utf-8")
+            summary = {"mutants": 100, "unviable": 0, "unit_killed_all": 20, "sampled": 20, "sample_unit_killed": 20,
+                       "sample_golden_killed": 0, "sample_either_killed": 20, "sample_golden_timeouts": 0, "unit_verdicts": {}}
+            (res / "rust--m--s1.json").write_text(json.dumps({"summary": summary}), encoding="utf-8")
+            out = Path(tmp) / "report.md"
+            args = ["--stage", "T", "--stages", str(stages), "--results", str(res), "--out", str(out), "--gate",
+                    "--reasons", str(Path(tmp) / "none.json")]
+            with contextlib.redirect_stdout(io.StringIO()):
+                code = sr.main(args)
+            text = out.read_text(encoding="utf-8")
+            self.assertEqual(code, 1)  # 20/20 on the shard present, yet not a pass
+            self.assertIn("incomplete: shard s0 missing", text)
+            self.assertIn("Missing results: 1.", text)
+            self.assertNotIn("100.0%", text)
+            (res / "rust--m--s0.json").write_text(json.dumps({"summary": summary}), encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(sr.main(args), 0)  # both shards: scored 40/40 and passes
+            self.assertIn("100.0%", out.read_text(encoding="utf-8"))
+            self.assertEqual(sr.missing_shards(res / "rust--m.json", 2), [])
+            (res / "rust--m--s0.json").unlink()
+            (res / "rust--m.json").write_text(json.dumps({"summary": summary}), encoding="utf-8")
+            self.assertEqual(sr.missing_shards(res / "rust--m.json", 2), [])  # unsharded local 0/1 file is complete
 
 
 class DocsStatus(unittest.TestCase):
@@ -1280,6 +1420,12 @@ class SiteA11y(unittest.TestCase):
         self.assertNotIn("<th></th>", out)
         self.assertIn('<th scope="row">k</th>', out)
         self.assertEqual(out.count("<thead>"), 1)
+        # a paragraph that is one <em> (run 44922499739) is shown as a block; mixed or split emphasis is left alone
+        para = m.a11y_fix("<h1>t</h1><p><em>Level: x. Source: <code>a/b.md</code></em></p><p>a <em>b</em></p>"
+                          "<p><em>c</em> d <em>e</em></p>", "t")
+        self.assertIn('<p><em class="para">Level: x. Source: <code>a/b.md</code></em></p>', para)
+        self.assertIn("<p>a <em>b</em></p><p><em>c</em> d <em>e</em></p>", para)
+        self.assertIn("em.para,strong.para{display:block}", m.CSS)
         svg = ('<svg viewBox="0 0 480 300" role="img" aria-label="betas, synthetic data" '
                'xmlns="http://www.w3.org/2000/svg" style="fill:currentColor"><text>b</text>'
                '<line style="stroke:var(--line)"/></svg>')

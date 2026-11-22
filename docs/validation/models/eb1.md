@@ -42,13 +42,13 @@ Operations (4; every operation whose name-map spec is the model's spec (shared s
 
 | Operation | Value-checked | Error | Invariance | Invariance base | Suites | Outside-checked value cases | Unit-test files (Python, Java, C++, Rust) |
 |---|---:|---:|---:|---:|---|---|---|
-| `vol.garch.estimate` | 4 | 13 | 2 | 2 | `e1_vol_1`, `fuzzfix_j`, `garch_f` | 0 of 0 (stage J) | 4, 1, 5, 0 |
+| `vol.garch.estimate` | 4 | 14 | 2 | 2 | `e1_vol_1`, `fuzzfix_j`, `fuzzrev_k`, `garch_f` | 3 of 4 (stage F) | 4, 1, 5, 0 |
 | `vol.garch.fit` | 2 | 7 | 2 | 2 | `e1_vol_1`, `garch_e` | 0 of 2 (stage E) | 4, 0, 4, 0 |
-| `vol.garch.forecast` | 8 | 18 | 2 | 2 | `e1_vol_1`, `fuzzfix_j`, `garch_e` | 0 of 0 (stage J) | 6, 1, 3, 0 |
+| `vol.garch.forecast` | 8 | 18 | 2 | 2 | `e1_vol_1`, `fuzzfix_j`, `garch_e` | 0 of 6 (stage E) | 6, 1, 3, 0 |
 | `vol.garch.loglik` | 14 | 25 | 5 | 5 | `e1_vol_1`, `garch_e`, `garch_f` | 5 of 5 (stage F) | 5, 0, 5, 0 |
 
-Totals: 28 value-checked, 63 error, 22 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 5 of 7 value cases (71.4%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Totals: 28 value-checked, 64 error, 22 invariance cases (measured from `datasets/golden` at generation).
+Outside-checked: 8 of 17 value cases (47.1%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: no module of `conformance/mutation/stages.json` names one of this model's value-checked suites by a pattern narrower than the whole stage (patterns such as `*` or `*_d` run every suite of a stage), so no mutation result maps to this model alone.
 

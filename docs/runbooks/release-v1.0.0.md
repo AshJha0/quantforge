@@ -12,7 +12,7 @@
 
 Sources: `.github/workflows/release.yml` and `.github/workflows/docs.yml` (read 2026-11-20); the tag pattern `v[0-9]+.[0-9]+.[0-9]+` is the workflow's `on.push.tags`.
 
-**State before this runbook is used (read 2026-11-20).** The last tag is v0.10.0. Stage K round 1 is on `main`, not tagged (pull requests #58 and #59), and goes out with v1.0.0 (owner decision 2026-11-20: no v0.10.1 tag). The version string on `main` is 0.10.1 in every file `tools/check_versions.py` reads. The `release-verify` job and the attested `SHA256SUMS` were added on branch `k-v1-k7` and have never run: they can run only after a tag push.
+**State before this runbook is used (read 2026-11-20; pull request list re-read 2026-11-21).** The last tag is v0.10.0. Stage K is on `main`, not tagged (pull requests #58 to #64), and goes out with v1.0.0 (owner decision 2026-11-20: no v0.10.1 tag). The version string on `main` is 0.10.1 in every file `tools/check_versions.py` reads. The `release-verify` job and the attested `SHA256SUMS` were added on branch `k-v1-k7` and have never run: they can run only after a tag push.
 
 ## 1. Before the tag: what the release must say
 
@@ -87,6 +87,14 @@ For `rust/Cargo.lock`, run `cargo update --workspace` from `rust/` (recalled fro
 
 ## 4. Merge, then tag
 
+Just before the release pull request is opened, the owner turns on the strict required-status-checks policy of ruleset 26732064 (G1k, ruling KR-225; owner decision: on just before the release pull request, not earlier). It was off when last read (`benchmarks/results/k7/ruleset-2026-11-20.json`). Check it, which only reads the setting:
+
+```bash
+gh api repos/AshJha0/quantforge/rulesets/26732064 > ruleset.json && python tools/check_ruleset.py --file ruleset.json
+```
+
+Exit 0 means strict is on and enforcement is active; anything else, the release pull request waits.
+
 The owner merges the release pull request (one pull request for the round; `--merge`, owner standing instruction). Wait for every check on the merge commit of `main` to finish green:
 
 ```bash
@@ -153,7 +161,7 @@ gh run download <run-id> --repo AshJha0/quantforge --name site-view --dir site-v
 
 If a page fails, it is fixed or listed in `docs/known-issues.md` with its measured width; it is never left out of the check. Written 2026-11-20 before these jobs first ran in CI (inferred from the workflow file).
 
-pa11y AA on every page (KR-227 read strictly by the coordinator, 2026-11-20) is part of the same run: jobs `docs-site-a11y` (12 shards: light and dark, 6 shards each; each first shows that pa11y-ci reports a planted contrast failure) and `docs-site-a11y-summary`, which fails if any shard failed or any page of the site was not reported on. Download the counts and paste `a11y-summary.md` into the release notes with the layout table: Split 2026-11-20: the jobs `docs-site-a11y` and `docs-site-a11y-summary` are not in `docs.yml` on main yet; they are held on branch `k-v1-a11y-ci` until every page passes (first CI runs, pull request #63: 33 pages per mode were reported for chart-text contrast that the tool could not measure, since changed to light and dark chart images; tutorials 36 and 39 still fail in both modes, cause not established). The tool, its self-test and the site fixes are on main. KR-227 stays not met.
+pa11y AA on every page (KR-227 read strictly by the coordinator, 2026-11-20) is part of the same run: jobs `docs-site-a11y` (12 shards: light and dark, 6 shards each; each first shows that pa11y-ci reports a planted contrast failure) and `docs-site-a11y-summary`, which fails if any shard failed or any page of the site was not reported on. Download the counts and paste `a11y-summary.md` into the release notes with the layout table: Split 2026-11-20: the jobs `docs-site-a11y` and `docs-site-a11y-summary` were held out of `docs.yml` on main (pull request #63) while tutorials 36 and 39 failed in both modes. Restored 2026-11-21 on branch `k-v1-a11y2` with the cause found and fixed: on those pages axe-core 4.2.4 (the copy pa11y 6.2.3 runs) threw inside color-contrast, because the middle of a multi-line inline `<code>` in a `<pre>` that scrolls sideways fell in a grid cell none of its line boxes touch; `pre code` is now one block (read from the diagnostic of run 44805977858 and the axe source; measured with a local replay). The next run (44922499739) passed every page but `docs/question-bank/14-stage-k-risk-platform.html`, a second axe 4.2.4 trap (an inline `<em>` on two lines with all its own text on the first); a paragraph that is one `<em>` or `<strong>` is now shown as a block. Docs run 44926203225 (2026-11-21, branch `k-v1-a11y2`, head cffcfe31) is green: pa11y AA passes on 861 of 861 pages in light and 861 of 861 in dark, 0 errors (read from its `a11y-summary.md`). Nothing was excluded and no rule was turned off. KR-227 is met on that branch; on main once it is merged and the Docs run there is green (`benchmarks/results/k7/a11y-local-2026-11-20.md`).
 
 ```bash
 gh run download <run-id> --repo AshJha0/quantforge --name site-a11y --dir site-a11y

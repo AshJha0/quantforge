@@ -126,3 +126,48 @@ class ProcstatTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CommitFieldTest(unittest.TestCase):
+    """soak.commit(): the C++ CI container could not run `git rev-parse` (unsafe repository) and wrote an empty commit."""
+
+    def setUp(self):
+        import soak
+
+        self.soak = soak
+        self.saved = (soak.subprocess.run, os.environ.get("GITHUB_SHA"))
+
+    def tearDown(self):
+        self.soak.subprocess.run = self.saved[0]
+        if self.saved[1] is None:
+            os.environ.pop("GITHUB_SHA", None)
+        else:
+            os.environ["GITHUB_SHA"] = self.saved[1]
+
+    def fake_git(self, stdout="", raises=False):
+        class Done:
+            pass
+
+        def run(*a, **k):
+            if raises:
+                raise FileNotFoundError("git")
+            d = Done()
+            d.stdout = stdout
+            return d
+
+        self.soak.subprocess.run = run
+
+    def test_git_head_wins(self):
+        self.fake_git("abc123\n")
+        os.environ["GITHUB_SHA"] = "fromenv"
+        self.assertEqual(self.soak.commit(), "abc123")
+
+    def test_unsafe_repository_falls_back_to_github_sha(self):
+        self.fake_git("")  # git prints nothing on stdout when it refuses the repository
+        os.environ["GITHUB_SHA"] = "11ba1b40"
+        self.assertEqual(self.soak.commit(), "11ba1b40")
+
+    def test_no_git_and_no_env_is_empty(self):
+        self.fake_git(raises=True)
+        os.environ.pop("GITHUB_SHA", None)
+        self.assertEqual(self.soak.commit(), "")

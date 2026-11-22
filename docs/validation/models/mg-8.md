@@ -42,10 +42,11 @@ Operations (2; named on the inventory entry's Purpose line): `xva.sbim.ir_delta`
 
 | Operation | Value-checked | Error | Invariance | Invariance base | Suites | Outside-checked value cases | Unit-test files (Python, Java, C++, Rust) |
 |---|---:|---:|---:|---:|---|---|---|
-| `xva.sbim.ir_delta` | 6 | 32 | 7 | 15 | `e1g_xva`, `fuzzfix_j`, `sbim_alias_k`, `sbim_g` | 0 of 0 (stage K) | 1, 1, 1, 0 |
+| `xva.sbim.ir_delta` | 6 | 32 | 7 | 15 | `e1g_xva`, `fuzzfix_j`, `sbim_alias_k`, `sbim_g` | 0 of 4 (stage G) | 1, 1, 1, 0 |
 | `xva.simm.ir_delta` | 0 | 5 | 8 | 0 | `sbim_alias_k` | 0 of 0 (stage K) | 1, 1, 1, 0 |
 
 Totals: 6 value-checked, 37 error, 30 invariance cases (measured from `datasets/golden` at generation).
+Outside-checked: 0 of 4 value cases (0.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: no module of `conformance/mutation/stages.json` names one of this model's value-checked suites by a pattern narrower than the whole stage (patterns such as `*` or `*_d` run every suite of a stage), so no mutation result maps to this model alone.
 

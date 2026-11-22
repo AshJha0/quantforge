@@ -1,6 +1,6 @@
 # CVA risk capital: BA-CVA (reduced and full) and SA-CVA
 
-Spec version 0.1.0. Status: implemented in all four builds (Python `python/quantforge_core/cva.py`; Java, C++ and Rust ports per `program/STAGE_K_W2A_HANDOVER.md` and `program/STAGE_K_W2B_HANDOVER.md`) on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; goldens in `datasets/golden/stage_k/` (spec lane 2026-11-19). The rulings stay PROPOSED except those confirmed in `stage-k-rulings-w2.md` (KR-312, KR-315, KR-319, KR-320, KR-324, KR-327, confirmed 2026-11-20). Rulings `stage-k-rulings-w2.md` KR-50, KR-62 to KR-64, KR-67 to KR-69. Parameters `specifications/tables/stage_k/mar50_cva.json`. Gate status: `program/STAGE_K_W2_GATE.md`.
+Spec version 0.1.0. Status: implemented in all four builds (Python `python/quantforge_core/cva.py`; Java, C++ and Rust ports per `program/STAGE_K_W2A_HANDOVER.md` and `program/STAGE_K_W2B_HANDOVER.md`) on the wave 2 integration branch `k-r3-w2` (2026-11-20), merged through `k-v1` to main (pull request #63, 2026-11-20); goldens in `datasets/golden/stage_k/` (spec lane 2026-11-19). Every ruling of `stage-k-rulings-w2.md` is CONFIRMED: KR-312, KR-315, KR-319 (`bank_gsib` default), KR-320, KR-324 and KR-327 on 2026-11-20, the rest on 2026-11-21 (stage K coordinator, delegated by owner). Rulings `stage-k-rulings-w2.md` KR-50, KR-62 to KR-64, KR-67 to KR-69. Parameters `specifications/tables/stage_k/mar50_cva.json`. Gate status: `program/STAGE_K_W2_GATE.md`.
 
 Every output carries `label`: "regulatory formula on caller inputs; not a regulatory return" (KR-69).
 
@@ -15,7 +15,7 @@ Every output carries `label`: "regulatory formula on caller inputs; not a regula
 | [CRE53] | CRE53.20-53.21, p. 467 | read 2026-11-19 | effective maturity for IMM banks (no five-year cap here) |
 | [CRE99] | SA-CCR examples, pp. 524-540 | read 2026-11-19 | EAD inputs for an illustrative BA-CVA chain (not a check) |
 | [SciPy] | SciPy 1.17.1 `integrate.quad` | measured 2026-11-19 | DF as the time average of exp(-0.05 t) (footnote 357's own definition) |
-| [ORE] | Open Source Risk Engine (Apache 2.0) | recalled, UNVERIFIED: whether ORE ships BA-CVA or SA-CVA example inputs and outputs was not checked in this lane | possible independent check, to be confirmed by the ORE lane (K-8b) |
+| [ORE] | Open Source Risk Engine (Modified BSD, `license.txt` at tag 1.8.17.0, as recorded in `oracle/LICENCES.md`; evidence class: read) | recalled, UNVERIFIED: whether ORE ships BA-CVA or SA-CVA example inputs and outputs was not checked in this lane | possible independent check, to be confirmed by the ORE lane (K-8b) |
 
 ## Formal statement
 

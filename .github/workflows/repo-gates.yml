@@ -39,6 +39,8 @@ jobs:
         run: python3 conformance/mutation/check_stages.py && python3 conformance/mutation/test_gates.py
       - name: golden case figures by class (R6-12)
         run: python3 tools/case_figures.py --check
+      - name: golden totals equal the last TOTALS line in program/R6_HANDOVER.md, no duplicate case ids
+        run: python3 tools/check_case_total.py
       - name: references page lists every spec source (R6-17)
         run: python3 tools/build_references.py --check && python3 tools/test_build_references.py
       - name: E1 error-case coverage, every operation with a Real input has an E1 golden (J0B)
@@ -62,7 +64,7 @@ jobs:
           python3 tools/check_examples.py --self-test && python3 tools/check_examples.py --static
           python3 tools/release_verify.py --self-test
           python3 tools/check_ruleset.py --self-test
-          python3 tools/check_versions.py --self-test && python3 tools/check_versions.py
+          python3 tools/check_versions.py --self-test && python3 tools/check_versions.py && python3 tools/check_release_notes.py --self-test && python3 tools/check_release_notes.py docs/releases/v1.0.0.md
       - name: every red scheduled workflow on main has an open known-issues row (K-9 review finding 1)
         env:
           GITHUB_TOKEN: ${{ github.token }}

@@ -81,20 +81,20 @@ public final class Paper {
     private static final Pattern NON_FINITE =
             Pattern.compile("(?i)[+-]?(inf|infinity|nan\\d*|snan\\d*)");
 
-    /** Python {@code Decimal(text)}: a non-finite token is E_SCHEMA (HR-12, F-2a), anything else malformed E_PARSE. */
+    /** Python {@code Decimal(text)}: a non-finite token (HR-12, F-2a) and anything else malformed (KR-344) are E_SCHEMA. */
     static BigDecimal parse(String text, String name) {
         String t = text.strip();
         if (FINITE.matcher(t).matches()) {
             try {
                 return new BigDecimal(t);
             } catch (NumberFormatException | ArithmeticException e) {
-                throw new QfError("E_PARSE", name + " is not a decimal", name);
+                throw new QfError("E_SCHEMA", name + " is not a decimal", name);
             }
         }
         if (NON_FINITE.matcher(t).matches()) {
             throw new QfError("E_SCHEMA", name + " is not a finite decimal", name);
         }
-        throw new QfError("E_PARSE", name + " is not a decimal", name);
+        throw new QfError("E_SCHEMA", name + " is not a decimal", name);
     }
 
     /** Python {@code dec}: a decimal given as a string or an integer; reals and booleans are refused (E_INPUT). */
@@ -119,7 +119,7 @@ public final class Paper {
             case String s -> {
                 return rng(parse(s, name), name);
             }
-            case null, default -> throw new QfError("E_PARSE", name + " is not a decimal", name);
+            case null, default -> throw new QfError("E_SCHEMA", name + " is not a decimal", name);
         }
     }
 
@@ -129,6 +129,17 @@ public final class Paper {
             throw new QfError("E_SCHEMA", name + " must be a decimal string", name);
         }
         return rng(rng(parse(s, name), name), name, MAX_INPUT_SCALE);
+    }
+
+    /**
+     * The E_SCHEMA part of {@link #dstr} alone (KR-344, HR-66): a JSON string that parses as a finite decimal,
+     * checked for every decimal of a case before any range (E_LIMIT) check.
+     */
+    static void schemaDec(Object v, String name) {
+        if (!(v instanceof String s)) {
+            throw new QfError("E_SCHEMA", name + " must be a decimal string", name);
+        }
+        parse(s, name);
     }
 
     /** No exponent, no trailing zeros, "0" for zero (HR-12). */
@@ -156,7 +167,14 @@ public final class Paper {
         return BigDecimal.valueOf(v);
     }
 
+    /**
+     * +1 BUY, -1 SELL. A present side that is not a JSON string is mistyped, E_SCHEMA (cli-contract.md, error
+     * table; fuzz run 44937631714); a string that is not listed is E_INPUT (paper-trading.md, Errors; rule_h-0040).
+     */
     static int sideSign(Object side) {
+        if (side != null && !(side instanceof String)) {
+            throw new QfError("E_SCHEMA", "side must be a string", "side");
+        }
         if ("BUY".equals(side)) {
             return 1;
         }
@@ -738,6 +756,9 @@ public final class Paper {
         simulatedOnly(order);
         int s = sideSign(order.containsKey("side") ? order.get("side") : "");
         Object otype = order.get("type");
+        if (otype != null && !(otype instanceof String)) {
+            throw new QfError("E_SCHEMA", "type must be a string", "type");
+        }
         if (!(otype instanceof String t) || !TYPES.contains(t)) {
             throw new QfError("E_INPUT", "unknown type " + otype, "type");
         }
@@ -793,28 +814,68 @@ public final class Paper {
         return v;
     }
 
-    private static List<DayFill> fillList(List<?> fills) {
-        List<DayFill> out = new ArrayList<>();
+    /**
+     * The E_SCHEMA checks of every fill, before any other check of the case (KR-230, HR-122): each fill an object,
+     * side, quantity and price present, and side and each decimal a JSON string (fuzz run 44937631714).
+     */
+    private static void fillSchema(List<?> fills) {
         for (int k = 0; k < fills.size(); k++) {
             String w = "fills/" + k + "/";
             if (!(fills.get(k) instanceof Map<?, ?> f)) {
                 throw new QfError("E_SCHEMA", w + " is not an object", w);
             }
-            Object side = req(f, "side", w);
-            sideSign(side);
-            BigDecimal q = dstr(req(f, "quantity", w), w + "quantity");
-            BigDecimal p = dstr(req(f, "price", w), w + "price");
-            BigDecimal fee = dstr(f.containsKey("fee") ? f.get("fee") : "0", w + "fee");
-            if (q.signum() <= 0 || p.signum() <= 0) {
-                throw new QfError("E_DOMAIN", "quantity and price must be positive", w + "quantity");
+            for (String key : List.of("side", "quantity", "price")) {
+                if (!(req(f, key, w) instanceof String)) {
+                    throw new QfError("E_SCHEMA", w + key + " must be a string", w + key);
+                }
             }
-            out.add(new DayFill(SYM, side, q, p, fee));
+            if (f.containsKey("fee") && !(f.get("fee") instanceof String)) {
+                throw new QfError("E_SCHEMA", w + "fee must be a decimal string", w + "fee");
+            }
+            for (String key : List.of("quantity", "price", "fee")) { // malformed or non-finite before any E_LIMIT
+                if (f.containsKey(key)) {
+                    parse((String) f.get(key), w + key);
+                }
+            }
+        }
+    }
+
+    /**
+     * Fills in the KR-230 order over the whole list: schema, decimals (malformed, then E_LIMIT), unknown side
+     * (structural E_INPUT), then a non-positive quantity or price (E_DOMAIN).
+     */
+    private static List<DayFill> fillList(List<?> fills) {
+        fillSchema(fills);
+        List<BigDecimal[]> parsed = new ArrayList<>();
+        for (int k = 0; k < fills.size(); k++) {
+            String w = "fills/" + k + "/";
+            Map<?, ?> f = (Map<?, ?>) fills.get(k);
+            parsed.add(new BigDecimal[] {dstr(f.get("quantity"), w + "quantity"), dstr(f.get("price"), w + "price"),
+                dstr(f.containsKey("fee") ? f.get("fee") : "0", w + "fee")});
+        }
+        for (Object f : fills) {
+            sideSign(((Map<?, ?>) f).get("side"));
+        }
+        List<DayFill> out = new ArrayList<>();
+        for (int k = 0; k < fills.size(); k++) {
+            BigDecimal[] v = parsed.get(k);
+            if (v[0].signum() <= 0 || v[1].signum() <= 0) {
+                throw new QfError("E_DOMAIN", "quantity and price must be positive", "fills/" + k + "/quantity");
+            }
+            out.add(new DayFill(SYM, ((Map<?, ?>) fills.get(k)).get("side"), v[0], v[1], v[2]));
         }
         return out;
     }
 
     /** {@code paper.book.apply_fill}: fills in order on one symbol (HR-50); {@code cash_delta} without {@code cash}. */
     public static Map<String, Object> bookCase(List<?> fills, Object cash, Object position, Object avgCost) {
+        fillSchema(fills);
+        Object[][] scalars = {{cash, "cash"}, {position, "position"}, {avgCost, "avg_cost"}};
+        for (Object[] sc : scalars) {
+            if (sc[0] != null) {
+                schemaDec(sc[0], (String) sc[1]);
+            }
+        }
         BigDecimal start = cash == null ? BigDecimal.ZERO : dstr(cash, "cash");
         Book book = new Book(start);
         Position pos = book.pos(SYM);
@@ -836,15 +897,25 @@ public final class Paper {
     /** {@code paper.book.end_of_day} with {@code paper.pnl.explain} for one symbol (HR-51 to HR-53). */
     public static Map<String, Object> dayCase(Object cashOpen, List<?> fills, Object positionOpen, Object avgCostOpen,
             Object prevClose, Object close, long days, Object cashRate, Object debitRate, Object borrowRate) {
+        fillSchema(fills);
+        Object[][] scalars = {{cashOpen, "cash_open"}, {positionOpen, "position_open"},
+            {avgCostOpen, "avg_cost_open"}, {prevClose, "prev_close"}, {close, "close"}, {cashRate, "cash_rate"},
+            {debitRate, "debit_rate"}, {borrowRate, "borrow_rate"}};
+        for (Object[] sc : scalars) { // every E_SCHEMA before any E_LIMIT or E_DOMAIN (HR-66, KR-344)
+            if (sc[0] != null) {
+                schemaDec(sc[0], (String) sc[1]);
+            }
+        }
+        int nSign = parse((String) positionOpen, "position_open").signum();
+        if (nSign != 0 && prevClose == null) {
+            throw new QfError("E_SCHEMA", "prev_close is missing (open position)", "prev_close");
+        }
+        if ((nSign != 0 || !fills.isEmpty()) && close == null) {
+            throw new QfError("E_SCHEMA", "close is missing (position or fills)", "close");
+        }
         BigDecimal cash = dstr(cashOpen, "cash_open");
         BigDecimal n = dstr(positionOpen, "position_open");
         List<DayFill> fl = fillList(fills);
-        if (n.signum() != 0 && prevClose == null) {
-            throw new QfError("E_SCHEMA", "prev_close is missing (open position)", "prev_close");
-        }
-        if ((n.signum() != 0 || !fl.isEmpty()) && close == null) {
-            throw new QfError("E_SCHEMA", "close is missing (position or fills)", "close");
-        }
         BigDecimal prev = prevClose == null ? null : dstr(prevClose, "prev_close");
         BigDecimal px = close == null ? null : dstr(close, "close");
         if (prev != null && prev.signum() <= 0) {
@@ -892,12 +963,10 @@ public final class Paper {
         for (String k : List.of("side", "type", "quantity")) {
             req(order, k, "order/");
         }
-        dstr(order.get("quantity"), "order/quantity");
-        if (order.get("limit_price") != null) {
-            dstr(order.get("limit_price"), "order/limit_price");
-        }
-        for (String k : List.of("max_order_qty", "max_notional", "max_abs_position", "price_band")) {
-            dstr(req(limits, k, "limits/"), "limits/" + k);
+        for (String k : List.of("side", "type")) { // mistyped is E_SCHEMA; an unlisted string is E_INPUT later
+            if (!(order.get(k) instanceof String)) {
+                throw new QfError("E_SCHEMA", "order/" + k + " must be a string", "order/" + k);
+            }
         }
         Object mo = req(limits, "max_orders_per_day", "limits/");
         if (!(mo instanceof Json.Number n && n.isIntegerForm())) {
@@ -907,6 +976,27 @@ public final class Paper {
             if (limits.containsKey(k) && !(limits.get(k) instanceof Boolean)) {
                 throw new QfError("E_SCHEMA", "limits/" + k + " must be a boolean", "limits/" + k);
             }
+        }
+        List<Object[]> scalars = new ArrayList<>();
+        scalars.add(new Object[] {order.get("quantity"), "order/quantity"});
+        if (order.get("limit_price") != null) {
+            scalars.add(new Object[] {order.get("limit_price"), "order/limit_price"});
+        }
+        for (String k : List.of("max_order_qty", "max_notional", "max_abs_position", "price_band")) {
+            scalars.add(new Object[] {req(limits, k, "limits/"), "limits/" + k});
+        }
+        scalars.add(new Object[] {refPrice, "ref_price"});
+        scalars.add(new Object[] {position, "position"});
+        scalars.add(new Object[] {cash, "cash"});
+        for (Object[] sc : scalars) { // every E_SCHEMA before any E_LIMIT (HR-66, KR-344)
+            schemaDec(sc[0], (String) sc[1]);
+        }
+        dstr(order.get("quantity"), "order/quantity");
+        if (order.get("limit_price") != null) {
+            dstr(order.get("limit_price"), "order/limit_price");
+        }
+        for (String k : List.of("max_order_qty", "max_notional", "max_abs_position", "price_band")) {
+            dstr(req(limits, k, "limits/"), "limits/" + k);
         }
         List<String> reasons = pretradeCheck(order, dstr(refPrice, "ref_price"), dstr(position, "position"),
                 dstr(cash, "cash"), ordersToday, limits);
@@ -1349,14 +1439,50 @@ public final class Paper {
     }
 
     /** {@code paper.session.run}: replays SUBMIT and CLOSE steps through one Session (A8: deterministic). */
+    /**
+     * A malformed or non-finite decimal string anywhere in the script is E_SCHEMA before the cash range check
+     * (KR-344, HR-66). Only string values are read; every other check of a step stays in step order.
+     */
+    private static void scriptDecimalSchema(List<?> script) {
+        for (int k = 0; k < script.size(); k++) {
+            if (!(script.get(k) instanceof Map<?, ?> step)) {
+                continue;
+            }
+            String w = "script/" + k + "/";
+            List<Object[]> found = new ArrayList<>();
+            if (step.get("order") instanceof Map<?, ?> order) {
+                for (String key : List.of("quantity", "limit_price")) {
+                    found.add(new Object[] {order.get(key), w + "order/" + key});
+                }
+            }
+            for (String r : List.of("cash_rate", "debit_rate", "borrow_rate")) {
+                found.add(new Object[] {step.get(r), w + r});
+            }
+            for (String name : List.of("prev_marks", "marks")) {
+                if (step.get(name) instanceof Map<?, ?> m) {
+                    for (Map.Entry<?, ?> ent : m.entrySet()) {
+                        found.add(new Object[] {ent.getValue(), w + name + "/" + ent.getKey()});
+                    }
+                }
+            }
+            for (Object[] f : found) {
+                if (f[0] instanceof String t) {
+                    parse(t, (String) f[1]);
+                }
+            }
+        }
+    }
+
     public static Map<String, Object> sessionCase(Object cash, Map<?, ?> limits, Map<?, ?> lit, List<?> script,
             Map<?, ?> dark) {
-        dstr(cash, "cash");
+        schemaDec(cash, "cash");
         for (String k : List.of("tick_size", "lot_size", "fee_schedule")) {
             if (lit.get(k) == null) {
                 throw new QfError("E_SCHEMA", "lit/" + k + " is missing", "lit/" + k);
             }
         }
+        scriptDecimalSchema(script); // malformed step decimals before the cash range (HR-66, KR-344)
+        dstr(cash, "cash");
         Session s = new Session(cash, limits, lit, dark);
         List<Object> results = new ArrayList<>();
         TreeMap<String, Object> symbols = new TreeMap<>(CODE_POINT);
@@ -1376,6 +1502,13 @@ public final class Paper {
                 for (String key : List.of("order_id", "symbol", "side", "type", "quantity")) {
                     if (order.get(key) == null) {
                         throw new QfError("E_SCHEMA", w + "order/" + key + " is missing", w + "order/" + key);
+                    }
+                }
+                // mistyped text fields are E_SCHEMA (fuzz run 44937631714 class); a null venue stays E_INPUT
+                for (String key : List.of("order_id", "symbol", "side", "type", "venue")) {
+                    Object v = order.get(key);
+                    if (v != null && !(v instanceof String)) {
+                        throw new QfError("E_SCHEMA", w + "order/" + key + " must be a string", w + "order/" + key);
                     }
                 }
                 for (String key : List.of("quantity", "limit_price")) {

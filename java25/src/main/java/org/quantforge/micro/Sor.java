@@ -250,7 +250,7 @@ public final class Sor {
                     tails.add(new Frac[0]);
                 } else {
                     qs.add(0);
-                    Object raw = v.containsKey("tail") ? v.get("tail") : List.of();
+                    Object raw = v.get("tail") == null ? List.of() : v.get("tail"); // null is absent, as C++ and Rust
                     if (!(raw instanceof List<?> tl)) {
                         throw new QfError("E_SCHEMA", "venues/" + k + "/tail: not an array", "venues");
                     }
@@ -270,9 +270,11 @@ public final class Sor {
             }
             lit = indices("LIT");
             dark = indices("DARK");
-            Object rawRows = inp.containsKey("lit_samples") ? inp.get("lit_samples") : List.of();
+            // Absent or null is no rows; any other non-array, or a row that is not an array, is mistyped: E_SCHEMA
+            // (cli-contract.md), in all four builds (fuzz run 44815591552, sor_h-0002).
+            Object rawRows = inp.get("lit_samples") == null ? List.of() : inp.get("lit_samples");
             if (!(rawRows instanceof List<?> rl)) {
-                throw new QfError("E_INPUT", "lit_samples: not an array", "lit_samples");
+                throw new QfError("E_SCHEMA", "lit_samples: not an array", "lit_samples");
             }
             if (lit.length > 0 && rl.isEmpty()) {
                 throw new QfError("E_INPUT", "lit_samples: empty", "lit_samples");
@@ -283,7 +285,7 @@ public final class Sor {
             int[][] rs = new int[rl.size()][];
             for (int i = 0; i < rl.size(); i++) {
                 if (!(rl.get(i) instanceof List<?> r)) {
-                    throw new QfError("E_INPUT", "lit_samples/" + i + ": not a row", "lit_samples");
+                    throw new QfError("E_SCHEMA", "lit_samples/" + i + ": not an array", "lit_samples");
                 }
                 rs[i] = new int[r.size()];
                 for (int j = 0; j < r.size(); j++) {

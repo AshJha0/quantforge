@@ -126,16 +126,23 @@ def _name(i: Inputs, key: str) -> tuple[float, float]:
     return n.real("hazard_rate"), n.real("recovery")
 
 
-@op("xva.adjustments.value")
-def _adjustments(i: Inputs) -> Any:
+def _adjustment_args(i: Inputs) -> tuple[Any, ...]:
+    """The G-41 request, read in schema order (shared by `xva.sens.aad`, KR-262)."""
     f = i.object("funding")
-    args = (
+    times, dfs, ee, ene = (
         i.reals("times"),
         i.reals("discount_factors"),
         i.reals("ee"),
         i.reals("ene"),
-        _name(i, "counterparty"),
-        _name(i, "own"),
+    )
+    cp, own = _name(i, "counterparty"), _name(i, "own")
+    return (
+        times,
+        dfs,
+        ee,
+        ene,
+        core.xva.Name(*cp),
+        core.xva.Name(*own),
         f.real("borrow_spread"),
         f.real("lend_spread"),
         f.boolean("exclude_dva_overlap"),
@@ -144,8 +151,25 @@ def _adjustments(i: Inputs) -> Any:
         i.reals("capital") if i.has("capital") else None,
         i.opt_real("hurdle_rate"),
     )
-    cp, own = args[4], args[5]
-    return core.xva.adjustments(*args[:4], core.xva.Name(*cp), core.xva.Name(*own), *args[6:])
+
+
+@op("xva.adjustments.value")
+def _adjustments(i: Inputs) -> Any:
+    return core.xva.adjustments(*_adjustment_args(i))
+
+
+@op("xva.sens.aad")
+def _sens_aad(i: Inputs) -> Any:
+    """KR-262: only `xva.adjustments.value` is wrapped; `wrt` is an optional array of strings."""
+    if i.string("operation") != core.xva_aad.WRAPPED:
+        raise QfError("E_SCHEMA", "operation is not supported", "operation")
+    args = _adjustment_args(i.object("inputs"))
+    wrt = None
+    if i.has("wrt"):
+        wrt = i.array("wrt")
+        if not all(isinstance(k, str) for k in wrt):
+            raise QfError("E_SCHEMA", "wrt is not an array of strings", "wrt")
+    return core.xva_aad.adjustments_aad(*args, wrt=wrt)
 
 
 @op("xva.sbim.ir_delta")

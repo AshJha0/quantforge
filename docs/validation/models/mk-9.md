@@ -55,7 +55,7 @@ Operations (10; named on the inventory entry's Purpose line): `risk.frtb.ima.lh`
 Totals: 33 value-checked, 66 error, 0 invariance cases (measured from `datasets/golden` at generation).
 Outside-checked: 23 of 33 value cases (69.7%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
-Mutation testing: no module of `conformance/mutation/stages.json` names one of this model's value-checked suites by a pattern narrower than the whole stage (patterns such as `*` or `*_d` run every suite of a stage), so no mutation result maps to this model alone.
+Mutation testing: modules `K/frtb_ima` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.
 
 Unit-test counts are files that contain the operation name or the language's function name from `specifications/name-map.json` (string match; Rust counts only files under a `tests` folder, so in-module `#[cfg(test)]` tests are not counted).
 
@@ -70,7 +70,7 @@ Unit-test counts are files that contain the operation name or the language's fun
 
 ## Limits
 
-implemented on the wave 2 integration branch `k-r3-w2` (2026-11-20), merge into `k-v1` pending; rulings KR-50 to KR-69 and KR-300 to KR-326 PROPOSED except KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 (confirmed 2026-11-20, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section. (Read from the inventory entry.)
+implemented in all four builds and merged to main (pull request #63, 2026-11-20); rulings KR-50 to KR-69 and KR-300 to KR-326 all confirmed (KR-312, KR-315, KR-319, KR-320, KR-324 and KR-327 on 2026-11-20, the rest on 2026-11-21, `specifications/stage-k-rulings-w2.md`); simplified scope as stated in the spec's Limits section. (Read from the inventory entry.)
 
 Use restriction for every model (inventory): research, education and conformance testing only; not for trading, valuation of record, risk limits or regulatory capital.
 

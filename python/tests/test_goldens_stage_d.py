@@ -1,8 +1,9 @@
 """The stage D golden suites, in process, judged by the conformance runner's own rules.
 
-For mutation testing: mutmut's copy of python/ cannot see datasets/, so this runs only when
-QF_GOLDEN_ROOT names a directory holding datasets/golden/stage_d, conformance/runner/runner.py and
-conformance/tolerances/policy.yaml. The normal conformance run covers the same cases."""
+The golden root is QF_GOLDEN_ROOT if set, else the repository holding this file (K-9 review finding 21: it
+used to run only when QF_GOLDEN_ROOT was set, so CI skipped it). The root must hold datasets/golden/stage_d,
+conformance/runner/runner.py and conformance/tolerances/policy.yaml. Mutmut's copy of python/ cannot see
+datasets/, so there the test skips with the reason listed in tests/expected_skips.txt."""
 
 import json
 import os
@@ -13,8 +14,11 @@ import pytest
 
 from quantforge_core.cli.main import run_case
 
-ROOT = os.environ.get("QF_GOLDEN_ROOT")
-pytestmark = pytest.mark.skipif(not ROOT, reason="QF_GOLDEN_ROOT is not set")
+ROOT = os.environ.get("QF_GOLDEN_ROOT") or str(Path(__file__).resolve().parents[2])
+pytestmark = pytest.mark.skipif(
+    not (Path(ROOT) / "datasets" / "golden" / "stage_d").is_dir(),
+    reason="no golden root: datasets/golden/stage_d not found (mutation copy)",
+)
 
 
 def test_stage_d_goldens() -> None:

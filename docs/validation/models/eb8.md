@@ -44,11 +44,11 @@ Operations (4; every operation whose name-map spec is the model's spec (shared s
 |---|---:|---:|---:|---:|---|---|---|
 | `risk.corr.dispersion` | 3 | 28 | 9 | 9 | `corr_e`, `e1_risk` | 0 of 3 (stage E) | 1, 0, 2, 0 |
 | `risk.corr.implied` | 6 | 20 | 5 | 5 | `corr_e`, `e1_risk`, `rulings_e_b` | 0 of 6 (stage E) | 1, 0, 1, 0 |
-| `risk.corr.nearest` | 15 | 7 | 1 | 1 | `corr_e`, `e1_risk`, `fuzzfix_j` | 0 of 0 (stage J) | 1, 0, 1, 0 |
-| `risk.corr.validate` | 17 | 15 | 2 | 2 | `corr_e`, `e1_risk`, `fuzzfix_j` | 0 of 0 (stage J) | 1, 0, 1, 0 |
+| `risk.corr.nearest` | 15 | 7 | 1 | 1 | `corr_e`, `e1_risk`, `fuzzfix_j` | 10 of 15 (stage E) | 1, 0, 1, 0 |
+| `risk.corr.validate` | 17 | 15 | 2 | 2 | `corr_e`, `e1_risk`, `fuzzfix_j` | 15 of 15 (stage E) | 1, 0, 1, 0 |
 
 Totals: 41 value-checked, 70 error, 34 invariance cases (measured from `datasets/golden` at generation).
-Outside-checked: 0 of 9 value cases (0.0%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
+Outside-checked: 25 of 39 value cases (64.1%) under rule R6-13 / D6, counting blind re-derivation where the rule allows it (from `oracle/OUTSIDE_SHARES.json`, written by `tools/outside_shares.py`). The plan's floor is 60% per stage and, from stage H on, per plan item; it is not a per-model rule.
 
 Mutation testing: modules `E/correlation` of `conformance/mutation/stages.json` mutate code checked by this model's value-checked suites; the gate is 80% killed with a 95% Wilson lower bound of 65% per module and language, on a 40-mutant sample (`.github/workflows/mutation-stage.yml`). Scores are those of the latest run, not stored in the tree.
 

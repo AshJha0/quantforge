@@ -321,7 +321,7 @@ def is_live(spec):
 def planned_page(slug, spec):
     return f"""# {spec['title']}
 
-<p class="note">Status: Planned, stage D (in progress). No CLI operation exists yet, so this page has no numbers or charts. Nothing here is a result.</p>
+<p class="note">Status: Planned. No CLI operation exists yet, so this page has no numbers or charts. Nothing here is a result.</p>
 
 ## What it will show
 
@@ -736,7 +736,7 @@ Generated on {any_d['meta']['date']} from commit `{any_d['meta']['commit']}`.
 An outside library in `verified_by` means QuantLib or Strata. The other cases have hand or replay sources, which can share a misreading with the spec. Each page gives the breakdown. The papers and standards behind each curve are cited in its spec and collected in [References](../references.md).
 
 {table(['Curve', 'Stage', 'Evidence'], rows)}
-
+{hand_pages()}
 Stage J wave 3 (historical scenario stress, interpolation backtests, drift detectors) has no gallery page: those operations take a curve, a smile or a series rather than build a curve, so they are worked through in [Tutorial 33](../getting-started/tutorial-33-stress-test-and-watch-for-drift.md) instead.
 {real}{RISK_CAPITAL}
 ## How the gallery is built
@@ -745,8 +745,32 @@ Stage J wave 3 (historical scenario stress, interpolation backtests, drift detec
 """
 
 
+# Hand-written method pages (docs lane k-v1-docs-b, 2026-11-21): written by hand, not from data/, so --check only
+# requires that each listed file exists; their numbers are rechecked by docs/question-bank/verify/v14_stage_k.py.
+HAND_PAGES = [
+    ("meeting-steps.md", "Central-bank meeting steps and the year-end turn", "`rates.ois.step_curve`, `rates.ois.fit_steps`"),
+    ("joint-solve.md", "Multi-curve joint solve and its Jacobian", "`rates.curve.joint_solve`, `rates.curve.joint_bootstrap`"),
+    ("curve-risk.md", "Curve risk: par buckets, key rates and the Jacobian", "`risk.curve.par`, `risk.curve.key_rate`, `risk.curve.jacobian`"),
+    ("incremental-update.md", "Incremental curve update (stage K)", "`curve.bootstrap.par_annual`, `curve.incremental.update`"),
+    ("cross-gamma.md", "Cross gamma on a curve", "`risk.curve.cross_gamma`"),
+    ("curve-pca.md", "Principal components of curve moves", "`risk.curve.pca`"),
+    ("linker-price-curve.md", "Inflation-linked bond priced on a CPI curve", "`infl.linker.price_curve`"),
+    ("xccy-pv.md", "Cross-currency basis swap PV", "`fx.xccy.pv`"),
+]
+
+
+def hand_pages():
+    missing = [f for f, _, _ in HAND_PAGES if not (OUT / f).is_file()]
+    if missing:
+        raise SystemExit(f"hand-written curve page missing: {missing}")
+    lines = "\n".join(f"| [{title}]({f}) | {ops} |" for f, title, ops in HAND_PAGES)
+    return ("\n## Method pages\n\nWritten by hand rather than generated from `docs/curves/data/`: each explains a curve method "
+            "with a worked example from the Python build on golden inputs, and says so at its top.\n\n"
+            f"| Page | Operations |\n|---|---|\n{lines}\n")
+
+
 # Gap G-5 of the docs plan: risk and capital term structures, only what is released (stage K docs lane, 2026-11-19).
-RISK_CAPITAL = "\n## Risk and capital term structures\n\nSome risk and capital figures are themselves functions of tenor or time: a regulator's risk weight per tenor, an exposure profile over a trade's life, a supervisory duration. This section lists only what is built and released today; it has no chart yet, and nothing here is a gallery row.\n\n| Term structure | What it is | Where (released) | Evidence |\n|---|---|---|---|\n| FRTB GIRR delta risk weights | Regulator's weight per tenor vertex: 1.7% at 0.25Y and 0.5Y, 1.6% at 1Y, 1.3% at 2Y, 1.2% at 3Y, 1.1% from 5Y to 30Y (MAR21.42 Table 1) | `risk.frtb.girr_delta`, `specifications/06-risk/frtb-sa-girr.md`, stage F | regulator text, read in stage F; goldens re-derived under the stage F rule |\n| Key-rate DV01 ladder | Sensitivity of a position to each curve tenor, money per basis point | `risk.ois.dv01` and the R2 key-rate operations, `specifications/06-risk/par-and-key-rate.md` | goldens; see [Tutorial 1](../getting-started/tutorial-1-swap.md) |\n| Exposure profile under Hull-White | Expected exposure EE(t) and the deflated quantile `deflated_pfe_q(t)` over a swap portfolio's life; the quantile is of deflated value, not PFE as a desk reads it (R6-5.1) | `xva.exposure.portfolio_hw`, `specifications/06-risk/xva-exposure-portfolio.md`, stage G | 80 of 96 value cases within 3 Monte Carlo standard errors of ORE 1.8.17 (`oracle/OUTSIDE_SHARES.md`) |\n\nNot shown here until released (stage K): SA-CCR supervisory duration and maturity factors (built in all four builds, on main since 2026-11-20, released with v1.0.0), FRTB internal-model liquidity horizons (wave 2, specification only), and the sensitivity-based margin's tenor weights, which use placeholder weights from a stated rule.\n"
+RISK_CAPITAL = "\n## Risk and capital term structures\n\nSome risk and capital figures are themselves functions of tenor or time: a regulator's risk weight per tenor, an exposure profile over a trade's life, a supervisory duration. This section lists only what is built and released today; it has no chart yet, and nothing here is a gallery row.\n\n| Term structure | What it is | Where (released) | Evidence |\n|---|---|---|---|\n| FRTB GIRR delta risk weights | Regulator's weight per tenor vertex: 1.7% at 0.25Y and 0.5Y, 1.6% at 1Y, 1.3% at 2Y, 1.2% at 3Y, 1.1% from 5Y to 30Y (MAR21.42 Table 1) | `risk.frtb.girr_delta`, `specifications/06-risk/frtb-sa-girr.md`, stage F | regulator text, read in stage F; goldens re-derived under the stage F rule |\n| Key-rate DV01 ladder | Sensitivity of a position to each curve tenor, money per basis point | `risk.ois.dv01` and the R2 key-rate operations, `specifications/06-risk/par-and-key-rate.md` | goldens; see [Tutorial 1](../getting-started/tutorial-1-swap.md) |\n| Exposure profile under Hull-White | Expected exposure EE(t) and the deflated quantile `deflated_pfe_q(t)` over a swap portfolio's life; the quantile is of deflated value, not PFE as a desk reads it (R6-5.1) | `xva.exposure.portfolio_hw`, `specifications/06-risk/xva-exposure-portfolio.md`, stage G | 80 of 96 value cases within 3 Monte Carlo standard errors of ORE 1.8.17 (`oracle/OUTSIDE_SHARES.md`) |\n\nNot shown here until released (stage K): SA-CCR supervisory duration and maturity factors (built in all four builds, on main since 2026-11-20, released with v1.0.0), FRTB internal-model liquidity horizons (`risk.frtb.ima.lh`, `risk.frtb.ima.es_lh`, wave 2: implemented in all four builds and on main since 2026-11-20, pull request #63, not tagged; most wave 2 rulings still proposed), and the sensitivity-based margin's tenor weights, which use placeholder weights from a stated rule.\n"
 
 
 def render_all(all_data):

@@ -22,11 +22,16 @@ public final class Normal {
 
     /** Upper tail for a >= 2: n(a) times the Mills ratio. */
     private static double tail(double a) {
+        return tail(a, pdf(a));
+    }
+
+    /** {@link #tail(double)} given n = pdf(a). */
+    private static double tail(double a, double n) {
         double f = a;
         for (int k = 300; k >= 1; k--) {
             f = a + k / f;
         }
-        return pdf(a) / f;
+        return n / f;
     }
 
     /** x + x^3/3 + x^5/(3 5) + ..., all terms of one sign, so that N(x) = 1/2 + n(x) times it. */
@@ -49,5 +54,21 @@ public final class Normal {
             return x < 0 ? 0.0 : 1.0;
         }
         return x < 0 ? tail(a) : 1.0 - tail(a);
+    }
+
+    /**
+     * cdf(x) for a caller that already holds n = pdf(x) (pdf is even, so pdf(-x) is the same double): the same
+     * operations as {@link #cdf(double)} with the density evaluated once instead of twice. Passing any other n
+     * gives a wrong result.
+     */
+    public static double cdf(double x, double n) {
+        double a = Math.abs(x);
+        if (a < 2.0) {
+            return x == 0.0 ? 0.5 : 0.5 + n * series(x);
+        }
+        if (a > 40.0) {
+            return x < 0 ? 0.0 : 1.0;
+        }
+        return x < 0 ? tail(a, n) : 1.0 - tail(a, n);
     }
 }

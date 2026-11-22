@@ -365,7 +365,7 @@ wheels = [
 
 [[package]]
 name = "quantforge-core"
-version = "0.10.1"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },

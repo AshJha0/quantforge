@@ -85,7 +85,7 @@ def benchmark_issues(date, auctions_file=None):
         rows = json.loads(Path(auctions_file).read_text(encoding="utf-8"))["data"]
     else:
         since = (dt.date.fromisoformat(date) - dt.timedelta(days=3 * 366)).isoformat()
-        rows = json.loads(c.fetch(AUCTIONS.format(since=since, until=date)))["data"]
+        rows = json.loads(c.fetch(AUCTIONS.format(since=since, until=date), expect_json=True))["data"]
     out = {}
     for tenor in TENORS:
         seen = []

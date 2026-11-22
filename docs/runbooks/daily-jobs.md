@@ -7,7 +7,7 @@
 | Paper ledger (K-2) | `.github/workflows/paper-ledger.yml` | `paper-ledger` | `paper-ledger-anchors` | `docs/developer-guides/paper-ledger.md` |
 | Daily curve run (K-11) | `.github/workflows/curve-daily.yml` | `curve-daily` | `curve-daily-anchors` | `specifications/12-platform/daily-curve-run.md` |
 
-Both read only from `main` (code), run only in `AshJha0/quantforge`, and were scheduled on `main` on 2026-11-20 (pull request #59). Sources for this page: the two workflow files and the guide above (read 2026-11-20).
+Both read only from `main` (code), run only in `AshJha0/quantforge`, and were scheduled on `main` on 2026-11-20 (pull request #59). Sources for this page: the two workflow files and the guide above (read 2026-11-20). First rows: each branch held one row, for 2026-11-20, on 2026-11-21 (`ledger/summary.json` on `paper-ledger` and `curve-daily`; the curve row's consistency check is pending because the Federal Reserve file then ended on 2026-11-13; read 2026-11-21). Both paper-ledger runs so far were started by the recorder's completion (`workflow_run`, one of its three triggers beside two `schedule` lines and `workflow_dispatch`), so on 2026-11-21 `tools/check_scheduled_runs.py` reported it as having no completed scheduled or manual run on main.
 
 **Formal statement.** A run ends in one of three states (from each workflow's "Run the day" step comment):
 

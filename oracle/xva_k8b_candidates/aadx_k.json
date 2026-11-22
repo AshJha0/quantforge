@@ -1,0 +1,985 @@
+{
+ "schema_version": "1.0",
+ "suite": "aadx_k",
+ "status": "PENDING implementation (candidate golden; K-8b specs PROPOSED)",
+ "spec": "specifications/06-risk/xva-aad-sensitivities.md",
+ "generator": "oracle/python/gen_stage_k_xva_k8b.py",
+ "reviewer": "none: self-assessment; no second review (owner decision 2026-11-18)",
+ "survival_convention": "KR-296 (proposed): survival at the bucket start for FCA, FBA, MVA, ColVA",
+ "cases": [
+  {
+   "case_id": "aadx_k-0001",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.adjustments.value",
+    "inputs": {
+     "times": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+     ],
+     "discount_factors": [
+      0.985,
+      0.97,
+      0.955,
+      0.94
+     ],
+     "ee": [
+      120.0,
+      150.0,
+      130.0,
+      80.0
+     ],
+     "ene": [
+      -60.0,
+      -90.0,
+      -100.0,
+      -70.0
+     ],
+     "counterparty": {
+      "hazard_rate": 0.02,
+      "recovery": 0.4
+     },
+     "own": {
+      "hazard_rate": 0.01,
+      "recovery": 0.4
+     },
+     "funding": {
+      "borrow_spread": 0.008,
+      "lend_spread": 0.008,
+      "exclude_dva_overlap": false
+     }
+    },
+    "wrt": [
+     "discount_factors[0]",
+     "discount_factors[1]",
+     "discount_factors[2]",
+     "discount_factors[3]",
+     "ee[0]",
+     "ee[1]",
+     "ee[2]",
+     "ee[3]",
+     "ene[0]",
+     "ene[1]",
+     "ene[2]",
+     "ene[3]",
+     "counterparty.hazard_rate",
+     "counterparty.recovery",
+     "own.hazard_rate",
+     "own.recovery",
+     "funding.borrow_spread",
+     "funding.lend_spread"
+    ],
+    "outputs": [
+     "cva",
+     "dva",
+     "fca",
+     "fba",
+     "fva"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 2.7098617740030235,
+     "dva": 0.8997960006816191,
+     "fca": 1.815622443344568,
+     "fba": 1.2027298203433914,
+     "fva": 0.6128926230011765,
+     "gradient": {
+      "cva": {
+       "discount_factors[0]": 0.7164119700599001,
+       "discount_factors[1]": 0.8821824817256994,
+       "discount_factors[2]": 0.7531753629024275,
+       "discount_factors[3]": 0.4565920262215698,
+       "ee[0]": 0.00588054825424168,
+       "ee[1]": 0.005704780048492856,
+       "ee[2]": 0.005532942089013986,
+       "ee[3]": 0.005364956308103444,
+       "ene[0]": 0.0,
+       "ene[1]": 0.0,
+       "ene[2]": 0.0,
+       "ene[3]": 0.0,
+       "counterparty.hazard_rate": 133.0258166316599,
+       "counterparty.recovery": -4.51643629000504,
+       "own.hazard_rate": -1.7909357321811956,
+       "own.recovery": 0.0,
+       "funding.borrow_spread": 0.0,
+       "funding.lend_spread": 0.0
+      },
+      "dva": {
+       "discount_factors[0]": 0.1795507490634367,
+       "discount_factors[1]": 0.2653163800005974,
+       "discount_factors[2]": 0.2904070374565019,
+       "discount_factors[3]": 0.20025840796020772,
+       "ee[0]": 0.0,
+       "ee[1]": 0.0,
+       "ee[2]": 0.0,
+       "ee[3]": 0.0,
+       "ene[0]": -0.0029476247971247527,
+       "ene[1]": -0.002859520984450883,
+       "ene[2]": -0.002773387207709593,
+       "ene[3]": -0.0026891843354656464,
+       "counterparty.hazard_rate": -0.6883815202951419,
+       "counterparty.recovery": 0.0,
+       "own.hazard_rate": 89.06645700511841,
+       "own.recovery": -1.499660001136032,
+       "funding.borrow_spread": 0.0,
+       "funding.lend_spread": 0.0
+      },
+      "fca": {
+       "discount_factors[0]": 0.48,
+       "discount_factors[1]": 0.5910671637618377,
+       "discount_factors[2]": 0.5046316774452243,
+       "discount_factors[3]": 0.30591919418659197,
+       "ee[0]": 0.00394,
+       "ee[1]": 0.003822234325659883,
+       "ee[2]": 0.0037071019381553012,
+       "ee[3]": 0.0035945505316924554,
+       "ene[0]": 0.0,
+       "ene[1]": 0.0,
+       "ene[2]": 0.0,
+       "ene[3]": 0.0,
+       "counterparty.hazard_rate": -1.199936890187775,
+       "counterparty.recovery": 0.0,
+       "own.hazard_rate": -1.199936890187775,
+       "own.recovery": 0.0,
+       "funding.borrow_spread": 226.952805418071,
+       "funding.lend_spread": 0.0
+      },
+      "fba": {
+       "discount_factors[0]": 0.24,
+       "discount_factors[1]": 0.3546402982571026,
+       "discount_factors[2]": 0.3881782134194033,
+       "discount_factors[3]": 0.267679294913268,
+       "ee[0]": 0.0,
+       "ee[1]": 0.0,
+       "ee[2]": 0.0,
+       "ee[3]": 0.0,
+       "ene[0]": -0.00394,
+       "ene[1]": -0.003822234325659883,
+       "ene[2]": -0.0037071019381553012,
+       "ene[3]": -0.0035945505316924554,
+       "counterparty.hazard_rate": -0.9201385442979327,
+       "counterparty.recovery": 0.0,
+       "own.hazard_rate": -0.9201385442979327,
+       "own.recovery": 0.0,
+       "funding.borrow_spread": 0.0,
+       "funding.lend_spread": 150.34122754292395
+      },
+      "fva": {
+       "discount_factors[0]": 0.24,
+       "discount_factors[1]": 0.23642686550473505,
+       "discount_factors[2]": 0.11645346402582098,
+       "discount_factors[3]": 0.038239899273323996,
+       "ee[0]": 0.00394,
+       "ee[1]": 0.003822234325659883,
+       "ee[2]": 0.0037071019381553012,
+       "ee[3]": 0.0035945505316924554,
+       "ene[0]": 0.00394,
+       "ene[1]": 0.003822234325659883,
+       "ene[2]": 0.0037071019381553012,
+       "ene[3]": 0.0035945505316924554,
+       "counterparty.hazard_rate": -0.27979834588984237,
+       "counterparty.recovery": 0.0,
+       "own.hazard_rate": -0.27979834588984237,
+       "own.recovery": 0.0,
+       "funding.borrow_spread": 226.952805418071,
+       "funding.lend_spread": -150.34122754292395
+      }
+     }
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1/A2: AAD of the operation as computed (KR-161)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "G-41 on xvaadj_g-0001"
+  },
+  {
+   "case_id": "aadx_k-0002",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.adjustments.value",
+    "inputs": {
+     "times": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+     ],
+     "discount_factors": [
+      0.985,
+      0.97,
+      0.955,
+      0.94
+     ],
+     "ee": [
+      120.0,
+      150.0,
+      130.0,
+      80.0
+     ],
+     "ene": [
+      -60.0,
+      -90.0,
+      -100.0,
+      -70.0
+     ],
+     "counterparty": {
+      "hazard_rate": 0.02,
+      "recovery": 0.4
+     },
+     "own": {
+      "hazard_rate": 0.01,
+      "recovery": 0.4
+     },
+     "funding": {
+      "borrow_spread": 0.008,
+      "lend_spread": 0.008,
+      "exclude_dva_overlap": true
+     }
+    },
+    "wrt": [
+     "discount_factors[0]",
+     "discount_factors[1]",
+     "discount_factors[2]",
+     "discount_factors[3]",
+     "ee[0]",
+     "ee[1]",
+     "ee[2]",
+     "ee[3]",
+     "ene[0]",
+     "ene[1]",
+     "ene[2]",
+     "ene[3]",
+     "counterparty.hazard_rate",
+     "counterparty.recovery",
+     "own.hazard_rate",
+     "own.recovery",
+     "funding.borrow_spread",
+     "funding.lend_spread"
+    ],
+    "outputs": [
+     "cva",
+     "dva",
+     "fca",
+     "fba",
+     "fva"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 2.7098617740030235,
+     "dva": 0.8997960006816191,
+     "fca": 1.815622443344568,
+     "fba": 0.3006824550858479,
+     "fva": 1.5149399882587202,
+     "gradient": {
+      "cva": {
+       "discount_factors[0]": 0.7164119700599001,
+       "discount_factors[1]": 0.8821824817256994,
+       "discount_factors[2]": 0.7531753629024275,
+       "discount_factors[3]": 0.4565920262215698,
+       "ee[0]": 0.00588054825424168,
+       "ee[1]": 0.005704780048492856,
+       "ee[2]": 0.005532942089013986,
+       "ee[3]": 0.005364956308103444,
+       "ene[0]": 0.0,
+       "ene[1]": 0.0,
+       "ene[2]": 0.0,
+       "ene[3]": 0.0,
+       "counterparty.hazard_rate": 133.0258166316599,
+       "counterparty.recovery": -4.51643629000504,
+       "own.hazard_rate": -1.7909357321811956,
+       "own.recovery": 0.0,
+       "funding.borrow_spread": 0.0,
+       "funding.lend_spread": 0.0
+      },
+      "dva": {
+       "discount_factors[0]": 0.1795507490634367,
+       "discount_factors[1]": 0.2653163800005974,
+       "discount_factors[2]": 0.2904070374565019,
+       "discount_factors[3]": 0.20025840796020772,
+       "ee[0]": 0.0,
+       "ee[1]": 0.0,
+       "ee[2]": 0.0,
+       "ee[3]": 0.0,
+       "ene[0]": -0.0029476247971247527,
+       "ene[1]": -0.002859520984450883,
+       "ene[2]": -0.002773387207709593,
+       "ene[3]": -0.0026891843354656464,
+       "counterparty.hazard_rate": -0.6883815202951419,
+       "counterparty.recovery": 0.0,
+       "own.hazard_rate": 89.06645700511841,
+       "own.recovery": -1.499660001136032,
+       "funding.borrow_spread": 0.0,
+       "funding.lend_spread": 0.0
+      },
+      "fca": {
+       "discount_factors[0]": 0.48,
+       "discount_factors[1]": 0.5910671637618377,
+       "discount_factors[2]": 0.5046316774452243,
+       "discount_factors[3]": 0.30591919418659197,
+       "ee[0]": 0.00394,
+       "ee[1]": 0.003822234325659883,
+       "ee[2]": 0.0037071019381553012,
+       "ee[3]": 0.0035945505316924554,
+       "ene[0]": 0.0,
+       "ene[1]": 0.0,
+       "ene[2]": 0.0,
+       "ene[3]": 0.0,
+       "counterparty.hazard_rate": -1.199936890187775,
+       "counterparty.recovery": 0.0,
+       "own.hazard_rate": -1.199936890187775,
+       "own.recovery": 0.0,
+       "funding.borrow_spread": 226.952805418071,
+       "funding.lend_spread": 0.0
+      },
+      "fba": {
+       "discount_factors[0]": 0.060000000000000005,
+       "discount_factors[1]": 0.08866007456427565,
+       "discount_factors[2]": 0.09704455335485083,
+       "discount_factors[3]": 0.06691982372831701,
+       "ee[0]": 0.0,
+       "ee[1]": 0.0,
+       "ee[2]": 0.0,
+       "ee[3]": 0.0,
+       "ene[0]": -0.0009850000000000002,
+       "ene[1]": -0.0009555585814149709,
+       "ene[2]": -0.0009267754845388254,
+       "ene[3]": -0.000898637632923114,
+       "counterparty.hazard_rate": -0.23003463607448318,
+       "counterparty.recovery": 0.0,
+       "own.hazard_rate": -90.43477116182883,
+       "own.recovery": 1.5034122754292394,
+       "funding.borrow_spread": 0.0,
+       "funding.lend_spread": 150.34122754292395
+      },
+      "fva": {
+       "discount_factors[0]": 0.42,
+       "discount_factors[1]": 0.5024070891975619,
+       "discount_factors[2]": 0.40758712409037345,
+       "discount_factors[3]": 0.23899937045827496,
+       "ee[0]": 0.00394,
+       "ee[1]": 0.003822234325659883,
+       "ee[2]": 0.0037071019381553012,
+       "ee[3]": 0.0035945505316924554,
+       "ene[0]": 0.0009850000000000002,
+       "ene[1]": 0.0009555585814149709,
+       "ene[2]": 0.0009267754845388254,
+       "ene[3]": 0.000898637632923114,
+       "counterparty.hazard_rate": -0.9699022541132919,
+       "counterparty.recovery": 0.0,
+       "own.hazard_rate": 89.23483427164106,
+       "own.recovery": -1.5034122754292394,
+       "funding.borrow_spread": 226.952805418071,
+       "funding.lend_spread": -150.34122754292395
+      }
+     }
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1/A2: AAD of the operation as computed (KR-161)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "G-41 overlap on (xvaadj_g-0002)"
+  },
+  {
+   "case_id": "aadx_k-0003",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.colva.value",
+    "inputs": {
+     "times": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0
+     ],
+     "discount_factors": [
+      0.9851119396030626,
+      0.9704455335485082,
+      0.9559974818331,
+      0.9417645335842487
+     ],
+     "collateral": [
+      100.0,
+      80.0,
+      50.0,
+      20.0
+     ],
+     "spread": [
+      0.002,
+      0.0015,
+      0.001,
+      0.0005
+     ],
+     "survival": "BOTH",
+     "counterparty": {
+      "hazard_rate": 0.03
+     },
+     "own": {
+      "hazard_rate": 0.015
+     }
+    },
+    "wrt": [
+     "collateral[0]",
+     "collateral[1]",
+     "collateral[2]",
+     "collateral[3]",
+     "spread[0]",
+     "spread[1]",
+     "spread[2]",
+     "spread[3]",
+     "discount_factors[0]",
+     "discount_factors[1]",
+     "discount_factors[2]",
+     "discount_factors[3]",
+     "counterparty.hazard_rate",
+     "own.hazard_rate"
+    ],
+    "outputs": [
+     "colva"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "colva": -0.18269219993460614,
+     "gradient": {
+      "colva": {
+       "collateral[0]": -0.0009851119396030628,
+       "collateral[1]": -0.000711640740791851,
+       "collateral[2]": -0.0004569655926356141,
+       "collateral[3]": -0.00022007335395855527,
+       "spread[0]": -49.25559698015313,
+       "spread[1]": -37.95417284223205,
+       "spread[2]": -22.848279631780706,
+       "spread[3]": -8.802934158342211,
+       "discount_factors[0]": -0.1,
+       "discount_factors[1]": -0.05866507423160018,
+       "discount_factors[2]": -0.023899937045827498,
+       "discount_factors[3]": -0.004673638603080138,
+       "counterparty.hazard_rate": 0.0579161098822114,
+       "own.hazard_rate": 0.0579161098822114
+      }
+     }
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1/A2: AAD of the operation as computed (KR-161)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "ColVA on colva_k-0005"
+  },
+  {
+   "case_id": "aadx_k-0004",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.funding.asymmetric",
+    "inputs": {
+     "times": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+     ],
+     "discount_factors": [
+      0.985,
+      0.97,
+      0.955,
+      0.94
+     ],
+     "ee": [
+      120.0,
+      150.0,
+      130.0,
+      80.0
+     ],
+     "ene": [
+      -60.0,
+      -90.0,
+      -100.0,
+      -70.0
+     ],
+     "counterparty": {
+      "hazard_rate": 0.02,
+      "recovery": 0.4
+     },
+     "own": {
+      "hazard_rate": 0.01,
+      "recovery": 0.4
+     },
+     "borrow_curve": {
+      "tenors": [
+       0.75,
+       3.0
+      ],
+      "zero_spreads": [
+       0.009,
+       0.015
+      ]
+     },
+     "lend_curve": {
+      "tenors": [
+       5.0
+      ],
+      "zero_spreads": [
+       0.004
+      ]
+     }
+    },
+    "wrt": [
+     "discount_factors[0]",
+     "discount_factors[1]",
+     "discount_factors[2]",
+     "discount_factors[3]",
+     "ee[0]",
+     "ee[1]",
+     "ee[2]",
+     "ee[3]",
+     "ene[0]",
+     "ene[1]",
+     "ene[2]",
+     "ene[3]",
+     "counterparty.hazard_rate",
+     "own.hazard_rate",
+     "own.recovery",
+     "borrow_curve.zero_spreads[0]",
+     "borrow_curve.zero_spreads[1]",
+     "lend_curve.zero_spreads[0]"
+    ],
+    "outputs": [
+     "fca",
+     "fba",
+     "fva"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "fca": 3.098730117682716,
+     "fba": 0.6013649101716957,
+     "fva": 2.4973652075110198,
+     "gradient": {
+      "fca": {
+       "discount_factors[0]": 0.5399999999999999,
+       "discount_factors[1]": 0.9604841411129861,
+       "discount_factors[2]": 1.0723423145711015,
+       "discount_factors[3]": 0.6500782876465079,
+       "ee[0]": 0.0044325,
+       "ee[1]": 0.00621113077919731,
+       "ee[2]": 0.007877591618580015,
+       "ee[3]": 0.007638419879846468,
+       "ene[0]": 0.0,
+       "ene[1]": 0.0,
+       "ene[2]": 0.0,
+       "ene[3]": 0.0,
+       "counterparty.hazard_rate": -2.406532104436776,
+       "own.hazard_rate": -2.406532104436776,
+       "own.recovery": 0.0,
+       "borrow_curve.zero_spreads[0]": 50.926993931391536,
+       "borrow_curve.zero_spreads[1]": 176.02581148667946,
+       "lend_curve.zero_spreads[0]": 0.0
+      },
+      "fba": {
+       "discount_factors[0]": 0.12,
+       "discount_factors[1]": 0.1773201491285513,
+       "discount_factors[2]": 0.19408910670970164,
+       "discount_factors[3]": 0.133839647456634,
+       "ee[0]": 0.0,
+       "ee[1]": 0.0,
+       "ee[2]": 0.0,
+       "ee[3]": 0.0,
+       "ene[0]": -0.00197,
+       "ene[1]": -0.0019111171628299415,
+       "ene[2]": -0.0018535509690776506,
+       "ene[3]": -0.0017972752658462277,
+       "counterparty.hazard_rate": -0.46006927214896637,
+       "own.hazard_rate": -0.46006927214896637,
+       "own.recovery": 0.0,
+       "borrow_curve.zero_spreads[0]": 0.0,
+       "borrow_curve.zero_spreads[1]": 0.0,
+       "lend_curve.zero_spreads[0]": 150.34122754292395
+      },
+      "fva": {
+       "discount_factors[0]": 0.41999999999999993,
+       "discount_factors[1]": 0.7831639919844348,
+       "discount_factors[2]": 0.8782532078613998,
+       "discount_factors[3]": 0.516238640189874,
+       "ee[0]": 0.0044325,
+       "ee[1]": 0.00621113077919731,
+       "ee[2]": 0.007877591618580015,
+       "ee[3]": 0.007638419879846468,
+       "ene[0]": 0.00197,
+       "ene[1]": 0.0019111171628299415,
+       "ene[2]": 0.0018535509690776506,
+       "ene[3]": 0.0017972752658462277,
+       "counterparty.hazard_rate": -1.94646283228781,
+       "own.hazard_rate": -1.94646283228781,
+       "own.recovery": 0.0,
+       "borrow_curve.zero_spreads[0]": 50.926993931391536,
+       "borrow_curve.zero_spreads[1]": 176.02581148667946,
+       "lend_curve.zero_spreads[0]": -150.34122754292395
+      }
+     }
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1/A2: AAD of the operation as computed (KR-161)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "funding on fva_k-0004"
+  },
+  {
+   "case_id": "aadx_k-0005",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.mva.value",
+    "inputs": {
+     "times": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+     ],
+     "discount_factors": [
+      0.985,
+      0.97,
+      0.955,
+      0.94
+     ],
+     "counterparty": {
+      "hazard_rate": 0.02
+     },
+     "own": {
+      "hazard_rate": 0.01
+     },
+     "borrow_spread": 0.008,
+     "im_spread": 0.001,
+     "expected_im": {
+      "method": "NORMAL_MPOR",
+      "stdev": [
+       1000.0,
+       1200.0,
+       900.0,
+       500.0
+      ],
+      "mpor_days": 10,
+      "quantile": 0.99
+     }
+    },
+    "wrt": [
+     "expected_im.stdev[0]",
+     "expected_im.stdev[1]",
+     "expected_im.stdev[2]",
+     "expected_im.stdev[3]",
+     "discount_factors[0]",
+     "discount_factors[1]",
+     "discount_factors[2]",
+     "discount_factors[3]",
+     "borrow_spread",
+     "im_spread",
+     "counterparty.hazard_rate",
+     "own.hazard_rate"
+    ],
+    "outputs": [
+     "mva"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "mva": 5.561276349300432,
+     "gradient": {
+      "mva": {
+       "expected_im.stdev[0]": 0.0016040168591511597,
+       "expected_im.stdev[1]": 0.0015560731720773392,
+       "expected_im.stdev[2]": 0.0015092015247190464,
+       "expected_im.stdev[3]": 0.0014633806228186456,
+       "discount_factors[0]": 1.6284435118285885,
+       "discount_factors[1]": 1.9250389757657806,
+       "discount_factors[2]": 1.4222841594210909,
+       "discount_factors[3]": 0.7783939483077903,
+       "borrow_spread": 794.4680499000616,
+       "im_spread": -794.4680499000616,
+       "counterparty.hazard_rate": -3.3894607426075294,
+       "own.hazard_rate": -3.3894607426075294
+      }
+     }
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1/A2: AAD of the operation as computed (KR-161)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "MVA on mva_k-0002 through sigma"
+  },
+  {
+   "case_id": "aadx_k-0006",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.wwr.cva_gaussian_copula",
+    "inputs": {
+     "times": [
+      1.0,
+      2.0
+     ],
+     "discount_factors": [
+      0.9704455335485082,
+      0.9417645335842487
+     ],
+     "mean": [
+      0.2,
+      0.4
+     ],
+     "stdev": [
+      1.0,
+      1.4142135623730951
+     ],
+     "hazard_rate": 0.02,
+     "recovery": 0.4,
+     "rho": 0.3
+    },
+    "wrt": [
+     "rho",
+     "hazard_rate",
+     "mean[0]",
+     "mean[1]",
+     "stdev[0]",
+     "stdev[1]"
+    ],
+    "outputs": [
+     "cva"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 0.026384614677401816,
+     "gradient": {
+      "cva": {
+       "rho": 0.045103156471747015,
+       "hazard_rate": 1.1574567252085461,
+       "mean[0]": 0.009606465675094883,
+       "mean[1]": 0.008925552907786138,
+       "stdev[0]": 0.009751201367087065,
+       "stdev[1]": 0.007878512346809108
+      }
+     }
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-15,
+    "relative": 1e-10,
+    "reason": "spec A4 (KR-161) on a special_function golden"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "WWR on wwr_k-0009"
+  },
+  {
+   "case_id": "aadx_k-0007",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.exposure.closeout_normal",
+    "inputs": {
+     "v0": 5000000.0,
+     "sigma": 1000000.0,
+     "mpor_days": 10,
+     "threshold_receive": 1000000.0,
+     "im": 465269.57480816817
+    },
+    "wrt": [
+     "sigma",
+     "im",
+     "v0",
+     "threshold_receive"
+    ],
+    "outputs": [
+     "ee"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "ee": 534961.4566317102,
+     "gradient": {
+      "ee": {
+       "sigma": 0.0022370789798254547,
+       "im": -0.9962484881251569,
+       "v0": 0.0,
+       "threshold_receive": 0.9962484881251569
+      }
+     }
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1/A2: AAD of the operation as computed (KR-161)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "close-out on cln_k-0005 with the IM given as a number"
+  },
+  {
+   "case_id": "aadx_k-0008",
+   "operation": "xva.sens.aad",
+   "inputs": {
+    "operation": "xva.exposure.portfolio_hw",
+    "inputs": {
+     "curve": {
+      "times": [
+       0.4986301369863014,
+       1.0,
+       2.0,
+       3.0,
+       5.002739726027397,
+       7.005479452054795,
+       10.005479452054795,
+       15.01095890410959,
+       20.013698630136986,
+       30.019178082191782
+      ],
+      "discount_factors": [
+       0.98085,
+       0.9619,
+       0.9254,
+       0.8906,
+       0.8242,
+       0.762,
+       0.6787,
+       0.561,
+       0.467,
+       0.332
+      ]
+     },
+     "mean_reversion": 0.03,
+     "sigma": 0.005,
+     "trades": [
+      {
+       "notional": 10000000.0,
+       "fixed_rate": 0.039,
+       "side": "PAY",
+       "start_years": 0.0,
+       "payment_times": [
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0
+       ]
+      }
+     ],
+     "exposure_times": [
+      1.0,
+      2.0,
+      3.0,
+      4.0
+     ],
+     "pfe_quantiles": [
+      0.95,
+      0.99
+     ],
+     "hazard_rate": 0.02,
+     "recovery": 0.4
+    },
+    "wrt": [
+     "hazard_rate",
+     "recovery"
+    ],
+    "outputs": [
+     "cva"
+    ]
+   },
+   "expected": {
+    "status": "ok",
+    "outputs": {
+     "cva": 2799.320017742617,
+     "gradient": {
+      "cva": {
+       "hazard_rate": 135211.36593836118,
+       "recovery": -4665.533362904362
+      }
+     }
+    }
+   },
+   "tolerance_limit": {
+    "absolute": 1e-12,
+    "relative": 1e-10,
+    "reason": "spec A1/A2: AAD of the operation as computed (KR-161)"
+   },
+   "verified_by": [
+    "mpmath-50"
+   ],
+   "tags": [
+    "xva",
+    "k8b",
+    "candidate"
+   ],
+   "description": "CVA of expsim_g-0003 (S5P); the oracle holds the golden's discounted_ee fixed (KR-162)"
+  }
+ ]
+}

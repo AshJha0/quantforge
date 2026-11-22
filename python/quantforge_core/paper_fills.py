@@ -32,10 +32,12 @@ from .paper import (
     Book,
     Ledger,
     dec,
+    dec_text,
     end_of_day,
     exact,
     input_decimal,
     pretrade_check,
+    schema_decimal,
     side_sign,
 )
 
@@ -351,6 +353,28 @@ class Session:
         return {"eod": eod, "tca": tcas}
 
 
+def _script_decimal_schema(script: Sequence[Any]) -> None:
+    """A malformed or non-finite decimal string anywhere in the script is E_SCHEMA before the cash
+    range check (KR-344, HR-66). Only string values are read here; every other check of a step,
+    including a decimal of the wrong JSON type, stays in step order."""
+    for k, step in enumerate(script):
+        if not isinstance(step, Mapping):
+            continue
+        w = f"script/{k}/"
+        found: list[tuple[Any, str]] = []
+        order = step.get("order")
+        if isinstance(order, Mapping):
+            found += [(order.get(key), f"{w}order/{key}") for key in ("quantity", "limit_price")]
+        found += [(step.get(r), w + r) for r in ("cash_rate", "debit_rate", "borrow_rate")]
+        for name in ("prev_marks", "marks"):
+            m = step.get(name)
+            if isinstance(m, Mapping):
+                found += [(v, f"{w}{name}/{sym}") for sym, v in m.items()]
+        for v, path in found:
+            if isinstance(v, str):
+                dec_text(v, path)
+
+
 @exact
 def session_case(
     cash: Any,
@@ -362,10 +386,12 @@ def session_case(
     """`paper.session.run`: replays a script of SUBMIT and CLOSE steps through one Session and
     returns every ledger record (with its hash), the head, positions and cash (cli-contract.md).
     Deterministic (A8); simulated only (HR-42)."""
-    input_decimal(cash, "cash")
+    schema_decimal(cash, "cash")
     for key0 in ("tick_size", "lot_size", "fee_schedule"):
         if lit.get(key0) is None:
             raise QfError("E_SCHEMA", f"lit/{key0} is missing", "lit/" + key0)
+    _script_decimal_schema(script)  # malformed step decimals before the cash range (HR-66, KR-344)
+    input_decimal(cash, "cash")
     s = Session(cash, limits, lit, dark)
     results: list[dict[str, Any]] = []
     symbols: set[str] = set()
@@ -383,6 +409,13 @@ def session_case(
             for key in ("order_id", "symbol", "side", "type", "quantity"):
                 if order.get(key) is None:
                     raise QfError("E_SCHEMA", f"{w}order/{key} is missing", w + "order/" + key)
+            # mistyped text fields are E_SCHEMA (an array symbol crashed the symbol set; fuzz run
+            # 44937631714 found the same fault in paper.book.apply_fill); a null venue stays E_INPUT
+            for key in ("order_id", "symbol", "side", "type", "venue"):
+                if order.get(key) is not None and not isinstance(order[key], str):
+                    raise QfError(
+                        "E_SCHEMA", f"{w}order/{key} must be a string", w + "order/" + key
+                    )
             for key in ("quantity", "limit_price"):
                 if order.get(key) is not None:
                     input_decimal(order[key], f"{w}order/{key}")

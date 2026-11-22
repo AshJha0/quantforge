@@ -32,6 +32,8 @@ A run longer than about 90 minutes on the laptop is started detached, with a wat
 
 A miss is recorded as a miss in `docs/known-issues.md`; the rule is not changed after a run.
 
+On a red `k6-soak` run, the verdict line of each build is in the job log: `gh run view <run id> --log-failed`, then look for the lines with `MISS` or `LEAK`. The first run on main (44824197236, 2026-11-20/21) is red this way: C++ and Rust missed on SLOPE and RANGE, Python on Linux on RANGE, and the Python planted-leak run came back `LEAK MISSED`; Java passed (read 2026-11-21; figures in `docs/known-issues.md`, K-6 rows). To bring its figures onto `docs/capacity.md`, download the run's artifacts into `benchmarks/results/k6/` and rerun `capacity_page.py`; that has not been done yet.
+
 ## Measure capacity
 
 ```bash
