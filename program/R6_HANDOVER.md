@@ -398,3 +398,7 @@ TOTALS: 16646 value 8155 error 5937 invariance 2554
 Branch `k-v1-aad` after merging `origin/k-v1` (990ddd45), counted 2026-11-22 by `tools/check_case_total.py` (measured): `k-v1`'s 16,652 (value 8,143, error 5,955) plus `aadadj_k` (37: 13 value, 24 error) = 16,689 (value 8,156, error 5,979, invariance 2,554).
 
 TOTALS: 16689 value 8156 error 5979 invariance 2554
+
+Branch `k-v1-pt` (pre-tag audit PT-6, 2026-11-22), counted by `tools/check_case_total.py` (measured): 16,689 plus `g41tiny_k` (4 value cases, G-41 at h = 1e-9 and h = 0, mpmath-50, KR-350) = 16,693 (value 8,160, error 5,979, invariance 2,554).
+
+TOTALS: 16693 value 8160 error 5979 invariance 2554

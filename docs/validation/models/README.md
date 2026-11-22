@@ -128,4 +128,4 @@ No model is Validated in the ladder's sense (tested on real data against an inde
 | [MK-9](mk-9.md) | FRTB IMA: ES with liquidity horizons, NMRF and SES, RFET, PLA, capital (stage K wave 2, K-8f) | Implemented | 10 | 33 | 23 of 33 (69.7%) |
 | [MK-10](mk-10.md) | CVA risk capital: BA-CVA and SA-CVA (stage K wave 2, K-8g) | Implemented | 2 | 21 | 14 of 21 (66.7%) |
 | [MK-11](mk-11.md) | Leverage ratio and large exposures, simplified (stage K wave 2, K-8i) | Implemented | 2 | 24 | 22 of 24 (91.7%) |
-| [MK-12](mk-12.md) | AAD sensitivities of the valuation adjustments (stage K, K-8 AAD, PROPOSED) | Implemented | 2 | 19 | 13 of 19 (68.4%) |
+| [MK-12](mk-12.md) | AAD sensitivities of the valuation adjustments (stage K, K-8 AAD, PROPOSED) | Implemented | 2 | 23 | 13 of 17 (76.5%) |
