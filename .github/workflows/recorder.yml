@@ -42,7 +42,7 @@ jobs:
         id: record
         continue-on-error: true # a failed source is logged as a failure row, and the gap monitor judges it
         run: python3 code/tools/recorder/record.py --data "$RUNNER_TEMP/raw" --log log/actions/log.jsonl
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Study signals
         # R3 amendments 6 and 7: one companion row per new study/<id> row, written to actions/signals.jsonl on this
         # branch by research/r3_forward.py daily, from the clean main checkout (its commit holds the holdout run

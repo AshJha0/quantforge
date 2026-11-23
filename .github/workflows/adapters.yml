@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: hand-built feed fixtures are current (adapters.md 3.6)
         run: python3 tools/adapters/build_feed_fixtures.py --check
       - name: codecs, records, adapters against in-process fakes (AD2, AD3 in process, AD5)
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: static check of the four library trees, after its planted faults (KR-281)
         run: python3 tools/check_adapter_deps.py --self-test && python3 tools/check_adapter_deps.py
       - name: Python library builds and imports with no adapter package installed (AD4)
@@ -75,7 +75,7 @@ jobs:
           else:
               raise SystemExit("quantforge_adapters is importable in the library environment")
           EOF
-      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         with:
           distribution: temurin
           java-version: "25.0.5"
@@ -98,10 +98,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: adapter environment (client libraries pinned in platform/python/pyproject.toml)
         run: uv venv --python 3.13 .venv-k3 && uv pip install --python .venv-k3 -e "platform/python[all]"
-      - uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
         if: matrix.adapter == 'aeron'
         with:
           distribution: temurin
