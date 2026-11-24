@@ -1,6 +1,6 @@
 # Rich cheap: 2026-11-24
 
-Result: **PASS** (1 checks, 0 failed, 1 warnings). Generated 2026-11-24T02:05Z by `tools/workflows/`. Batch command: none.
+Result: **PASS** (1 checks, 0 failed, 1 warnings). Generated 2026-11-24T23:49Z by `tools/workflows/`. Batch command: none.
 
 **BLOCKED: no price data.** Fitted-curve residuals from end-of-day reference prices; not executable prices; tradability not established. Both free sources refuse automated use, so this job does not fetch. Place downloaded price files in --data to run the screen (layout in `tools/workflows/rich_cheap.py`).
 | Source | Why it is blocked (terms checked 2026-11-07) |
