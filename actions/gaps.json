@@ -2,7 +2,7 @@
  {
   "series": "recorder/bls-cpi-u-nsa",
   "from": "2026-11-09",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -11,7 +11,7 @@
  {
   "series": "recorder/boe-sonia",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -20,7 +20,7 @@
  {
   "series": "recorder/cftc-cot-disaggregated",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -29,7 +29,7 @@
  {
   "series": "recorder/ecb-aaa-yield-curve",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -38,7 +38,7 @@
  {
   "series": "recorder/ecb-estr",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-10",
    "2026-11-23"
@@ -48,7 +48,7 @@
  {
   "series": "recorder/ecb-reference-rates",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -57,7 +57,7 @@
  {
   "series": "recorder/eia-ng-bulk",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -66,7 +66,7 @@
  {
   "series": "recorder/eurostat-hicp",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -75,7 +75,7 @@
  {
   "series": "recorder/fiscaldata-treasury-auctions",
   "from": "2026-11-09",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -84,7 +84,7 @@
  {
   "series": "recorder/frb-h10",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -93,7 +93,7 @@
  {
   "series": "recorder/nyfed-bgcr",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -102,7 +102,7 @@
  {
   "series": "recorder/nyfed-sofr",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -111,7 +111,7 @@
  {
   "series": "recorder/nyfed-tgcr",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -120,7 +120,7 @@
  {
   "series": "recorder/ons-chaw",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -129,7 +129,7 @@
  {
   "series": "recorder/ons-d7bt",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -138,7 +138,7 @@
  {
   "series": "recorder/ons-l522",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -147,7 +147,7 @@
  {
   "series": "recorder/us-treasury-bill-rates",
   "from": "2026-11-09",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -156,7 +156,7 @@
  {
   "series": "recorder/us-treasury-par-yields",
   "from": "2026-11-07",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -165,7 +165,7 @@
  {
   "series": "recorder/us-treasury-real-yields",
   "from": "2026-11-09",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -174,7 +174,7 @@
  {
   "series": "study/R3-01",
   "from": "2026-11-09",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -183,7 +183,7 @@
  {
   "series": "study/R3-02",
   "from": "2026-11-09",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
@@ -192,7 +192,7 @@
  {
   "series": "study/R3-03",
   "from": "2026-11-09",
-  "expected": 11,
+  "expected": 12,
   "missing": [
    "2026-11-23"
   ],
