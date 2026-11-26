@@ -1,6 +1,6 @@
 # EOD curves: 2026-11-25
 
-Result: **PASS** (39 checks, 0 failed, 0 warnings). Generated 2026-11-25T23:32Z by `tools/workflows/`. Batch command: rust `quantforge --batch`.
+Result: **PASS** (39 checks, 0 failed, 0 warnings). Generated 2026-11-26T23:38Z by `tools/workflows/`. Batch command: rust `quantforge --batch`.
 
 
 ## USD
@@ -46,7 +46,7 @@ USD proxy curve: Treasury par yields bootstrapped with SOFR OIS conventions. Not
 
 ## GBP
 
-Reference: Bank of England fitted OIS spot curve (50 maturities) and nominal government spot curve (80 maturities) for 2026-11-24, from the latest yield curve data zip, with SONIA fixings to 2026-11-23. Only pass or fail is published: the curves are Bank copyright, licensed here for internal non-commercial use only, and raw SONIA may not be redistributed until the Bank answers (`tools/recorder/sources.json`); the zip is fetched per run and no raw copy is kept. The library does not build its own GBP curve: free data has no SONIA swap quotes to bootstrap from.
+Reference: Bank of England fitted OIS spot curve (50 maturities) and nominal government spot curve (80 maturities) for 2026-11-25, from the latest yield curve data zip, with SONIA fixings to 2026-11-24. Only pass or fail is published: the curves are Bank copyright, licensed here for internal non-commercial use only, and raw SONIA may not be redistributed until the Bank answers (`tools/recorder/sources.json`); the zip is fetched per run and no raw copy is kept. The library does not build its own GBP curve: free data has no SONIA swap quotes to bootstrap from.
 
 ## Checks
 
@@ -76,10 +76,10 @@ Reference: Bank of England fitted OIS spot curve (50 maturities) and nominal gov
 | USD par probe 7Y | fail | ok | ok |
 | USD key-rate risk | fail | ok | 50/50 trades ok; failed none |
 | USD sum of key rates vs parallel DV01 | warn | ok | sum 79,720.61 vs DV01 79,720.60 |
-| SONIA level | fail | ok | 2026-11-23: value withheld |
+| SONIA level | fail | ok | 2026-11-24: value withheld |
 | SONIA day change | fail | ok | value withheld vs 0.01 |
 | SONIA day change (warn) | warn | ok | value withheld vs 0.0025 |
-| GBP BoE curves read | fail | ok | OIS 17 days, nominal 17 days |
+| GBP BoE curves read | fail | ok | OIS 18 days, nominal 18 days |
 | GBP BoE OIS spot zero rates in band | fail | ok | value withheld; 50 maturities |
 | GBP BoE OIS spot forwards in band | fail | ok | value withheld |
 | GBP BoE OIS spot day change | fail | ok | value withheld vs 0.01 |
@@ -90,7 +90,7 @@ Reference: Bank of England fitted OIS spot curve (50 maturities) and nominal gov
 | GBP BoE nominal spot day change (warn) | warn | ok | value withheld vs 0.003 |
 | GBP OIS vs nominal gap | warn | ok | value withheld vs 0.015; 50 shared maturities |
 | GBP SONIA vs shortest OIS spot | warn | ok | value withheld vs 0.0075; OIS shortest maturity 0.5y |
-| GBP BoE curve date vs SONIA | warn | ok | BoE 2026-11-24, SONIA 2026-11-23 |
+| GBP BoE curve date vs SONIA | warn | ok | BoE 2026-11-25, SONIA 2026-11-24 |
 
 ## Data notices
 

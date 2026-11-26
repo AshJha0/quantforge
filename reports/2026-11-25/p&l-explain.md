@@ -1,6 +1,6 @@
 # P&L explain: 2026-11-25
 
-Result: **PASS** (4 checks, 0 failed, 0 warnings). Generated 2026-11-25T23:32Z by `tools/workflows/`. Batch command: rust `quantforge --batch`.
+Result: **PASS** (4 checks, 0 failed, 0 warnings). Generated 2026-11-26T23:38Z by `tools/workflows/`. Batch command: rust `quantforge --batch`.
 
 Real moves of a proxy curve; synthetic product terms. USD proxy curve: Treasury par yields bootstrapped with SOFR OIS conventions. Not a SOFR swap curve. Years [2026], 10 day pairs, implementation rust. Threshold: spec `06-risk/pnl-explain.md`.
 
