@@ -1,13 +1,13 @@
 {
- "declared_on_time_days": 4,
+ "declared_on_time_days": 5,
  "gaps": 0,
- "head": "71bac626fc4f37cb26d90c6d2b29b93f9c16d0493041be2f0fea5f36839d77d6",
+ "head": "039ac83b8e402ff2acda3624f862a23c328ba12e4ff5b70cb4b3fb146fef6aa5",
  "label": "paper marks on a fitted curve; not tradable",
- "last_date": "2026-11-25",
+ "last_date": "2026-11-27",
  "late_days": 0,
- "nav": "10013344.579225",
+ "nav": "9999034.828325",
  "note": "declared_on_time_days counts rows the runner labelled on time; recorded trading days are counted from Bitcoin block times by verify --bitcoin-headers",
  "ok": true,
- "pnl": "13344.579225",
- "records": 5
+ "pnl": "-965.171675",
+ "records": 6
 }
